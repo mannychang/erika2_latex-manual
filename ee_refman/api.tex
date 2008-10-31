@@ -1,0 +1,2629 @@
+\chapter{API reference}
+\label{sec:api_reference}
+
+\section{Introduction}
+The \ee\ Operating System provides a basic interface for the execution
+of concurrent applications on a single processor and on multiprocessor
+systems.
+
+The interface proposed is suited for small 8 to 32 bit
+microcontrollers, and proposes an architecture where tasks can execute
+concurrently exchanging data with a shared memory paradigm. Support
+for limited synchronization primitives is also provided. 
+
+Tasks in \ee\ are scheduled according to fixed priorities, and share
+resources using the Immediate Priority Ceiling protocol.
+
+On top of task execution there are interrupts, that always preempt the
+running task to execute urgent operations required by peripherals, or,
+in case of a multicore system, by other CPUs.
+
+\ee\ can be configured to allow a normal (named Standard Status) or
+extended (named Extended Status) error recognition.
+
+Extended status is mainly used to check as many errors as possible
+during the Debug phase. Once the application has been debugged, some
+error checking can be disabled, saving execution time and code
+footprint. Standard and Extended status are enabled in the OIL
+configuration file. When describing \ee\ primitive return values, an
+``(Extended)'' token near the error description means that the error
+is raised only when the system runs with extended status.
+
+
+
+
+
+\subsection{Conformance Classes}
+To further reduce the overall footprint of the kernel, \ee\ provides
+subsets of the OS API. These subsets are called {\em Conformance
+Classes}. There are four Conformance Classes, named BCC1, BCC2, ECC1,
+ECC2.
+
+Conformance classes starting with the letter {\bf B} (that is, BCC1
+and BCC2) only support Basic Tasks. Conformance classes starting with
+the letter {\bf E} (that is, ECC1 and ECC2) support both Basic Tasks
+and Extended Tasks. 
+
+BCC1 and BCC2 conformance classes are designed to be as small as
+possible, and in particular these conformance classes are the most
+suited to implement small concurrent systems with little RAM
+footprint, thanks to the stack sharing that can be obtained between
+basic tasks.
+
+ECC1 and ECC2 conformance classes are designed to be higher end
+conformance classes supporting synchronization primitives that implies
+the usage of separate stacks, and of course higher OS overheads due to
+the stack change mechanisms.
+
+Conformance classes ending with the number 1 (that is, BCC1 and ECC1)
+does not store pending activations. The ready queue implementation is
+done using a linear queue with $O(n)$ access time where n is the
+number of tasks in the ready queue (using a linear queue allow the
+minimization of the overall OS RAM footprint). Priorities are stored
+as bit fields, implying that the number of different priorities in the
+system is limited by the register width (for example, a 32 bit CPU can
+have up to 32 different priorities).
+
+Conformance classes ending with the number 2 (that is, BCC2 and ECC2)
+allow a task to store one or more pending activations (the maximum
+number of pending activation is specified in the \vr{ACTIVATION}
+attribute of a Task in the OIL Specification). The ready queue
+implementation is done using a bit field that exposes an $O(1)$
+complexity that is independent on the number of tasks in the
+system. The BCC2 Conformance class have only up to 8 different task
+priorities, whereas ECC2 has up to 16 different task priorities.
+
+More than one task with the same priority can coexist at the same time
+for all the four conformance classes.
+
+Resources, Alarms, and Application modes are codified as integers, so
+there can be up to $2^n-1$ different entities, where $n$ is the number
+of bits of the CPU register width (e.g., 32 for a 32 bit CPU).
+
+
+\subsection{Available primitives}
+\ee\ provides a set of primitives that can be called in different
+situations. The complete list of primitives is listed in Table
+\ref{tab:api-restrictions}, together with the locations where it is
+legal to call these functions.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INIZIO PARTE IMPORTATA DA TabellaOSEK.lyx - NON MODIFICARE
+% MODIFICATE IL LYX, ESPORTATE e commentate all'inizio ed alla fine!!!
+\input{tabellaosek.tex}
+% FINE PARTE IMPORTATA DA TABELLAOSEK.LYX - NON MODIFICARE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+%% 
+%% Basic template 
+%%
+%% \begin{function}{FunctionName}
+%% \synopsis{}
+%%   \begin{fundescription}
+%%   \end{fundescription}
+%%   \begin{funparameters}
+%%     \fpar{}{}
+%%   \end{funparameters}
+%%   \begin{funreturn}
+%%   \fret{}{}
+%%   \fret{}{(Extended)}.
+%%   \end{funreturn}
+%%   \begin{funconformance}
+%%     BCC1, BCC2, ECC1, ECC2
+%%   \end{funconformance}
+%% \end{function}
+
+
+\pagebreak
+
+\section{Constants}
+\label{sec:constants}
+
+This is a list of the \ee\ constants that can be used by the developer
+for writing applications.
+
+\begin{constant}{Error List}
+  \begin{constantdescription}
+    This is the list of the error values returned by the kernel primitives:
+    \begin {lstlisting}
+#define E_OK          0
+#define E_OS_ACCESS   1
+#define E_OS_CALLEVEL 2
+#define E_OS_ID       3
+#define E_OS_LIMIT    4
+#define E_OS_NOFUNC   5
+#define E_OS_RESOURCE 6
+#define E_OS_STATE    7
+#define E_OS_VALUE    8
+#define E_OS_SYS_INIT 9
+    \end{lstlisting}
+  \end{constantdescription}
+\end{constant}
+
+\begin{constant2}{INVALID\_TASK}{INVALID_TASK}
+  \begin{constantdescription}
+    This constant represent an invalid task ID, and is returned by
+    \reffun{GetTaskID} when the function is called and no task is
+    running.
+  \end{constantdescription}
+\end{constant2}
+
+\begin{constant}{OSService IDs}
+  \begin{constantdescription}
+    This is the list of Service IDs values that can be returned by
+    \reffun{OSErrorGetServiceId}:
+    \begin {lstlisting}
+#define OSServiceId_ActivateTask     1
+#define OSServiceId_TerminateTask    2
+#define OSServiceId_ChainTask        3
+#define OSServiceId_Schedule         4
+#define OSServiceId_GetTaskState     5
+#define OSServiceId_GetResource      6
+#define OSServiceId_ReleaseResource  7
+#define OSServiceId_SetEvent         8
+#define OSServiceId_ClearEvent       9
+#define OSServiceId_GetEvent        10
+#define OSServiceId_WaitEvent       11
+#define OSServiceId_GetAlarmBase    12
+#define OSServiceId_GetAlarm        13
+#define OSServiceId_SetRelAlarm     14
+#define OSServiceId_SetAbsAlarm     14
+#define OSServiceId_CancelAlarm     16
+#define OSServiceId_AlarmTick       17
+#define OSServiceId_ForceSchedule   18
+    \end{lstlisting}
+    Please note that the primitives:
+    \begin{itemize}                              \vspace{-2mm}
+      \item \reffun{GetTaskID}                   \vspace{-2mm}
+      \item \reffun{DisableAllInterrupts}        \vspace{-2mm}
+      \item \reffun{EnableAllInterrupts}         \vspace{-2mm}
+      \item \reffun{SuspendAllInterrupts}        \vspace{-2mm}
+      \item \reffun{ResumeAllInterrupts}         \vspace{-2mm}
+      \item \reffun{SuspendOSInterrupts}         \vspace{-2mm}
+      \item \reffun{ResumeOSInterrupts}          \vspace{-2mm}
+      \item \reffun{GetActiveApplicationMode}    \vspace{-2mm}
+      \item \reffun{StartOS}                     \vspace{-2mm}
+      \item \reffun{ShutdownOS}                  \vspace{-2mm}
+    \end{itemize}
+    never return an error, and for that reason they are not listed
+    here.
+  \end{constantdescription}
+\end{constant}
+
+\begin{constant2}{RES\_SCHEDULER}{RES_SCHEDULER}
+  \begin{constantdescription}
+    This is the ID of the \const{RES_SCHEDULER} resource.
+
+    That resource exists only when \const{USERESSCHEDULER} is set to
+    \const{TRUE} within the OIL configuration file. The
+    \const{RES_SCHEDULER} ceiling depends on the tasks that exists in
+    the system, and it is computed when \rtd\ generates the \ee\ 
+    configuration code.
+  \end{constantdescription}
+\end{constant2}
+
+\begin{constant}{Task States}
+  \begin{constantdescription}
+    This is the list of the task states a task can have during its life:
+    \begin {lstlisting}
+#define RUNNING   0
+#define WAITING   1
+#define READY     2
+#define SUSPENDED 3
+    \end{lstlisting}
+	Please note that the \const{WAITING} state is only available in
+    the conformance classes ECC1 and ECC2.
+  \end{constantdescription}
+\end{constant}
+
+%% Nota: questa parte non è ancora generata da RT-Druid!
+
+%% \begin{constant}{xxxx}
+%% \nb{Nell'oil un 'counter' deve essere definito come segue
+
+%% COUNTER Counter1 {
+%%     MINCYCLE = 1;
+%%     MAXALLOWEDVALUE = 16;
+%%     TICKSPERBASE = 2;
+%% };
+
+%% quindi, con un MINCYCLE, MAXALLOWEDVALUE e TICKPERBASE, che sono anche i valori qui indicati;
+%% Pero' questi NON vengono dichiarati nel codice usando delle define, ma inserendone i valori nel vettore
+
+%%     const EE_oo_counter_ROM_type EE_counter_ROM[] = {
+%%         {16, 2, 1}         /*Counter1*/
+%%     };
+
+%% Mi sembra che torni con quanto indicato su ee/pkg/kernel/oo/inc/ee_common.h
+
+%% Mentre, di TICKDURATION ... NON so nulla : e' la prima volta che lo vedo (forse c'era qualcosa nella primissima versione con H8).
+
+%% Altra cosa: non mi sembra esista un 'counter di sistema'.
+%% }
+%% \begin {lstlisting}
+%% /* these #defines have to be defined by the user or by the HAL!!!
+%%    x is the counter */
+
+%% /* Maximum possible allowed value of counter x in ticks. */
+%% //#define OSMAXALLOWEDVALUE_x 
+
+%% /* Number of ticks required to reach a specific unit of counter x. */
+%% //#define OSTICKSPERBASE_x 
+%% /* Minimum allowed number of ticks for a cyclic alarm of counter x. */
+%% //#define OSMINCYCLE_x 
+%% /* Maximum possible allowed value of the system counter in ticks. */
+%% //#define OSMAXALLOWEDVALUE 
+%% /* Number of ticks required to reach a specific unit of the system counter. */
+%% //#define OSTICKSPERBASE 
+%% /* Minimum allowed number of ticks for a cyclic alarm of the system counter. */
+%% //#define OSMINCYCLE 
+
+%% /* Duration of a tick of the system counter in nanoseconds. */
+%% //#define OSTICKDURATION
+%% \end{lstlisting}
+%% \end{constant}
+
+\begin{constant}{OSDEFAULTAPPMODE}
+  \begin{constantdescription}
+    This is the default Application Mode. This value is always a valid
+    Application Mode that can be passed to \reffun{StartOS}.
+  \end{constantdescription}
+\end{constant}
+
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\section{Types}
+\label{sec:types}
+
+This Section contains a description of the data types used by the OS
+interface of \ee. When the size of a type is specified to be of the
+size of a machine register, it is intended that the type has the same
+size of the CPU general purpose register.
+
+\begin{type}{AlarmBaseType}
+  \begin{typedescription}
+    This structure is used to store the basic information about
+    Counters. It has the following fields:
+    \begin{description}
+    \item[TickType maxallowedvalue] Is the maximum allowed count value
+      in ticks for a counter.
+    \item[TickType ticksperbase] It is the number of ticks required to
+      reach a counter-specific significant unit.
+    \item[TickType mincycle] It is the smallest allowed value for the
+      \vr{cycle} parameter of the primitives 
+      \reffun{SetRelAlarm}/\reffun{SetAbsAlarm}. This field is only
+      present when Extended status is selected.
+    \end{description}
+  \end{typedescription}
+\end{type}
+
+\begin{type}{AlarmBaseRefType}
+  \begin{typedescription}
+    This is a pointer to \reftype{AlarmBaseType}.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{AlarmType}
+  \begin{typedescription}
+    This (signed) type is used to store Alarm IDs, and it has the size
+    of a register.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{AppModeType}
+  \begin{typedescription}
+    This (unsigned) type is used to store Application Mode IDs, and it
+    has the size of a register.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{CounterType}
+  \begin{typedescription}
+    This (signed) type is used to store Counter IDs, and it has the size
+    of a register.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{EventMaskType}
+  \begin{typedescription}
+    This (unsigned) type is used to store Event masks as bit fields,
+    and it has the size of a register.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{EventMaskRefType}
+  \begin{typedescription}
+    This is a pointer to \reftype{EventMaskType}.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{OSServiceIdType}
+  \begin{typedescription}
+    This unsigned 8-bit integer type is used to store Service IDs, and it
+    is used within the \reffun{OSErrorGetServiceId}.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{ResourceType}
+  \begin{typedescription}
+    This (unsigned) type is used to store Resource ID values, and it
+    has the size of a register.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{SemType}
+  \begin{typedescription}
+    This type is a structure storing the information related to a
+    counting semaphore.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{SemRefType}
+  \begin{typedescription}
+    This is a pointer to \reftype{SemType}.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{StatusType}
+  \begin{typedescription}
+    This type is an \const{unsigned char} used to store function error
+    return values.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{TaskType}
+  \begin{typedescription}
+    This (signed) type is used to store Task ID, and it has the size
+    of a register.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{TaskRefType}
+  \begin{typedescription}
+    This is a pointer to \reftype{TaskType}.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{TaskStateType}
+  \begin{typedescription}
+    This (unsigned) type is used to store Task Status values, and it
+    has the size of a register.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{TaskStateRefType}
+  \begin{typedescription}
+    This is a pointer to \reftype{TaskStateType}.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{TickType}
+  \begin{typedescription}
+    This (unsigned) type is used to store Counter Ticks, and it has
+    the size of a register.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{TickRefType}
+  \begin{typedescription}
+    This is a pointer to \reftype{TickType}.
+  \end{typedescription}
+\end{type}
+
+
+\pagebreak
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\section{Object Declarations}
+The following declarations have to be used to declare Tasks, Resources,
+Alarms, and Events within the application code.
+
+\begin{function_nopb}{DeclareAlarm}
+  \synopsis{DeclareAlarm (AlarmIdentifier)}
+  \begin{fundescription}
+    Declares an alarm.
+
+    This declaration is currently not mandatory because alarm
+    identifiers are all declared within the code generated by \rtd.
+  \end{fundescription}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function_nopb}{DeclareEvent}
+  \synopsis{DeclareEvent(EventID)}
+  \begin{fundescription}
+    \fn{DeclareEvent} serves as an external declaration of an
+    event. The function and use of this service are similar to that of
+    the external declaration of variables.
+
+    This declaration is currently not mandatory because event
+    identifiers are all declared within the code generated by \rtd.
+  \end{fundescription}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function_nopb}{DeclareResource}
+  \synopsis{DeclareResource(ResourceID)}
+  \begin{fundescription}
+    \fn{DeclareResource} serves as an external declaration of a
+    resource. The function and use of this service are similar to that
+    of the external declaration of variables.
+
+    
+    This declaration is currently not mandatory because Resource
+    identifiers are all declared within the code generated by \rtd.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{ResourceID}{Resource Identifier}
+  \end{funparameters}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function_nopb}{DeclareTask}
+  \synopsis{DeclareTask(TaskType TaskID);}
+  
+  \begin{fundescription}
+    DeclareTask serves as an external declaration of a task. The
+    function and use of this service are similar to that of the
+    external declaration of variables.
+    
+    This declaration is currently not mandatory because task
+    identifiers are all declared within the code generated by \rtd.
+  \end{fundescription}
+  
+  \begin{funparameters}
+    \fpar{TaskID}{Task reference.}
+  \end{funparameters}
+  
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb}
+
+\pagebreak
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Object Definitions}
+The following macro have to be used when defining Tasks, ISRs and
+Alarm Callbacks.
+
+\begin{function_nopb}{ALARMCALLBACK}
+  \synopsis{ALARMCALLBACK(t)}
+  \begin{fundescription}
+    This macro is used to declare and to define an alarm callback.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{t}{Name of the alarm callback.}
+  \end{funparameters}
+  %  \begin{funreturn}
+  %    \fret{E_OK}{No error.}
+  %  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function_nopb}{ISR}
+  %PJ: da ricontrollare come è scritta
+  \synopsis{ISR(Funcname) \{...\}}
+  
+  \begin{fundescription}
+    The ISR keyword must be used when declaring an ISR function, to
+    distinguish it from other function types and from tasks.
+  \end{fundescription}
+  
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function_nopb}{TASK}
+  %PJ: da ricontrollare come è scritta
+  \synopsis{TASK(Funcname) \{...\}}
+  
+  \begin{fundescription}
+    The TASK keyword must be used when declaring a TASK function.
+  \end{fundescription}
+  
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Task Primitives}
+
+\ee\ supports two flavors of tasks:
+\begin{description}
+\item[Basic Tasks] A basic task is the simplest task in \ee,
+  providing concurrency together with a one-shot task model. Basic
+  Tasks can share their stack to reduce the overall RAM usage.
+\item[Extended Tasks] An extended task is a task that can block on
+  the synchronization primitive \reffun{WaitEvent}.
+\end{description}
+
+Basic Tasks are typically implemented as normal C functions, that
+executes their code and then ends. One of these executions is called
+also {\em Task Instance}\index{Task Instance}. After the end of a
+basic task, its stack is freed. Basic Tasks never block, and they are
+the ideal kind of tasks for implementing stack sharing techniques.
+
+Extended Tasks, on the converse, are typically implemented as a never
+ending task in which each instance ends with a synchronization
+implemented with a call to the \reffun{WaitEvent} primitive. Extended
+tasks always have a private stack.
+
+\rtd identifies a task as Extended when its OIL definition contains
+the specification of \const{Event}s. A task without any \const{Event}
+assigned is a Basic Task.
+
+The scheduling policy of \ee\ is a Fixed Priority Scheduling with
+Immediate Priority Ceiling. As a result, the following case of tasks
+may be implemented:
+\begin{description}
+\item[Full Preemptive Task] A Full Preemptive task is a task that can
+  be preempted in each instant by higher priority tasks.
+\item[Non Preemptive Task] A Non Preemptive task is like a Full
+  Preemptive task that executes all the time locking a resource with
+  its ceiling equal to the maximum priority in the system. As a
+  result, a non preemptive task cannot be preempted by other tasks:
+  only interrupts can preempt it.
+\item[Mixed Preemptive Task] A Mixed Preemptive task is like a task
+  that executes all the time locking a pseudo-resource (also called
+  {\em Internal Resource}\index{Internal Resource}. As a result, only
+  tasks with higher priority than the ceiling of the Internal
+  Resource, and interrupts, can preempt it.
+\end{description}
+
+Tasks are activated using the primitives \reffun{ActivateTask} or
+\reffun{ChainTask}. Activating a task means that the activated task,
+may be selected for scheduling, and may execute one Task Instance. A
+task activation while a task is already waiting its execution or while
+being the running task has an effect that depends on how many pending
+activations\index{Pending activations} the particular Conformance
+Class can store. BCC1 and ECC1 does not store pending activations,
+whereas BCC2 and ECC2 can store pending activations if the task has
+been properly configured in the OIL Configuration file.
+
+Tasks {\bf must end} with a call either to \reffun{TerminateTask} or
+\reffun{ChainTask}. Terminating a task without one of these two
+primitives leads to indefinite results.
+
+On multiprocessor systems, Tasks are statically assigned to CPUs at
+compile time. The CPU a task is assigned to is specified within the
+OIL configuration file.
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ActivateTask}
+  \synopsis{StatusType ActivateTask(TaskType TaskID);}
+  
+  \begin{fundescription}
+    This primitive activates a task \vr{TaskID}, putting it in the
+    \const{READY} state, or in the \const{RUNNING} state if the
+    scheduler finds that the activated task should become the running
+    task.
+
+    Once activated, the task will run for an instance, starting from
+    its first instruction. For the BCC2 and ECC2 Conformance classes,
+    pending activations can be stored if the task has been configured
+    with a number of activations greater than 1 within the OIL
+    configuration file.
+
+    The function can be called from the Background task (typically,
+    the \fn{main()} function).
+
+  \end{fundescription}
+  
+  \begin{funparameters}
+    \fpar{TaskID}{Task reference.}
+  \end{funparameters}
+  
+  \begin{funreturn}
+    \fret{E_OK}{No error.}
+    \fret{E_OS_LIMIT}{Too many pending activations of \vr{TaskID}.}
+    \fret{E_OS_ID}{(Extended) \vr{TaskID} is invalid.}
+  \end{funreturn}
+  
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{TerminateTask}
+  \synopsis{StatusType TerminateTask(void)}
+  
+  \begin{fundescription}
+    This primitive terminates the calling task. The function can be
+    called from any function nesting: the stack space used by the task
+    is also freed. The calling task should not have any Resource
+    locked when this primitive is called (apart an Internal Resource
+    that is automatically released with this call).
+
+    After the call, the calling task is set in the \const{SUSPENDED}
+    state, and it can be reactivated again using
+    \reffun{ActivateTask}, \reffun{ChainTask}, or using Alarm
+    notifications.
+
+    All the tasks must terminate with a call to \fn{TerminateTask} or
+    \reffun{ChainTask}. Otherwise, the behavior after task end is
+    undefined.
+
+    With Standard Status, the primitive never returns. With Extended
+    Status, the primitive may return in case of errors.
+  \end{fundescription}
+
+  %  \begin{funparameters}
+  %  \item No parameters
+  %  \end{funparameters}
+  
+  \begin{funreturn}
+    \fret{no return}{(Standard) -- in this case, the function is
+      declared as returning \const{void}.}
+    \fret{E_OS_RESOURCE}{(Extended) The task still occupies resources.}
+    \fret{E_OS_CALLEVEL}{(Extended) The function was called at interrupt level.}
+  \end{funreturn}
+  
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ChainTask}
+  \synopsis{StatusType ChainTask(TaskType TaskID);}
+  
+  \begin{fundescription}
+    This primitive is similar to \reffun{TerminateTask}, with the
+    differences listed below.
+
+    After the calling task is terminated, \vr{TaskID} is activated
+    again.
+
+    If \vr{TaskID} is the calling task ID, then the calling task is
+    terminated, the Internal Resource is unlocked, and then the
+    calling task is put again in the ready queue to be scheduled. The
+    Internal Resource will be locked again when the task will be again
+    selected for scheduling.
+
+    When called successfully, \fn{ChainTask} does not return to the
+    caller. In case of error the primitive returns, and the returned
+    error value can be evaluated by the application.
+    
+    When an extended task is transferred from suspended state into
+    ready state all its events are cleared.
+  \end{fundescription}
+  
+  \begin{funparameters}
+    \fpar{TaskID}{Task reference}
+  \end{funparameters}
+  
+  \begin{funreturn}
+    \fret{No return}{If the call is successful.}
+    \fret{E_OS_LIMIT}{Too many task activations of \vr{TaskID}. The
+      Task activation in this case is ignored.}
+    \fret{E_OS_ID}{(Extended) Task \vr{TaskID} is invalid.}
+    \fret{E_OS_RESOURCE}{(Extended) Calling task still occupies
+      resources.}  
+    \fret{E_OS_CALLEVEL}{(Extended) Call at interrupt
+      level.}
+  \end{funreturn}
+  
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{Schedule}
+  \synopsis{StatusType Schedule(void)}
+  \begin{fundescription}
+    This primitive can be used as a rescheduling point for tasks that
+    have Internal Resources and for non preemptive tasks\footnote{Non
+    preemptive tasks are tasks with an Internal Resource with the
+    highest priority ceiling available assigned.}.
+
+    When this primitive is called, the task releases its Internal
+    Resource, and checks if there are higher priority tasks that have
+    to preempt (In that case, a preemption is implemented). When the
+    primitive returns, the task will reacquire its internal resource.
+    
+    The primitive does nothing if the calling task has no internal
+    resource assigned.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{void}{The function is redefined as returning \const{void} when
+      Standard Error is used.}  
+    \fret{E_OK}{No error.}
+    \fret{E_OS_CALLEVEL}{(Extended) The primitive was called at interrupt level.}
+    \fret{E_OS_RESOURCE}{(Extended) The calling task occupies resources.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ForceSchedule}
+  \synopsis{StatusType ForceSchedule(void)}
+  \begin{fundescription}
+    This function implements a preemption check. If a higher-priority
+    task is ready, the current task is put into the ready state, its
+    context is saved and the higher-priority task is
+    executed. Otherwise the calling task is continued.
+
+    This function does not release the internal resource that the
+    current task may have locked. This function is typically used
+    after a call to \reffun{CounterTick} within a task, to force a
+    reschedule of the system after a task activation that may have
+    been issued within an alarm notification executed by the
+    \reffun{CounterTick} primitive.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{void}{The function is redefined as returning \const{void} when
+      Standard Error is used.}  
+    \fret{E_OK}{No error.}
+    \fret{E_OS_CALLEVEL}{(Extended) Call at interrupt level.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{GetTaskID}
+  %PJ: OK nota: qui ritorna void, lo standard ritorna un errore
+  \synopsis{void GetTaskID ( TaskRefType TaskID )}
+  \begin{fundescription}
+    \fn{GetTaskID} returns the TaskID of the running task.
+    
+    If no task is running, \const{INVALID_TASK} is returned.
+  \end{fundescription}
+  %%   \begin{funparameters}
+  %%     \fpar{}{}
+  %%   \end{funparameters}
+  %%   \begin{funreturn}
+  %%   \fret{}{}
+  %%   \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{GetTaskState}
+  \synopsis{StatusType GetTaskState(TaskType TaskID, TaskStateRefType State)}
+  \begin{fundescription}
+    This primitive returns the state of a given task. possible states
+    are listed in Section \ref{con:Task States}. 
+
+    If the task \const{TaskID} supports pending activation, and the
+    task has been activated more than once, the results refer to the
+    state of its oldest activation.
+    % lo standard diceva:
+    % When the service is called for a task,
+    % which is activated more than once, the state is set to running if
+    % any instance of the task is running.
+
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{TaskID}{(in) Task reference.}
+    \fpar{State}{(out) Reference to the state of task \vr{TaskID}.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void}{(Standard) The function returns void if Standard Mode is used.}
+    \fret{E_OK}{(Extended) No error.}
+    \fret{E_OS_ID}{(Extended) Task \vr{TaskID} is invalid.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+
+\pagebreak
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Interrupt primitives}
+
+\ee\ gives support for interrupts. Interrupts are modeled considering
+typical microcontroller designs featuring interrupt controllers with a
+prioritized view of the interrupt sources.
+
+To map the requirements of fast OS-independent requests, \ee\ supports
+the definition of fast interrupts handlers, called {\em ISR Type 1},
+that on one side can handle interrupts in the fastest way possible,
+but on the other side lack the possibility to call OS services. 
+
+On the other end, lower priority interrupts, called {\em ISR Type 2} and
+used (for example) for hardware timers, can call selected OS primitives
+but are slower than ISR Type 1 due to the OS bookkeeping needed to
+implement preemption.
+
+\ee\ also offers a set of primitives to directly control interrupt
+disabling and enabling, with also a nested version of these
+primitives.
+
+\pagebreak
+
+\begin{function}{DisableAllInterrupts}
+  \synopsis{void DisableAllInterrupts(void)}
+  \begin{fundescription}
+    \reffun{DisableAllInterrupts} and \reffun{EnableAllInterrupts} are
+    used to implement critical sections with interrupt disabled.
+
+    This primitive disables all the interrupts sources in the system,
+    and saves the interrupt state that will be restored by a call to
+    \reffun{EnableAllInterrupts}.
+    
+    The primitive may be called from an ISR category 1 and category 2
+    and from the task level, but not from hook routines. No primitives
+    can be called within critical sections surrounded by
+    \reffun{DisableAllInterrupts} and \reffun{EnableAllInterrupts}.
+
+    Critical sections using \reffun{DisableAllInterrupts}
+    \reffun{EnableAllInterrupts} cannot be nested.  If you need nested
+    critical sections, please use \reffun{SuspendOSInterrupts} /
+    \reffun{ResumeOSInterrupts} or \reffun{SuspendAllInterrupts} /
+    \reffun{ResumeAllInterrupts}.
+  \end{fundescription}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{EnableAllInterrupts}
+  \synopsis{void EnableAllInterrupts(void)}
+  \begin{fundescription}
+    \reffun{DisableAllInterrupts} and \reffun{EnableAllInterrupts} are
+    used to implement critical sections with interrupt disabled.
+
+    This primitive restores the state saved by
+    \reffun{DisableAllInterrupts}, enabling the recognition of interrupts.
+    
+    The primitive may be called from an ISR category 1 and category 2
+    and from the task level, but not from hook routines.  No primitives
+    can be called inside critical sections surrounded by
+    \reffun{DisableAllInterrupts} and \reffun{EnableAllInterrupts}.
+  \end{fundescription}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{SuspendAllInterrupts}
+  \synopsis{void SuspendAllInterrupts(void)}
+  \begin{fundescription}
+    \reffun{SuspendAllInterrupts} and \reffun{ResumeAllInterrupts} are
+    used to implement critical sections with interrupt disabled, with
+    nesting support.
+
+    This primitive disables all the interrupts sources in the system,
+    and saves the interrupt state that will be restored by a call to
+    \reffun{ResumeAllInterrupts}.
+    
+    The service may be called from an ISR category 1 and category 2,
+    from alarm-callbacks and from the task level, but not from all
+    hook routines.
+
+    No primitive calls beside \fn{SuspendAllInterrupts} /
+    \reffun{ResumeAllInterrupts} pairs and
+    \reffun{SuspendOSInterrupts} / \reffun{ResumeOSInterrupts} pairs
+    are allowed within this critical section.
+  \end{fundescription}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ResumeAllInterrupts}
+  \synopsis{void ResumeAllInterrupts(void)}
+  \begin{fundescription}
+    \reffun{SuspendAllInterrupts} and \reffun{ResumeAllInterrupts} are
+    used to implement critical sections with interrupt disabled, with
+    nesting support.
+
+    This primitive restores the state saved by
+    \reffun{SuspendAllInterrupts}, enabling the recognition of
+    interrupts if it is the last call in a series of nested calls of
+    \fn{SuspendAllInterrupts} / \reffun{ResumeAllInterrupts} and
+    \reffun{SuspendOSInterrupts} / \reffun{ResumeOSInterrupts} pairs.
+
+    This primitive may be called from an ISR category 1 and category
+    2, from alarm-callbacks and from the task level, but not from all
+    hook routines.
+
+  \end{fundescription}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{SuspendOSInterrupts}
+  \synopsis{void SuspendOSInterrupts(void)}
+  \begin{fundescription}
+    \reffun{SuspendOSInterrupts} and \reffun{ResumeOSInterrupts} are
+    used to implement critical sections with interrupt category 2
+    disabled, with nesting support.
+
+    This primitive disables all the interrupts sources of category 2
+    in the system, and saves the interrupt state that will be restored
+    by a call to \reffun{ResumeOSInterrupts}.
+    
+    The service may be called from an ISR category 1 and category 2,
+    and from the task level.
+
+    No primitive calls beside \fn{SuspendAllInterrupts} /
+    \reffun{ResumeAllInterrupts} pairs and
+    \reffun{SuspendOSInterrupts} / \reffun{ResumeOSInterrupts} pairs
+    are allowed within this critical section.
+  \end{fundescription}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ResumeOSInterrupts}
+  \synopsis{void ResumeOSInterrupts(void)}
+  \begin{fundescription}
+    \reffun{SuspendOSInterrupts} and \reffun{ResumeOSInterrupts} are
+    used to implement critical sections with interrupt category 2
+    disabled, with nesting support.
+
+    This primitive restores the state saved by
+    \reffun{SuspendOSInterrupts}, enabling the recognition of
+    interrupts if it is the last call in a series of nested calls of
+    \fn{SuspendAllInterrupts} / \reffun{ResumeAllInterrupts} and
+    \reffun{SuspendOSInterrupts} / \reffun{ResumeOSInterrupts} pairs.
+
+    The primitive may be called from an ISR category 1 and category 2
+    and from the task level, but not from hook routines.
+  \end{fundescription}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+
+
+\pagebreak
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Resource primitives}
+\label{sec:resource-primitives}
+
+Resources are the term used by \ee\ to refer to binary semaphores used
+to implement shared critical sections.
+
+Resources are implemented using the Immediate Priority Ceiling
+protocol. 
+%
+%
+% \nb{mettere link alla sezione di Peppe}
+%
+%
+A resource is locked using the primitive \reffun{GetResource}, and
+unlocked using \reffun{ReleaseResource}.
+
+A special resource named \refconst{RES_SCHEDULER} is also
+supported. the \refconst{RES_SCHEDULER} resource has a ceiling equal
+to the highest priority in the system. As a result, a task locking
+\refconst{RES_SCHEDULER} becomes non-preemptive. If needed, the
+\refconst{RES_SCHEDULER} resource have to be configured in the OIL
+configuration file.
+
+On multiprocessor systems, Resources are divided in:
+\begin{description}
+\item[Local resources] A Resource is local when all the tasks that
+  uses it are assigned to the same processor.
+\item[Global resources] A Resource is global when the tasks that uses
+  it are assigned to different processors.
+\end{description}
+
+A special kind of resources, called {\em Internal Resources}, are also
+supported by \ee. Internal Resources are locked when the tasks enter
+the \const{RUNNING} state, and it is released when the task
+ends. Internal resources are used by optimization algorithms to limit
+the maximum stack space used by application tasks. Please note that
+\reffun{Schedule} explicitly release any Internal Resource locked by
+the running task, thus limiting the possibility to reduce the overall
+stack in the system. Also \reffun{WaitEvent} always release the
+internal resource of the task; however, this fact does not impact on
+stack usage because tasks using \reffun{WaitEvent} must run on a
+private stack since \reffun{WaitEvent} is a blocking primitive. Please
+also note that on Multicore systems, Internal Resources can only
+be {\em local}. Global Internal Resources are not supported.
+
+The primitives \reffun{GetResource} and \reffun{ReleaseResource}
+automatically internally uses a spin-lock mechanism when called on a
+Global Resource.
+
+\pagebreak
+
+
+\begin{function}{GetResource}
+  \synopsis{StatusType GetResource (ResourceType ResID)}
+  \begin{fundescription}
+    This primitive can be used to implement a critical section guarded
+    by Resource \vr{ResID}. The critical section will end with the
+    call to \reffun{ReleaseResource}.
+
+    Nesting between critical sections guarded by different resources
+    is allowed.
+
+    Calls to \reffun{TerminateTask}, \reffun{ChainTask},
+    \reffun{Schedule}, and \reffun{WaitEvent} are not allowed inside
+    the critical section. % ForceSchedule si
+
+    % Resources on ISR level non implementate ancora
+    The service may be called from task level only.
+    %The service may be called from an ISR and from task level.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{ResID}{Reference to resource}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void} {The function is redefined as returning \const{void} when
+      Standard Error is used.} 
+    \fret{E_OK}{(Extended) No error.}
+    \fret{E_OS_ID}{(Extended) Resource \vr{ResID} is invalid.}
+    \fret{E_OS_ACCESS}{(Extended) Attempt to get a resource which is
+      already occupied by any task or ISR, or the statically assigned
+      priority of the calling task or interrupt routine is higher than
+      the calculated ceiling priority.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ReleaseResource}
+  \synopsis{StatusType ReleaseResource (ResourceType ResID)}
+  \begin{fundescription}
+    \fn{ReleaseResource} is used to release a resource locked using
+    \reffun{GetResource}, closing a critical section.
+    
+    For information on nested critical sections, see \reffun{GetResource}.
+
+    % Resources on ISR level non implementate ancora
+    The service may be called from task level only.
+    %The service may be called from an ISR and from task level.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{ResID}{Resource identifier}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void} {The function is redefined as returning \const{void}
+      when Standard Error is used.}
+
+    \fret{E_OK}{(Extended) No error}
+
+    \fret{E_OS_ID}{(Extended) \vr{ResID} is an invalid identifier}
+
+    \fret{E_OS_NOFUNC}{(Extended) Attempt to release a resource which
+      is not occupied by any task or ISR, or another resource shall be
+      released before.}
+
+    \fret{E_OS_ACCESS}{(Extended) Attempt to release a resource which
+      has a lower ceiling priority than the statically assigned
+      priority of the calling task or interrupt routine.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+\pagebreak
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Event related primitives}
+Events represents a technique used by \ee\ to implement synchronization
+primitives. Events are assigned to tasks. Tasks with events assigned
+to are called {\em Extended tasks}. Tasks without events assigned to
+are called {\em Basic Tasks}.
+
+Extended tasks are supported only in the ECC1 and ECC2 conformance
+classes. To assign an event to a task, the event have to be listed
+inside the task declaration in the OIL configuration file.
+
+Events are implemented as bits in a bit mask. Each task in the system is
+associated to a bit mask, which is typically as large as a CPU data
+register. The bit mask is initialized to $0$ at system startup.
+
+The status of an extended task event mask can be read by tasks and
+ISRs using the \reffun{GetEvent} primitive. Events can also be set
+from tasks or ISRs using the \reffun{SetEvent} primitive (more than
+one event can be set with a single call to \reffun{SetEvent}).
+
+An extended task can wait for one ore more events from an event mask
+to be set using the \reffun{WaitEvent} primitive. An extended task
+needs then to explicitly clear an event calling the
+\reffun{ClearEvent} primitive.
+
+Calls to WaitEvent may provoke the task to block. For that reason,
+extended tasks must have a private stack assigned to them, implying
+also the fact that the multistack kernel have to be used.
+
+\pagebreak
+
+\begin{function}{SetEvent}
+  \synopsis{StatusType SetEvent (TaskType TaskID, EventMaskType Mask)}
+  \begin{fundescription}
+    The events of task \vr{TaskID} are set according to the event mask
+    \vr{Mask}. The call to \fn{SetEvent} may cause \vr{TaskID} to
+    wakeup from a \reffun{WaitEvent} primitive. Any events not set in
+    the event mask remain unchanged.  The service may be called from
+    an interrupt service routine and from the task level, but not from
+    hook routines.
+
+    The function can be called from the Background task. Typically,
+    it is called within the \fn{main()} function.
+
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{TaskID}{Task identifier}
+    \fpar{Mask}{Mask of the events to be set}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void} {The function is redefined as returning \const{void}
+      when Standard Error is used.}
+    \fret{E_OK}{(Extended) No error}
+    \fret{E_OS_ID}{(Extended) Reference \vr{TaskID} is invalid.}
+    \fret{E_OS_ACCESS}{(Extended) Task \vr{TaskID} is not an extended task.}
+    \fret{E_OS_STATE}{(Extended) Events can not be set as the
+      referenced task is in the suspended state.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ClearEvent}
+  \synopsis{StatusType ClearEvent (EventMaskType Mask)}
+  \begin{fundescription}
+    \fn{ClearEvent} clears the events \vr{Mask} of the calling task.
+
+    This system call is restricted to extended tasks which own the
+    event.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{Mask}{Mask of the event to be cleared}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void} {The function is redefined as returning \const{void}
+      when Standard Error is used.}
+    \fret{E_OK}{(Extended) No error}
+    \fret{E_OS_ACCESS}{(Extended) The service has been invoked by a
+      non-extended task.}
+    \fret{E_OS_CALLEVEL}{(Extended) The service has been invoked at
+      the interrupt level.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{GetEvent}
+  \synopsis{StatusType GetEvent(TaskType TaskID, EventMaskRefType Event)}
+  \begin{fundescription}
+    This primitive returns the current state of all event bits of the
+    task \vr{TaskID}.  The service may be called from interrupt
+    service routines, task level and some hook routines.  The current
+    status of the event mask of task \vr{TaskID} is copied to
+    \vr{Event}.  The referenced task shall be an extended task.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{TaskID}{task whose mask is to be returned.}
+    \fpar{Event}{(out) returned mask.}   
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void} {The function is redefined as returning \const{void}
+      when Standard Error is used.}
+    \fret{E_OK}{(Extended) No error}
+    \fret{E_OS_ID}{(Extended) \vr{TaskID} is an invalid reference.}
+    \fret{E_OS_ACCESS}{(Extended) \vr{TaskID} is not an extended task.}
+    \fret{E_OS_STATE}{(Extended) \vr{TaskID} is in suspended state.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{WaitEvent}
+  \synopsis{StatusType WaitEvent (EventMaskType Mask)}
+  \begin{fundescription}
+    The calling task blocks if none of the events specified in
+    \vr{Mask} are set.
+
+    If the calling task blocks, the system is reschedule, and the
+    Internal resource of the task is released. This service shall only
+    be called from the extended task owning the events.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{Mask}{mask of the events waited for}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void} {The function is redefined as returning \const{void}
+      when Standard Error is used.}
+    \fret{E_OK}{(Extended) No error}
+    \fret{E_OS_ACCESS}{(Extended) The calling task is not extended}
+    \fret{E_OS_RESOURCE}{(Extended) Calling task occupies resources.}
+    \fret{E_OS_CALLEVEL}{(Extended) Call at interrupt level.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+\pagebreak
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Counter and Alarms primitives}
+\ee\ supports a notification mechanism based on {\em Counter}s and {\em
+Alarm}s.
+
+A Counter is basically an integer value that can be incremented by $1$
+``Tick'' using the primitive \reffun{CounterTick}. 
+
+An Alarm is a notification that is attached to a specific Counter (the
+link between a Counter and an Alarm is specified at compile time in
+the OIL Configuration file).
+
+An Alarm can be set to fire at a specified tick value using the
+primitives \reffun{SetRelAlarm} and \reffun{SetAbsAlarm}. Alarms can
+be set to be cyclically reactivated. Alarms can be canceled using the
+primitive \reffun{CancelAlarm}.
+
+When an Alarm fires, a notification takes place. A notification is set
+to be one of the following actions:
+\begin{description}
+\item[Task activation.] In this case, a task is activated when the
+  Alarm fires.
+\item[Event set.] In this case, an event mask is set on a task when
+  the Alarm fires.
+\item[Alarm callback.] In this case, an alarm callback (defined using
+  \reffun{ALARMCALLBACK}) is called.
+\end{description} 
+
+The notifications are executed inside the \reffun{CounterTick}
+function. It is up to the developer placing the counter in meaningful
+places (e.g., a timer interrupt).
+
+Counters, Alarms, and their notifications are specified inside the OIL
+configuration file. 
+
+On multiprocessor systems, Counters are statically assigned to CPUs at
+compile time. Counters are local to (and only visible in) a
+CPU. Alarms are local to the CPU that hosts the counter they are
+linked to.
+
+\begin{warning}
+Currently there is no support for automatically generated system
+counters\index{System counters} (e.g., counters that are automatically
+linked to hardware timers). All the counters have to be defined inside
+the OIL Configuration file, and the user have to call
+\reffun{CounterTick} to increment them. 
+
+Also, there is limited support for the \reftype{AlarmBaseType} type
+and \reffun{GetAlarmBase} primitive. In fact, although the primitive
+returns the values that are set for the alarm in the OIL file, these
+values are not taken into consideration by \reffun{CounterTick},
+\reffun{SetRelAlarm}, and \reffun{SetAbsAlarm}. Support for this
+feature will be provided in the next versions of \ee.
+\end{warning}
+
+\pagebreak
+
+\begin{function}{CounterTick}
+  %PJ: vedere il commento
+  \synopsis{void CounterTick(CounterType c)}
+  \begin{fundescription}
+    This function receives a counter identifier as parameter, and it
+    increments it by 1. This function is typically called inside an
+    ISR type 2 or inside a task to notify that the trigger the counter
+    is counting has happened.
+    
+    The function also implements the notification of expired alarms,
+    that is implemented, depending on the alarm configuration, as:
+    \begin{itemize}
+      \item an alarm callback function;
+      \item a task activation;
+      \item an event mask set on an extended task.
+    \end{itemize}
+
+    The function is atomic, and no rescheduling will take place after
+    the execution of this function. When called from the task level,
+    to implement the rescheduling the application should call
+    \reffun{Schedule} or \reffun{ForceSchedule} after the call to this
+    function. When called from the ISR type 2 level, the rescheduling
+    will automatically take place at the end of the interrupt routines.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{c}{The counter that needs to be incremented.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void}{The function does not return an error.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{GetAlarmBase}
+  \synopsis{StatusType GetAlarmBase(AlarmType AlarmID, AlarmBaseRefType Info)}
+  \begin{fundescription}
+    Returns the alarm base characteristics. The return value \vr{Info}
+    is a structure in which the information of data type
+    \tp{AlarmBaseType} is stored.
+    
+    Allowed on task level, ISR, and in several hook routines.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{AlarmID}{Alarm identifier.}
+
+    \fpar{Info}{Reference to the structure containing the constants
+      that define the alarm base.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void} {The function is redefined as returning \const{void}
+      when Standard Error is used.}
+    \fret{E_OK}{(Extended) No error.}
+    \fret{E_OS_ID}{(Extended) Reference \vr{AlarmID} is invalid.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{GetAlarm}
+  \synopsis{StatusType GetAlarm (AlarmType AlarmID, TickRefType Tick)}
+  \begin{fundescription}
+    The system service GetAlarm returns the relative value in ticks
+    before the alarm \vr{AlarmID} expires. If \vr{AlarmID} is not in
+    use, \vr{Tick} has an undefined value. Allowed on task level, ISR,
+    and in several hook routines.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{AlarmID}{Alarm identifier}
+    \fpar{Tick}{(out) Relative value in ticks before the alarm expires}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{E_OK}{No error}
+    \fret{E_OS_NOFUNC}{ \vr{AlarmID} is not used}
+    \fret{E_OS_ID}{(Extended) reference \vr{AlarmID} is invalid}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{SetRelAlarm}
+  \synopsis{StatusType SetRelAlarm (AlarmType AlarmID, TickType increment, TickType cycle)}
+  \begin{fundescription}
+    After \vr{increment} ticks have elapsed, the \vr{AlarmID}
+    notification is executed.
+    
+    If the relative value \vr{increment} is very small, the alarm may
+    expire, and the notification can be executed before the system
+    service returns to the user.  If \vr{cycle} is unequal zero, the
+    alarm element is logged on again immediately after expiry with the
+    relative value \vr{cycle}.
+    
+    The alarm \vr{AlarmID} must not already be in use.  To change
+    values of alarms already in use the alarm shall be canceled
+    first.
+    
+    If the alarm is already in use, this call will be ignored and the
+    error \const{E_OS_STATE} is returned.  Allowed on task level and
+    in ISR, but not in hook routines.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{AlarmID}{Reference to alarm}
+
+    \fpar{increment}{Relative value in ticks representing the offset
+      with respect to the current time of the first alarm expiration.}
+
+    \fpar{cycle}{Cycle value in case of cyclic alarm. In case of
+      single alarms, this parameter must be set to 0.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{E_OK}{No error.}
+    \fret{E_OS_STATE}{Alarm is already in use.}
+    \fret{E_OS_ID}{(Extended) reference \vr{AlarmID} is invalid}
+    
+    \fret{E_OS_VALUE}{(Extended) Value of \vr{increment} outside of
+      the admissible limits, or value of \vr{cycle} unequal to 0 and
+      outside of the admissible counter limits.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{SetAbsAlarm}
+  \synopsis{StatusType SetAbsAlarm (AlarmType AlarmID, TickType start, TickType cycle)}
+  \begin{fundescription}
+    The primitive occupies the alarm \vr{AlarmID} element. When
+    \vr{start} ticks are reached, the \vr{AlarmID} notification is
+    executed.
+    
+    If the absolute value \vr{start} is very close to the current
+    counter value, the alarm may expire, and the task may become ready
+    or the alarm-callback may be called before the system service
+    returns to the user.
+    
+    If the absolute value \vr{start} was already reached before the
+    system call, the alarm shall only expire when the absolute value
+    \vr{start} is reached again, i.e. after the next overrun of the
+    counter.
+    
+    If \vr{cycle} is unequal zero, the alarm element is logged on
+    again immediately after expiry with the relative value \vr{cycle}.
+    
+    The alarm \vr{AlarmID} shall not already be in use.  To change
+    values of alarms already in use the alarm shall be canceled
+    first.  If the alarm is already in use, this call will be ignored
+    and the error \const{E_OS_STATE} is returned.  Allowed on task
+    level and in ISR, but not in hook routines.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{AlarmID}{reference to alarm}
+
+    \fpar{start}{Absolute value in ticks representing the time of the
+      first expiration of the alarm.}
+
+    \fpar{cycle}{cycle value in case of cyclic alarm. In case of
+      single alarms, this parameter must be set to 0.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{E_OK}{No error.}
+    \fret{E_OS_STATE}{Alarm is already in use.}
+    \fret{E_OS_ID}{(Extended) reference \vr{AlarmID} is invalid}
+  
+    \fret{E_OS_VALUE}{(Extended) Value of \vr{start} outside of the
+      admissible limits, or value of \vr{cycle} unequal to 0 and
+      outside of the admissible counter limits}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{CancelAlarm}
+  \synopsis{StatusType CancelAlarm (AlarmType AlarmID)}
+  \begin{fundescription}
+    The primitive cancels the alarm \vr{AlarmID}. Allowed on task
+    level and in ISR, but not in hook routines.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{AlarmID}{reference to alarm}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{E_OK}{No error.}
+    \fret{E_OS_STATE}{Alarm is already in use.}
+    \fret{E_OS_ID}{(Extended)  reference \vr{AlarmID} is invalid.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+\pagebreak
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Counting Semaphores}
+
+This section describes in detail the primitives provided by \ee\ to
+support counting semaphores as a way to implement mutual exclusion and
+synchronization between tasks.
+
+Counting semaphores are an RTOS abstractions of an integer counter
+coupled with a blocking queue. Basically two main operations are
+possible on a semaphore, which are {\em waiting} on a semaphore, which
+results in decrementing the counter if the counter has a value greater
+than 0, or blocking the running task if the counter is 0, and {\em
+posting} on a semaphore, which results in a counter increment if there
+are no task blocked, or in the unblock of a blocked task otherwise.
+
+\ee\ counting semaphores exports a simple interface which covers the
+basic functionalities of a semaphore, like:
+\begin{itemize}
+\item Initializing a semaphore (\reffun{InitSem});
+\item Waiting on a semaphore in a blocking
+  (\reffun{WaitSem}) or non-blocking way (\reffun{TryWaitSem};
+\item Posting on a semaphore (\reffun{PostSem});
+\item Getting the value of a semaphore (\reffun{GetValueSem}).
+\end{itemize}
+
+Since waiting on a semaphore may result in blocking the running task,
+the \reffun{WaitSem} primitive should be called only if the calling
+task has a separate stack allocated to it. For this reason, the
+\reffun{WaitSem} primitive can only be called by extended tasks in
+conformance classes ECC1 and ECC2. Semaphores are available as non
+blocking in conformance classes BCC1 and BCC2.
+
+Semaphores can be allocated statically as a global variable, which
+allow to bypass the call to \reffun{InitSem}.
+
+Semaphores definition are not listed in the OIL file; semaphore
+primitives receive as a parameter a pointer to the semaphore
+descriptor.
+
+The current semaphore implementation does {\em not} support
+multiprocessor systems. That is, semaphores must be defined and used
+locally to the same CPU.
+
+\begin{warning}
+Counting semaphores {\em do not} avoid Priority Inversion
+problems. Please use Resources instead (see Section
+\ref{sec:resource-primitives}).
+\end{warning}
+
+\pagebreak
+
+\begin{function}{STATICSEM}
+  \synopsis{SemType s = STATICSEM(value);}
+  \begin{fundescription}
+    This macro can be used to statically initialize a semaphore. It
+    must be used inside the definition of a global semaphore variable
+    to initialize a semaphore to a given value.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{value}{The counter value for the semaphore being initialized.}
+  \end{funparameters}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{InitSem}
+  \synopsis{void InitSem(SemType s, int value);}
+  \begin{fundescription}
+    This macro can be used to initialize a semaphore at runtime. It
+    receives as a parameter the init value of the semaphore counter.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{s}{The semaphore being initialized.}
+    \fpar{value}{The counter value for the semaphore being initialized.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void}{The function is a macro and it does not return an error.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{WaitSem}
+  \synopsis{StatusType WaitSem(SemRefType s);}
+  \begin{fundescription}
+    If the semaphore counter is greater than 0, then the counter is
+    decremented by one. If the counter has a value of 0, then the
+    calling (running) task blocks. 
+
+    This function can only be called by extended tasks in conformance
+    classes ECC1 and ECC2.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{s}{The semaphore used by the primitive.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{void}{The function is redefined as returning \const{void} when
+      Standard Error is used.}  
+    \fret{E_OK}{No error.}
+    \fret{E_OS_CALLEVEL}{(Extended) The primitive was called at interrupt level.}
+    \fret{E_OS_RESOURCE}{(Extended) The calling task occupies resources.}
+    \fret{E_OS_ACCESS}{(Extended) The calling task is not an extended task.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{function}{TryWaitSem}
+  \synopsis{int TryWaitSem(SemRefType s);}
+  \begin{fundescription}
+    This is a non-blocking version of \reffun{SemWait}. If the
+    semaphore counter is greater than 0, then the counter is
+    decremented by one, and the primitive returns 0. If the counter
+    has a value of 0, then the counter is decremented, and the
+    primitive returns 1.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{s}{The semaphore used by the primitive.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{int}{0 if the semaphore counter has been decremented, 1 otherwise.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{PostSem}
+  \synopsis{StatusType PostSem(SemRefType s);}
+  \begin{fundescription}
+    This primitive unblocks a task eventually blocked on the
+    semaphore. If there are no tasks blocked on the semaphore, then
+    the semaphore counter is incremented by one.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{s}{The semaphore used by the primitive.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{E_OK}{No error.}
+
+    \fret{E_OS_VALUE}{The semaphore has not been incremented because
+      its counter was equal to the semaphore maximum value
+      \const{EE_MAX_SEM_COUNTER}.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{GetValueSem}
+  \synopsis{int GetValueSem(SemRefType s);}
+  \begin{fundescription}
+    This primitive returns the value of the semaphore counter.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{s}{The semaphore used by the primitive.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{int}{The semaphore counter value.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Application modes, Startup and Shutdown primitives}
+\ee\ supports the specification of a set of {\em Application
+Modes}. Application modes are startup configurations that are used to
+configure the running application for a certain mode of
+operation. Examples of Application Modes are for example ``Normal
+execution'', ``Flash Programming'', ``Debug Mode'', and so on.
+
+The main idea is that the CPU startup code somehow discovers the
+current Application mode\footnote{Typical ways to discover Application
+Modes are for example the usage of dip switches on the device
+board.}. Once done that, the application mode is passed to
+\reffun{StartOS}, that sets the application mode for this run. Once
+the system is started, the application mode value can be read using a
+call to \reffun{GetActiveApplicationMode}.
+
+Application modes are listed inside the OIL configuration file. There
+always exist at least one application mode called
+\refconst{OSDEFAULTAPPMODE}. Once set at startup into
+\reffun{StartOS}, the Application mode cannot be changed.
+
+Application modes are also useful to autostart tasks and alarms
+following a call to \reffun{StartOS}. Tasks and alarms autostart
+features must be specified inside the OIL configuration file.
+
+Application modes should not be used to map application states that
+may vary during the application execution.
+
+The primitive \reffun{ShutdownOS} is used to prepare the system for
+system shutdown. Currently the function simply calls
+\reffun{ShutdownHook} and then it starts a forever loop waiting for an
+hardware reset.
+
+\pagebreak
+
+\begin{function}{GetActiveApplicationMode}
+  \synopsis{AppModeType GetActiveApplicationMode(void)}
+  \begin{fundescription}
+    The function returns the current Application Mode, that has been
+    set up by \reffun{StartOS} at system startup.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Application mode}{The function returns the current Application Mode.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{StartOS}
+  \synopsis{StatusType StartOS (AppModeType Mode)}
+  \begin{fundescription}
+    The user can call this system service to start the operating
+    system in a specific Application mode. Only allowed outside of the
+    operating system, at startup. The function calls in order the
+    \reffun{StartupHook}, then it activates the tasks and set the
+    alarms \const{AUTOSTART} set as \const{TRUE} inside the OIL
+    configuration file. After that, the system is rescheduled and the
+    highest priority ready task is executed.
+
+    The function returns to the caller after the first idle time is
+    reached. It is up to the caller to implement a meaningful
+    background activity. If unsure of a meaningful background
+    activity, just use the \fn{for(;;)} construct.
+    
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{Mode}{application mode}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{E_OK}{(Extended) No error.}
+    \fret{E_OS_SYS_INIT}{(Extended) Error during initialization.}
+    \fret{void}{The function returns void when Extended Status is not
+                selected.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ShutdownOS}
+  \synopsis{void ShutdownOS (StatusType Error)}
+  \begin{fundescription}
+    The user can call this system service to abort the overall system
+    (e.g. emergency off). 
+
+    % non succede mai
+    %The operating system also calls this
+    %function internally, if it has reached an undefined internal state
+    %and is no longer ready to run.
+    
+    If a \reffun{ShutdownHook} is configured the hook routine
+    \reffun{ShutdownHook} is always called (with \vr{Error} as
+    argument) before shutting down the operating system.
+    
+    The Operating system shutdown is currently implemented as a forever
+    loop.
+
+    %If \reffun{ShutdownHook} returns, further behaviour of
+    %\fn{ShutdownOS} is implementation specific.
+    
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{Error}{The identifier of the error that occurred.}
+  \end{funparameters}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+\pagebreak
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Hooks and Error handling primitives}
+\ee supports five application callbacks that are called when specific
+situations happens during application execution.
+
+On multiprocessor systems, hooks are local callbacks to each processor.
+
+The \reffun{ErrorHook} callback is called every time an error is
+detected inside an \ee primitive. The callback can be used to
+implement centralized error handling. A set of macros are also
+available to better understand the source of the error (see Section
+\ref{sec:errorhook-macros}).
+
+The \reffun{StartupHook} callback is called inside the
+\reffun{StartOS} primitive to implement the application startup
+procedure.
+
+The \reffun{ShutdownHook} callback is called inside the
+\reffun{ShutdownOS} primitive to implement the Application specific
+shutdown procedures.
+
+The \reffun{PreTaskHook} and \reffun{PostTaskHook} callbacks are
+called respectively every time a task becomes the \const{RUNNING}
+Task, and every time a task stops to be the \const{RUNNING} Task.
+
+The application can only call a limited set of primitives inside Hook
+functions.
+
+\subsection{Placement of the application startup code}
+In general, there are three ways where the application startup code
+can be placed:
+
+\begin{enumerate}
+\item before the call to \reffun{StartOS}. This case is typically used
+  for non-OS related initializations, because calling \ee\ primitives
+  before \reffun{StartOS} may have in general unpredictable results.
+\item inside \reffun{StartupHook}. This case is used for the
+  initializations that require a call to \ee\ primitives. Please note
+  that \reffun{StartupHook} is called before the rescheduling in
+  \reffun{StartOS} takes place.
+\item after the call to \reffun{StartOS}. This case can be used also
+  for \ee\ related initializations: the startup code is called {\em
+  after} the end of \reffun{StartOS}, and that means at the first idle
+  time {\em after} the autostart tasks has been activated and executed
+  Please note that if the autostart tasks never terminate, these
+  initializations are never called.
+\end{enumerate}
+
+\pagebreak
+
+\begin{function}{ErrorHook}
+  %PJ: ho riscritto in breve il contenuto dello standard
+  \synopsis{void ErrorHook (StatusType Error)}
+  \begin{fundescription}
+    When configured in the OIL File, the system calls this callback
+    every time the return value of a function is different from
+    \const{E_OK}. The application can then get additional informations
+    using the \fn{OSErrorGetServiceId} macro, that returns the
+    function that is generating the Error. Once the function that
+    generated the error is known, the application can also access the
+    parameters that generated the error using the \fn{OSError_XXX_YYY}
+    macros, where \fn{XXX} is the name of the function, and \fn{YYY}
+    is the name of the parameter passed to the function.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{Error}{the identifier of the error that occurred}
+  \end{funparameters}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{PreTaskHook}
+  %PJ: ho riscritto in breve il contenuto dello standard
+  \synopsis{void PreTaskHook (void)}
+  \begin{fundescription}
+    When configured in the OIL File, this hook function is called
+    every time a task becomes the \const{RUNNING} task due to the call
+    of other functions, or due to the preemption done by
+    interrupts. The ID of the task which has just become the
+    \const{RUNNING} task can be read using the \reffun{GetTaskID}
+    function.
+  \end{fundescription}
+  % \begin{funparameters}
+  %   \fpar{Error}{the identifier of the error that occurred}
+  % \end{funparameters}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{PostTaskHook}
+  %PJ: ho riscritto in breve il contenuto dello standard
+  \synopsis{void PreTaskHook (void)}
+  \begin{fundescription}
+    When configured in the OIL File, this hook function is called
+    every time a task is no more the \const{RUNNING} task due to the
+    call of other functions, or due to the preemption done by
+    interrupts. The ID of the task which has just finished to be the
+    \const{RUNNING} task can be read using the \reffun{GetTaskID}
+    function.
+  \end{fundescription}
+  % \begin{funparameters}
+  %   \fpar{Error}{the identifier of the error that occurred}
+  % \end{funparameters}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{StartupHook}
+  %PJ: ho riscritto in breve il contenuto dello standard
+  \synopsis{void StartupHook (void)}
+  \begin{fundescription}
+    When configured in the OIL File, this hook function is called
+    inside \reffun{StartOS}. Inside this callback, the Application can
+    call the Operating System-related functions \reffun{ActivateTask},
+    \reffun{SetRelAlarm}, and \reffun{SetAbsAlarm}. Please note that the
+    simplest way to activate a task or set an alarm at startup is to
+    specify their initial activation/setting inside the OIL File.
+  \end{fundescription}
+  % \begin{funparameters}
+  %   \fpar{Error}{the identifier of the error that occurred}
+  % \end{funparameters}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ShutdownHook}
+  %PJ: ho riscritto in breve il contenuto dello standard
+  \synopsis{void ShutdownHook (StatusType Error)}
+  \begin{fundescription}
+    When configured in the OIL File, this hook function is called
+    inside \reffun{ShutdownOS}. Inside this callback, the Application
+    can implement application dependent shutdown functions.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{Error}{the identifier of the error that occurred, that is the same value that has been passed to the ShutdownOS primitive}.
+  \end{funparameters}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+\pagebreak
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{ErrorHook Macros}
+\label{sec:errorhook-macros}
+These macros are meaningful inside the \reffun{ErrorHook} Hook
+function, and are used to better understand the source of the
+error. In particular, \reffun{ErrorHook} receives as parameter the
+error that is raised by the primitive. Then, a call to
+\reffun{OSErrorGetServiceId} returns informations about which
+primitive caused the error. Finally, calls to the macros
+\fn{OSError_XXX_YYY} returns the values of the \const{YYY} parameter
+of the primitive \const{XXX}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function_nopb2}{OSErrorGetServiceId}{OSErrorGetServiceId}
+  \synopsis{OSServiceIdType OSErrorGetServiceId(void)}
+  \begin{fundescription}
+    The function may be used inside \reffun{ErrorHook} to return the
+    Service ID that generated the error that caused the call to
+    \reffun{ErrorHook}.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Service ID}{The service ID causing the error.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_ActivateTask\_TaskID}{OSError_ActivateTask_TaskID}
+  \synopsis{TaskType OSError_ActivateTask_TaskID(void)}
+  \begin{fundescription}
+    The function returns the \const{TaskID} parameter passed to
+    \reffun{ActivateTask}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Task ID}{The value of the \const{TaskID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_ChainTask\_TaskID}{OSError_ChainTask_TaskID}
+  \synopsis{TaskType OSError_ChainTask_TaskID(void)}
+  \begin{fundescription}
+    The function returns the \const{TaskID} parameter passed to
+    \reffun{ChainTask}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Task ID}{The value of the \const{TaskID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_GetTaskState\_TaskID}{OSError_GetTaskState_TaskID}
+  \synopsis{TaskType OSError_GetTaskState_TaskID(void)}
+  \begin{fundescription}
+    The function returns the \const{TaskID} parameter passed to
+    \reffun{GetTaskState}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Task ID}{The value of the \const{TaskID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_GetTaskState\_State}{OSError_GetTaskState_State}
+  \synopsis{TaskStateRefType OSError_GetTaskState_State(void)}
+  \begin{fundescription}
+    The function returns the \const{State} parameter passed to
+    \reffun{GetTaskState}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{StateRef}{The value of the \const{State} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_GetResource\_ResID}{OSError_GetResource_ResID}
+  \synopsis{ResourceType OSError_GetResource_ResID(void)}
+  \begin{fundescription}
+    The function returns the \const{ResID} parameter passed to
+    \reffun{GetResource}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Resource ID}{The value of the \const{ResID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_ReleaseResource\_ResID}{OSError_ReleaseResource_ResID}
+  \synopsis{ResourceType OSError_ReleaseResource_ResID(void)}
+  \begin{fundescription}
+    The function returns the \const{ResID} parameter passed to
+    \reffun{ReleaseResource}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Resource ID}{The value of the \const{ResID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_SetEvent\_TaskID}{OSError_SetEvent_TaskID}
+  \synopsis{TaskType OSError_SetEvent_TaskID(void)}
+  \begin{fundescription}
+    The function returns the \const{TaskID} parameter passed to
+    \reffun{SetEvent}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Task ID}{The value of the \const{TaskID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_SetEvent\_Mask}{OSError_SetEvent_Mask}
+  \synopsis{EventMaskType OSError_SetEvent_Mask(void)}
+  \begin{fundescription}
+    The function returns the \const{Mask} parameter passed to
+    \reffun{SetEvent}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Mask}{The value of the \const{Mask} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_ClearEvent\_Mask}{OSError_ClearEvent_Mask}
+  \synopsis{EventMaskType OSError_ClearEvent_Mask(void)}
+  \begin{fundescription}
+    The function returns the \const{Mask} parameter passed to
+    \reffun{ClearEvent}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Mask}{The value of the \const{Mask} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_GetEvent\_TaskID}{OSError_GetEvent_TaskID}
+  \synopsis{TaskType OSError_GetEvent_TaskID(void)}
+  \begin{fundescription}
+    The function returns the \const{TaskID} parameter passed to
+    \reffun{GetEvent}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Task ID}{The value of the \const{TaskID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_GetEvent\_Event}{OSError_GetEvent_Event}
+  \synopsis{EventMaskRefType OSError_GetEvent_Event(void)}
+  \begin{fundescription}
+    The function returns the \const{TaskID} parameter passed to
+    \reffun{GetEvent}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Event}{The value of the \const{Event} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_WaitEvent\_Mask}{OSError_WaitEvent_Mask}
+  \synopsis{EventMaskType OSError_WaitEvent_Mask(void)}
+  \begin{fundescription}
+    The function returns the \const{Mask} parameter passed to
+    \reffun{WaitEvent}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Mask}{The value of the \const{Mask} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_GetAlarmBase\_AlarmID}{OSError_GetAlarmBase_AlarmID}
+  \synopsis{AlarmType OSError_GetAlarmBase_AlarmID(void)}
+  \begin{fundescription}
+    The function returns the \const{AlarmID} parameter passed to
+    \reffun{GetAlarmBase}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Alarm ID}{The value of the \const{AlarmID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_GetAlarmBase\_Info}{OSError_GetAlarmBase_Info}
+  \synopsis{AlarmBaseRefType OSError_GetAlarmBase_Info(void)}
+  \begin{fundescription}
+    The function returns the \const{Info} parameter passed to
+    \reffun{GetAlarmBase}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Info}{The value of the \const{Info} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_GetAlarm\_AlarmID}{OSError_GetAlarm_AlarmID}
+  \synopsis{AlarmType OSError_GetAlarm_AlarmID(void)}
+  \begin{fundescription}
+    The function returns the \const{AlarmID} parameter passed to
+    \reffun{GetAlarm}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Alarm ID}{The value of the \const{AlarmID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_GetAlarm\_Tick}{OSError_GetAlarm_Tick}
+  \synopsis{TickRefType OSError_GetAlarm_Tick(void)}
+  \begin{fundescription}
+    The function returns the \const{Tick} parameter passed to
+    \reffun{GetAlarm}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Tick}{The value of the \const{Tick} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_SetRelAlarm\_AlarmID}{OSError_SetRelAlarm_AlarmID}
+  \synopsis{AlarmType OSError_SetRelAlarm_AlarmID(void)}
+  \begin{fundescription}
+    The function returns the \const{AlarmID} parameter passed to
+    \reffun{SetRelAlarm}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Alarm ID}{The value of the \const{AlarmID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_SetRelAlarm\_increment}{OSError_SetRelAlarm_increment}
+  \synopsis{TickType OSError_SetRelAlarm_increment(void)}
+  \begin{fundescription}
+    The function returns the \const{increment} parameter passed to
+    \reffun{SetRelAlarm}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{increment}{The value of the \const{increment} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_SetRelAlarm\_cycle}{OSError_SetRelAlarm_cycle}
+  \synopsis{TickType OSError_SetRelAlarm_cycle(void)}
+  \begin{fundescription}
+    The function returns the \const{cycle} parameter passed to
+    \reffun{SetRelAlarm}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{cycle}{The value of the \const{cycle} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_SetAbsAlarm\_AlarmID}{OSError_SetAbsAlarm_AlarmID}
+  \synopsis{AlarmType OSError_SetAbsAlarm_AlarmID(void)}
+  \begin{fundescription}
+    The function returns the \const{AlarmID} parameter passed to
+    \reffun{SetAbsAlarm}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Alarm ID}{The value of the \const{AlarmID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_SetAbsAlarm\_start}{OSError_SetAbsAlarm_start}
+  \synopsis{TickType OSError_SetAbsAlarm_start(void)}
+  \begin{fundescription}
+    The function returns the \const{start} parameter passed to
+    \reffun{SetAbsAlarm}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{start}{The value of the \const{start} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_SetAbsAlarm\_cycle}{OSError_SetAbsAlarm_cycle}
+  \synopsis{TickType OSError_SetAbsAlarm_cycle(void)}
+  \begin{fundescription}
+    The function returns the \const{cycle} parameter passed to
+    \reffun{SetAbsAlarm}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{cycle}{The value of the \const{cycle} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{OSError\_CancelAlarm\_AlarmID}{OSError_CancelAlarm_AlarmID}
+  \synopsis{AlarmType OSError_CancelAlarm_AlarmID(void)}
+  \begin{fundescription}
+    The function returns the \const{AlarmID} parameter passed to
+    \reffun{CancelAlarm}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Alarm ID}{The value of the \const{AlarmID} parameter.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_CounterTick\_AlarmID}{OSError_CounterTick_AlarmID}
+  \synopsis{AlarmType OSError_CounterTick_AlarmID(void)}
+  \begin{fundescription}
+    The function returns the \const{AlarmID} of the Alarm notification
+    triggered by \reffun{CounterTick} that raised the error. The function must
+    be used inside \reffun{ErrorHook} after having discovered using
+    \reffun{OSErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Alarm ID}{The value of the \const{AlarmID} of the Alarm
+      notification that triggered the error.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_CounterTick\_TaskID}{OSError_CounterTick_TaskID}
+  \synopsis{TaskType OSError_CounterTick_TaskID(void)}
+  \begin{fundescription}
+    The function returns the \const{TaskID} related to the Alarm
+    notification triggered by \reffun{CounterTick} that raised the
+    error. The function must be used inside \reffun{ErrorHook} after
+    having discovered using \reffun{OSErrorGetServiceId} that the
+    error was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Task ID}{The value of the \const{TaskID} of the Alarm
+      notification that triggered the error.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_CounterTick\_Mask}{OSError_CounterTick_Mask}
+  \synopsis{EventMaskType OSError_CounterTick_Mask(void)}
+  \begin{fundescription}
+    The function returns the Event \const{Mask} related to the Alarm
+    notification triggered by \reffun{CounterTick} that raised the
+    error. The function must be used inside \reffun{ErrorHook} after
+    having discovered using \reffun{OSErrorGetServiceId} that the
+    error was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Mask}{The value of the Event Mask of the Alarm
+      notification that triggered the error.}
+  \end{funreturn}
+  \begin{funconformance}
+    ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_CounterTick\_action}{OSError_CounterTick_action}
+  \synopsis{EE_TYPENOTIFY OSError_CounterTick_action(void)}
+  \begin{fundescription}
+    The function returns the \const{action} related to the Alarm
+    notification triggered by \reffun{CounterTick} that raised the
+    error. The function must be used inside \reffun{ErrorHook} after
+    having discovered using \reffun{OSErrorGetServiceId} that the
+    error was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{action}{The value of the action of the Alarm notification
+      that triggered the error. Possible values of this parameter are:
+      \const{EE_ALARM_ACTION_TASK} for task notifications,
+      \const{EE_ALARM_ACTION_CALLBACK} if the notification is an alarm
+      callback, and \const{EE_ALARM_ACTION_EVENT} (only available with
+      ECC1 and ECC2), if the notification is an event set.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{OSError\_StartOS\_Model}{OSError_StartOS_Mode}
+  \synopsis{AppModeType OSError_StartOS_Mode(void)}
+  \begin{fundescription}
+    The function returns the \const{Model} related to the StartOS
+    Call. The function must be used inside \reffun{ErrorHook} after
+    having discovered using \reffun{OSErrorGetServiceId} that the
+    error was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Mode}{The Mode parameter that was passed to the
+                \reffun{StartOS} primitive.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function_nopb2}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

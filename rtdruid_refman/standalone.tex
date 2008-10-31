@@ -1,0 +1,57 @@
+\chapter{Standalone version of \rtd}
+\label{cha:Commandline}
+
+\section{Introduction}
+
+This chapter describes the standalone version of \rtd. The idea behind
+of the standalone version is to provide the \rtd\ code generator
+plugin packed {\em without} the Eclipse Framework, to have a simple and
+fast way to generate code and templates from the command line.
+
+The standalone version of \rtd\ is stored inside the \file{bin}
+directory inside the \rtd\ installation directory.
+
+\section{Code generation}
+To generate code using the standalone version of \rtd, please run the
+following command:
+
+\begin{lstlisting}
+rtdruid_launcher.bat --oil filename --output dir
+\end{lstlisting}
+
+\noindent Where:
+\begin{itemize}
+\item \const{filename} is the name of the OIL file.
+\item \const{dir} is the directory where the generator should put the
+  generated files. The \const{--output} option is optional. If not
+  specified, the default directory name used is \const{Debug}.
+\end{itemize}
+
+\section{Template code instantiation}
+This section explains how to obtain the automatic generation of a
+template example, as it is done from the ``New Project'' menu item
+from the Eclipse Framework.
+
+To obtain the list of available templates, please run the following
+command:
+
+\begin{lstlisting}
+template.bat --list
+\end{lstlisting}
+
+\noindent as a result, the command displays a list of the available
+templates, with their IDs.
+
+Then, to instantiate a template, please run the following command:
+
+\begin{lstlisting}
+template.bat --template ID --output dir
+\end{lstlisting}
+
+\noindent Where:
+\begin{itemize}
+\item \const{ID} is one of the IDs returned using the \const{--list} command..
+\item \const{dir} is the directory where the generator should put the
+  generated files. The \const{--output} option is optional. If not
+  specified, the default directory name used is the current directory.
+\end{itemize}

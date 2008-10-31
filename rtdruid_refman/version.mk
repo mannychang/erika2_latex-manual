@@ -1,0 +1,5 @@
+
+RTDRUID_REFMAN__DIR = rtdruid_refman
+RTDRUID_REFMAN__MAIN_NAME = rtdruid_refman
+RTDRUID_REFMAN__MAIN = rtd
+RTDRUID_REFMAN__VER = 1_4_9

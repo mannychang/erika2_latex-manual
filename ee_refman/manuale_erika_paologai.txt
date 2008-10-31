@@ -1,0 +1,495 @@
+Manuale per erika enterprise
+
+
+quadro generale con vantaggi e svantaggi, un po' di marketing
+---------------
+vedi la fine
+
+
+System tools and components needed to develop a Nios II multiprocessor system
+-----------------------------------------------------------------------------
+
+The purpose of this section is to shortly describe the design flow that is needed to develop a multiprocessor system using the tools provided by Altera and by Evidence Srl.
+
+The basis of a multiprocessor system is the multiprocessor hardware that is obtained using  the Altera tools. Basically, the user can design a multiprocessor system by inserting a set of CPU and Peripheral components inside a SOPCBuilder block, that is then compiled using Quartus II to obtain the FPGA layout used for the particular application. After that, using the Nios II IDE based on the Eclipse Framework, the user can instantiate a system library project, representing the software device drivers for the particular CPU, and an application project to describe the application running on each CPU. Altera provides a good document named "The Multiprocessor Nios II Systems Tutorial" that describes the basics of designing a multiprocessor Nios II system.
+
+The RT-Druid Toolset and ERIKA Enterprise allow to fully use the power of the multiprocessor designs that can be created using the Altera tools. 
+
+On the host side, RT-Druid offers an integrated view of a multiprocessor application under the Nios II IDE, allowing the user to partition the application jobs on the different available CPU. To do that, RT-Druid offers a concept of "application" project that spans different CPUs, allowing an easy move of features across the execution units.
+
+On the target side, ERIKA Enterprise offers a multiprogramming environment that can be used to deploy the application architecture defined in RT-Druid on the real hardware. ERIKA Enterprise helps the partitioning job supporting code deployment that is independent from the particular CPU, allowing the use to move code between CPUs without changing it.
+
+The main thing in the entire approach is the fact that the RT-Druid Toolset and ERIKA Enterprise do not change dramatically the current Altera Workflow. For that reason, users accustomed with the Nios II IDE editing and debugging features can reuse their knowledge.
+
+
+How to design a multiprocessor system that is suitable for RT-Druid and ERIKA Enterprise
+----------------------------------------------------------------------------------------
+
+To be used with RT-Druid and ERIKA Enterprise, a multiprocessor system have to be designed following the guidelines that are described in this document. In this section, we recall just the main points and features:
+
+- multiprocessor system have to be defined inside a single SOPCBuilder block. This is the common case and it is the same described in the Altera multiprocessor tutorial.
+
+- CPU are not identical: peripherals are typically attached to a particular CPU, that receves their interrupts and handles them using appropriate software. Moreover, the "first" CPU takes care of the initialization of the multiprocessor system, acting as the CPU that have to initialize common shared data and that have to impose a synchronization barrier to all the CPUs.
+
+- The multiprocessor system have to include at least an Altera Avalon mutex peripheral. That avalon Mutex peripheral will be handled internally by ERIKA Enterprise to guarantee mutual exclusion between different activities residing on different CPUs. The application will not use directly the mutex peripheral. Its usage is hided by ERIKA Enterprise, that will use it only when needed, depending on the particular partitioning that is done by the designer.
+
+- The multiprocessor system have to include an interprocessor interrupt feature. Again, the user does not have to use directly the interprocessor interrupts. They are used internally when needed by the ERIKA Enterprise RTOS, in a way transparent to the user. The instantiation of an Interprocessor Interrupt peripheral is done using a custom SOPCBuilder Component, that exports some internal avalon pins to the outside of the multiprocessor SOPCBuilder block. Then, the user have to instantiate an appropriate IPIC controller and connect it to the SOPCBuilder block pins.
+
+- The multiprocessor system have to include some shared memory (that can be on-chip or off-chip). Shared memory will be used to exchange informations between the different CPUs. In this case, the user have to provide an idea of the data flows inside the application, identifying which are the dara structures that have to be shared between threads. When a data structure is global to different processors, then the first CPU will define the data structure and share that data with the other CPUs. Then, depending on the actual partitioning of the system, the data will be allocated by the ERIKA Enterprise build scripts inside a local or inside a shared memory.
+
+- The user have to instantiate a Nios II IDE system library for each CPU. ERIKA Enterprise allows users to reuse all their preexisting source code developed for the Altera HAL, adding multiprogramming support to ease the partitioning job and to fully utilize the multiprocessor power available with Altera Nios II.
+
+- The user application is set up inside a RT-Druid Project. An RT-Druid Project is similar to an Altera C/C++ Application Project, except that its configuration is specified using a configuration file that follows the OSEK OIL Standard. The software for all the CPUs is specified inside the same Application Project, easing the partitioning job
+
+(aggiungere figura dove si descrive l'approccio di Altera e l'approccio di Evidence alle system library ed alle applicazioni).
+
+
+
+
+RT-Druid Projects
+-----------------
+To create an application managed by RT-Druid the user have to create an RT-Druid Project.  Please refer to the RT-Druid manual on how to create a new  RT-Druid Project.
+
+
+
+
+
+Data scopes in an ERIKA  multiprocessor system
+----------------------------------------------
+
+a multiprocessor ERIKA Enterprise system has the following different data types:
+
+automatic data
+..............
+These data are allocated on the current stack by a function call when the function is called. The scope of these data is the function itself. 
+
+Example:
+void foobar(void)
+{
+	int this_is_automatic;
+	...
+}
+
+static data
+...........
+Static data is a C global variable that is defined as static. Only the source code inside a file that define the static variable can refer to the particular symbol.
+
+Example:
+static int this_is_static;
+
+
+global data
+...........
+Global data are C global symbols. The scope of these symbols is the entire source code that is linked inside an ELF file. That is, global data is not shared among different CPUs.
+
+int this_is_global;
+
+heap
+....
+Heap data structure are region of memory that are allocated dynamically using library functions such as malloc() and free(). Typically, each processor has its own heap memory pool, that each processor handles independently. Data structures allocated in the heap typically are local to each processor and should not be shared.
+ERIKA Enterprise doen not give any support to share a heap variable between tasks allocated to different processors. To do that, the developer must ensure that:
+- the heap memory resides on a memory zone accessible by the different processors that have to access it
+- proper chache disabling strategies are used to ensure that each processor uses the data consistently
+- that the memory is allocated and freed on the same processor
+
+
+multiprocessor global data
+..........................
+Multiprocessor global data are data structures that are visible to -all- the CPU in the system. These data structures are typically defined and initialized inside the MASTER CPU, and the are accessible to all the other CPU. 
+
+The Multiprocessor Global data must be accessible toall the CPUs, that is, it must reside om a memory accessible to all the CPUs. As an alternative, the user can let the memory be shared among the CPUs that really uses the shared memory, plus the Master CPU (This may help saving some LE reducing the arbitration logic). Multiprocessor global data not shared by the Master CPU is not supported in this release (but will probably be supported in future releases).
+
+When a CPU access a multiprocessor global data, the data cache, if present, is automatically disabled.
+
+stack
+.....
+The stack memory is used to store function calls, return address, and parameters. Each task in ERIKA Enterprise has a stack, that eventually can be shared with other threads to reduce the overall stack space required by an application.
+
+Basically, each CPU has stack called "shared", that is a fixed size amount that can be specified in the OIL configuration file. The shared stack has its top at the top of stack specified for each CPU inside the Altera System Library. That is, the main() function is always run on the shared stack (that is the same behavior of normal Altera HAL applications.
+
+Additionally, each task in the system can have a private stack. A private stack is always needed if the task use blocking primitives like, for example, WaitEvent. Private stacks are allocated on the same CPU where the task is allocated.
+
+
+types of memories and their allocation
+--------------------------------------
+The various types of memories that may be available on a Nios II system can be used to store data or code. Every time some data or code have to be shared among tasks allocated to different processors, then the memory component in Altera SOPCBuilder containing them have to be connected to the data master of all the CPUs that must access them. Connecting a memory to the Avalon data masters of the various CPUs give the right to access to the shared location.
+
+In general, we will consider a system composed by a set of CPUs that have some "private" memory components (connected to that CPU only), and a set of shared memory components (connected to all the CPUs).
+
+(inserire una figura)
+
+In the following, we will consider that the shared memories are connected to all the available CPUs. Having memories connected to all the CPUs has the following drawbacks:
+
+- If a CPU does not need any data structure allocated on a particular memory component, the connection logic used to connect that CPU to the memory component is wasted. As we will see, however, having a fully connected memory helps partitioning tasks to different processors without changing the hardware. In any case, unused arbitration logic can be removed in the final product if needed.
+
+- Having all the shared memories all connected, allows a proper handling of the system startup. The idea is that there is a CPU, called MASTER_CPU, that assumes a role of "container" and "allocator" of all the shared data structures in the system. That is, all the definitions of the shared data staructures are done in the MASTER_CPU. Having a single CPU responsible for the allocation of the shared data structures simplifies the system architecture because the designer can leave the job of allocating shared data structures to the linker. Using other structures would have forced the designer to manually allocate shared data structures to separate memory zones, basically giving the developer to manually implement the job typically done by linkers. This way of proceeding  has the additional advantage of automatically adapting to code changes, because inserting new shared data structures (for example because we are splitting a task in two parts allocated to different processors), or removing existing shared data structures (because doing a proper partitioning it may be that a shared data is accessed only by tasks allocated to the same CPU) is handled automatically by the configuration scripts, without requiring any kind of configuration or, worse, hardware change.
+
+This way of designing the system gives another opportunity to the designer: in particular, the designer can give the system the possibility to choose whether a shared data must be a multiprocessor global data or just a global data, depending on the partitioning of the various tasks on the various processors.
+
+Please note that if for simple applications the partitioning problem may be a manageable task, when the application size grows it may require a few design cycles to converge to a good partitioning of the application tasks. The approach proposed by RT-Druid and ERIKA Enterprise allows a simple way to manage the partitioning problem, helping the designer concentrating on the application architecture instead of concentrating on the communication pattern of the application. Please also note that the partitioning is done only at the software level, without modifying the hardware needed to develop an application.
+
+- The Nios II configurations that can be designed inside Altera SOPCBuilder exporte the same address spaces for every CPU. That means that the same address can be referenced by all the CPUs, and also means that a source code only accessing automatic variables and multiprocessor global data can be shared among the different CPUs.
+
+- The design of a multiprocessor system should take care of the fact that more than one CPU can access the same memory component at the same time. That is, the bandwidth of the memory component is shared between different tasks that may access multiprocessor global data strustures that are not correlated, eventually creating bottlenecks. Such situations can be prevented for onchip memories by appropriately fragmenting memory components if possible, allowing decoupled parallel access to the different banks (for example, instead of having a big onchip memory of 64Kb, having 2 32k memories with an appropriate partition of the data structures).
+
+
+
+
+Handling data consistency using multual exclusion
+-------------------------------------------------
+Whenever a data structure can be accessed concurrently by different tasks, a mutual exclusion mechanism must be used to ensure that the shared data structure is accessed without consistency problems.
+
+ERIKA Enterprise provides mutual exclusion through the primitives called GetResource and ReleaseResource
+
+These primitives can be used by threads independently from the CPU where the task is assigned to. The configuration system based on OIL and RT-Druid, and the implementation of the primitives done on ERIKA Enterprise guarantees that GetResource and ReleaseResource can be transparently remapped to multiprocessor platform, hiding the complexity of the multiprocessor platform. In fact, 
+
+- the usage of these primitives on a resource that is used only by tasks allocated to a particular CPU only provoke a modification of the scheduling parameters only on the local CPU.
+
+- the usage of these primitives on a resource that is used only by tasks allocated to different CPUs involve a coordination between tasks allocated to different CPUs that is solved by the kernel internally using an Altera Avalon Mutex peripheral.
+
+Please note that the kind of lock really used in a particular execution only depends on the partitioning defined in the OIL file. The developers does not have to modify their code after a system repartitioning.
+
+
+
+startup barriers
+................
+
+When executing a multiprocessor system, each CPU will have a different ELF image, with a different startup pattern that depends on the peripherals that are allocated to each CPU. 
+Having a different startup code imply that each CPU will have a different boot time (the time from the hardware reset to the execution of the first assembler instruction of the main() function).
+
+Since the different CPUs will execute a set of interacting code, it is important that all the CPU execution will be synchronized before they start the application, giving in that way the time to all the CPUs to startup their peripherals, and to properly initialize their global data structures. We call that initial synchronization a "startup barrier".
+
+The implementation of the startup barrier uses the services of the Altera Avalon Mutex peripheral. In particular, the designer have to identify a CPU as the Master CPU. The Master CPU will be responsible, among other things, for initializing multiprocessor global data structures. The CPUID value of the Master CPU must be used as the "Initial owner" in the SOPCBuilder Avalon Mutex peripheral dialog box.
+
+A typical setting of the initialization value of the Altera mutex is the following one:
+- the mutex initial owner is set to 0, that is typically the CPUID of the first CPU in the SOPCBuilder
+- the first cpu that is listed in the OIL file is the first CPU that is listed in SOPCBuilder (in this way, RT-Druid willa ssign that CPU the index 0
+- the Master CPU setting in the OIL file is set to the first CPU 
+
+The main problem in this approach is that Altera does not guarantee an assignment patternm to the CPUID (ctrl5) values. The CPUID values are assigned in an automatic way by SOPCBuilder, and the user does not have control over it. In that way, the value that is set as initialization value for the Altera Avalon Mutex may be not what the user would like to. In our experiments, we found that an initialization value of 0 often corresponds to the first CPU in SOPCBuilder.
+
+In this case, the typical scenario is the following:
+- the designer creates a multiprocessor system, setting the Altera Avalon Mutex to 0x0
+- the designer generates the SOPCBuilder system, and compiles the hardware
+- the designer creates a small Altera HAL application for the first CPU (for example, a simple helloworld application. Then, the application is debugged, and the CPUID of the first CPU is verified inside the registers window of the debugger to be the same as the one specified in the Altera Mutex.
+
+Typical behavior that shows up when the mutex initialization is not done in the proper ways is that the either system (all the CPUs) simply blocks at the startup barrier, or simply the barrier is not considered at all. The latter case is subtle because some of the processors could start to use the shared data structures when the CPU responsible for their initialization has not initialized them yet. In this case the early arriving processor could have read uninitialized values, and the values written could be overwritten by the initialization values.
+
+The startup barrier is basically needed for the following reason:
+- there exist a set of CPUs using concurrently certain multiprocessor global data structures
+- the multiprocessor global data structures are typically defined and initialized by the first CPU, and then shared with the other CPUs as external data
+- the system startup routine of the multiprocessor system have to initialize the multiprocessor global data strucrures, and the initialization  time may require a time that depends on the number of peripherals attached to the CPUs, to the size of the data structures that are defined by the CPU (in general they can be global or multiprocessor global)
+- for these reasons, when the system starts, all the CPUs have a different initialization time, and only when all the CPUs have finished their initialization they can start using the multiprocessor system.
+
+
+
+Interprocessor interrupt
+........................
+Evidence SRL provides an Inter Processor Interrupt Controller (IPIC) that allows the usage of up to 4 CPUs. support for more than 4 CPUs will be provided in the next releases.
+
+The Interprocessor interrupt features is completely hided to the designer; the ERIKA Enterprise RTOS takes care of its handling.
+
+The interprocessor interrupt have to be initializedfollowing these guidelines:
+
+- There is a SOPCBuilder component called evidence_ipic4_sublogic that is used to exports the interrupt pins outside the SOPCBuilder block. The component can be found under the components group "Evidence" in SOPCBuilder. The designer have to generate an instance of the IPIC sublogic
+
+- The designer have to instantiate an IPIC sublogic SOPCBuilder block for each CPU. The component needs to be connected to only one data master. The component has an interrupt line, that is the interprocessor interrupt. That interrupt line typically has the lowest priority among all the interrupts attached to the CPUs (that is, the greater number in SOPCBuilder).
+
+- Once instantiated the IPIC sublogic component for each CPU, the designer have to generate the SOPCBuilder block, updating it in the Quartus II window.
+
+- Once generated, the SOPCBuilder block will export in Quartus II a set of pins. On the left side of the block there will be the multiprocessor interrupt input line, whereas on the right side there will be the enable and data pins that have to go to the IPIC controller.
+
+- Then, the designer have to instantiate the IPIC controller in the main BDF file on Quartus II. The IPIC controller can be found under the IPIC sublogic component directory. The IPIC controller have to be connected as showed in the Figure XXX, that is the CPU with CPUID 0 must be connected to the entries related to teh CPU 0 of the IPIC controller, and so on. Only the CPUs that are really present in the design have to be connected to the IPIC controller. Eventual additional entries on the IPIC controller must be left disconnected (they will be optimized away by Quartus II. Do not forget to connect the clock and reset pins of the IPIC controller.
+
+- Before compiling, remember to add the IPIC controller directory to the directories on which the IPIC controller is located.
+
+- Finally, inside the Nios II IDE, the designer have to specify the name given in SOPCBuilder to each IPIC sublogic component inside the CPU part of the OIL file.
+
+- At that point, ERIKA Enterprise will take care of the interprocessor interrupt. The only thing the user have to specify is the CPU where each task have to be executed; the configuration system will automatically use interprocessor interrupts wjhen needed.
+
+
+
+
+
+
+
+
+
+multiprocessor data sharing
+---------------------------
+When dealing with multiprocessor data sharing, the main issue is to enable the different processor cooperating together maintaining the guarantee that the data structures that are shared between the processors always remain consistent. The problem of data consistency for the Nios II architectures melts down to two topics: one is the mutual exclusion between accesses, that is obtained hiding the usage of the Altera Avalon Mutex peripherals inside the RTOS GetResource and ReleaseResoiurce primitives, and the other one is related to the access pattern of the data structures that is influenced by the usage of data caches. 
+
+This section describes the usage of data cache and of data cache disabling to implement multiprocessor data sharing. Basically, all the accesses to multiprocessor global data structures in Nios II architectures must be done using cache disabling techniques, because the architecture does not support (yet) cache coherency protocols.
+
+Cache disabling in the Nios II can be obtained using the following methods:
+- using IORD/IOWR to explicitly say that a particular access must be done using cache disabling
+- using tightly coupled memories
+- using explicit data cache flushes
+- using bit-31 cache disabling
+
+In most of these cases, (except tightly coupled memories) implementing a cache disabling mechanism implies a modification of the source code to explicitly insert the instructions to obtain the particular mechanism.
+
+ERIKA Enterprise supports data sharing using the bit-31 cache disabling features of Nios II. In particular, it adds a transparent support for bit31 cache disabling, allowing the designer not to change its source code when cache disabling have to be imposed to selected global data structures.
+
+The idea of using cache disable when dealing with multiprocessor global data is that the designer have to write the application code in a way independent from the fact that a particular data structure is shared or not. That because the fact that a data structure is shared or not among processors depends on the partitioning that the developer has configured inside the OIL file. A change in the partitioning may influence the fact that a data structure is global or not, and the designer must be as much as possible freed from modifying the code upon a repartitioning of an application. 
+
+Another feature that we support is the possibility of moving a single processor application code to a multiprocessor system without changing the source code implementing the application algorithms, but only changing the data definitions. The idea is that the source code must be as much as possible independent from the partitioning scheme chosen by the developer.
+
+As the final thing, since cache disabling reduces the performance of the system because it basically skips the usage of the CPU data cache (if present), cache disabling techniques must be used only for selected data structures, limiting as much as possible the performance penalty related to the cache disabling technique.
+
+a) How to define multiprocessor global data structures that uses cache disabling
+................................................................................
+
+ERIKA Enterprise currently offers two techniques to implement cache disabling: 
+
+1) cache disabling for all the accesses to a multiprocessor global data structure
+
+This technique can be used whenever the developer wants to disable the cache to all the accesses to a particular data structure. In particular, the user have to DEFINE the multiprocessor global data structure using the EE_SHARED macro. The following example shows how to use the EE_SHARED_DATA macro to define a global structure named mystruct
+
+struct mystruct {
+  ...
+};
+
+struct mystruct EE_SHARED_DATA(foo);
+
+In this example, the foo variable is defined to be shared, and all the accesses done to that variable will use the bit-31 cache disabling technique.
+
+All the multiprocessor globa data structures have to be defined in files that are coimpiled by the MASTER_CPU specified in the OIL File.
+
+A typical way of doing that is to put all the multiprocessor global data structures inside a file that is specified in the MASTER_CPU CPU section.
+
+
+
+2) cache disabling for all the data structures that are used by different CPUs
+
+This technique uses cache disabling selectively only on the data structures that are shared between different CPUs. The idea is that a multiprocessor application is composed by a set of tasks that uses shared resources. Shared resources are defined inside the OIL file, and for each task it is specified whiche resource the task is using. Depending on the partitioning of tasks to CPUs chosen by the designer, the resources can be either local (that is, all the tasks using the resources are allocated to the same CPU, and the data structure can be global to that CPU only), or global (that is, the tasks using the resource are allocated to different CPUs). Only the latter case really needs a cache disabling mechanism (using cache disabling with the former technique is correct but not efficient, because cache disabling is used also when data accesses could have been cached).
+
+In this case, the EE_SHARED_RES macro have to be used. EE_SHARED_RES takes an additional parameter, that is the OIL resource that have to be considered for deciding if cache disabling have to be applied or not. The following examples shows a typical usage of the macro:
+
+struct mystruct EE_SHARED_RES(myresource, foo);
+
+In this case, the foo data structure will be shared using bit-31 cache disabling only when myresource is a global resource.
+
+Special care must be taken in this case, because the definition of all the data structures for resource myresource must be put in a separate file. The filename have then to be listed in the RESOURCE section of the myresource resource in the OIL file. If the resource is local, the File will be compiled together with the CPU where the tasks using it are allocated; if the resource is global, the file will be compiled together with the MASTER_CPU.
+
+
+
+
+b) How to define a data structure that is global to a single processor
+......................................................................
+
+To define a data structure that is global to a single CPU, the developer have to define a traditional C global variable, making sure that the file that defines the variable is compiled inside the right CPU. The scope of the global definition is the CPU, and that means that other CPUs can define symbols with the same name.
+
+
+c) How to allocate a data structure inside a particular data memory
+...................................................................
+In general, to allocate a data structure to a particular memory region, the user have to explicitly use the section attribute of the gcc compiler. Moreover, the memory region must be visible to the CPU defining it.
+
+Warning: if the memory region is not private to a particular CPU, but is shared among different CPUs, then the memory region should also be visible to the MASTER_CPU, and the variable that have to be allocated on that memory region should be defined in a file that is compiled by the MASTER_CPU (see the .hex file problem for more details).
+
+
+
+
+
+Disabling GP addressing for global resource access
+..................................................
+The Nios II architecture allows two types of addressing for the data structures: one is the global addressing, where the compiler generates code to compute an absolute address that is then used to access the data; the other method is to maintain a register value containing an absolute address of a memory region, and then use an offset to that location to access the memory. Whereas the latter method is more efficient than the former, it has the limitation that it can access only data structures that lies in a range +/- 32Kbytes from the address used in the register.
+
+The gcc compiler uses the second method to access the small data sections (typically, small data elements like integers, chars, small structures, ...). In particular, it reserves the gp register for this use.
+
+When using small multiprocessor global data structures, the compiler continues to generate gp-relative code, but that gp-relative code cannot be used because bit-31 cache disabling generates an address that is far beyond the 32Kb offset possible with relative addressing.
+
+The result is that the compiler generates gp-relative code that at the end cannot be linked. A typical linker error in this case is the following:
+
+filename:line: Unable to reach this_is_shared (at 0x82012120) from the 
+global pointer (at 0x0201a064) because the offset (2147451068) is out 
+of the allowed range, -32678 to 32767.
+
+To avoid this linker error the developer have to tell the compiler to disable the GP-relative code generation for that data structure. There are two possible ways that can be used, depending on the final memory where the data structure can be allocated:
+
+- if the data structure is allocated in the default memory specified in the Altera system library, the developer can use the following declaration
+
+extern int this_is_shared EE_DISABLE_GP_ADDRESSING;
+
+(this method works in all the cases.
+
+- As an alternative to the previous method, if the data structure is allocated in a particular memory component, the developer can  expolicitly specify the target memory in the DECLARATION using the gcc section attribute command. An example of a typical declaration is the following:
+
+extern int goofy __attribute__ ((section (".mymemory")));
+
+Please note that ALL the declaration of the data structure must have the sections specified in this way. In general, the gcc compiler consider the attribute specified in the latest declaration.
+
+
+
+
+
+
+Code sharing
+............
+Sharing code among processor can be useful if the designer has need to save the memory used by some parts of source code.
+
+The source code that can be shared among CPUs must have the following characteristics:
+- the code must only use multiprocessor global data or automatic data.
+- the code must be compiled on the MASTER_CPU.
+- the code must reside in a memory that is acecssible from the other CPUs that needs access to it.
+
+Please note that a shared code accessing global data (that is, global symbols visible from the code on the MASTER_CPU only) may not work if executed on other processors. NO ERRORS are raised by the compiler in these situations, so it is up to the developer to check that everything is generated correctly.
+
+To share a C function, the user have to use the EE_SHARED_CODE macro when defining the function. Here is an example:
+
+void EE_SHARED_CODE(foobar)(void)
+{
+	...
+}
+
+
+
+
+
+
+
+
+On-chip memories, .hex files and multiprocessor systems
+-------------------------------------------------------
+Oncip memories are special memories that resides inside the FPGA internal memory. Initialization of these memories is done at FPGA reset time when the FPGA datastream is loaded initializing all the hardware. The initialization of the onchip memories is initially stored inside the .hex files when the elf images are created by the Nios II IDE scripts, and then they are stored inside the .sof file at the assembly phase in Quartus II.
+
+ERIKA Enterprise basically uses a modified version of the Altera Makefiles. These scripts are responsible not only for generating the ELF and flash files for the applications, but also generates the .hex initialization images for the onchip memories. Unfortunately, these scripts put the .hex files inside the hardware project directory (that is, the directory that also contains the SOPCBuilder block files).
+
+The idea is that once compiled an application inside Nios II IDE, the hardware project can be assembled putting inside the .sof files the intialization values written inside the .hex files. In this way, onchip memories are already initialized upon FPGA reset.
+
+In the case of a multiprocessor system, onchip memories will be often used to implement data exchange between processors. That means that mkore than one CPU will have the right of accessing a particular onchip memory, and also means that the compilation scripts for all the CPUs will produce their .hex files with the initialization of these memories. In general, the hex files will be the one produced by the latest compilation of the CPU that can access them.
+
+At the end of the compilation process the ERIKA Enterprise scripts takes care of handling the .hex generation in the following way:
+
+- onchip memories that are accessible from one CPU only
+in this case, the .hex file is generated when the CPU elf file is compiled as part of the compilation process. The hex file contains all the data structures (and their initialization) that the user put on that memory using the gcc section attribute. As an example, to allocate a data structure inside an onchip memory the user have to write:
+
+int foo __attribute__ ((section (".myonchipmemory")));
+
+Please note that if in the Altera system library configuration for the particular CPU the onchip memory has been defined as the privileged memory for data and code, also the corresponding sections  (.text for code, .data, .sdata, ... for the data) will be inserted inside the particular onchip memory.
+
+
+- onchip memories that are accessible by different CPUs (MASTER_CPU included)
+In this case, the final .hex file will be produced when compiling the MASTER_CPU. In fact, this is the common case where the onchip memories are used for data exchange between CPUs. In this case, the shared data structures are defined in the MASTER CPU and used by all the other CPUs (other CPUs will have the data structure only declared, not defined). The MASTER_CPU will also have the burden of initializing the onchip memory.
+
+- onchip memories that are accessible by different CPUs (MASTER_CPU not included)
+This case is currently not handled, and will be probably supported in future releases of ERIKA Enterprise. The current behavior is that the .hex that is finally used is the one produced by the latest CPU that has been compiled and that can access the memory. The current behavior is that the latest CPU is typically the latest one in the OIL file, although this behavior will not be maintained in future releases. In summary:
+- when possible, do not use this case
+- if you really need to use it (for example in cases where there is no space on the FPGA for the arbitartion logic for the CPU0, or qhen using tightly coupled memories between CPUs differnet from the MASTER_CPU), try to write the code in a way that it will not depend on the initialization values of the data stored in that onchip memories.
+
+
+
+
+
+
+Altera System libraries
+-----------------------
+ERIKA Enterprise uses the same system libraries that are used together with teh Altera HAL. When using the Altera System Libraries, developers have to take care of the following issues:
+- the developer have to create a system library for each CPU in the system.
+- do not use a separate stack space for exceptions.
+- custom linker scripts are supported also on ERIKA Enterprise. Custom linker scripts are specified the same way as in the Altera System Libraries.
+
+
+
+Designing multiprocessor software
+---------------------------------
+
+The typical structure of the architecture of a multiprocessor application can be highlighted by the following points:
+
+- The platform is defined by a multiprocessor Nios II system composed by a set of CPUs. Each CPU has a set of peripheral connected to it, plus an Altera Avalon Mutex and an Evidence IPIC Sublogic component.
+
+- The partitioning scheme used on a given configuration is specified inside an OIL configuration file (next releases of RT-Druid will include a graphical configuration plugin for this purpose).
+
+- Tasks should be written each one on a different file. Putting more than one task on the same file is permitted, although it limits the possibilities to partition the two tasks on different CPUs (the minimal entity that can be partitioned from one CPU to the others is a file). Activating tasks on other CPUs is possible and it is handled transparently by the kernel primitives using multiprocessor IRQs
+
+- some data structures will be typically local to a CPU, other data structures will be global to all the CPU that exists in the system. Cache disabling and sharing symbols among the various CPUs is automatically handled by ERIKA Enterprise.
+
+- shared data between tasks must be handled using GetResource and ReleaseResource primitives independently of the CPU where tasks are allocated. Transparent usage of the Altera Avalon Mutex is provided by ERIKA Enterprise.
+
+- Task Activations, Task Event Setting, and Alarm notifications that involves them are handled transparently in a way independent from which CPU a particular task is allocated to.
+
+- Counters, Alarms, Application modes, and Hooks are local to a given CPU and are not shared among them.
+
+- A typical multiprocessor application will consider the fact that a set of tasks related to peripheral/interrupt handling should be allocated to the CPUs where these peripherals are connected to. Eventually these task will have to call the Altera HAL peripheral primitives. Further processing, and peripheral independent tasks will be allocated and partitioned among the various available CPUs.
+
+- Resources will be dedicated to the exchange of informations between the various tasks. Resources will be used to protect data structures, that will be shared only if they are shared between tasks allocated to different CPUs.
+
+- Periodic activations of tasks will be handled using Alarms. Alarms are attached to counters, and both are local to the CPU that raises the counting event (typically an IRQ source like a timer). Alarms can activate tasks allocated to other CPUs.
+
+- Support for the usage of Altera HAL primitives is given provided that on each CPU HAL functions are not called concurrently by different tasks. In that case, HAL function calls must be protected by the usage of GetResource/ReleaseResource. Concurrent versions of the Altera HAL primitives will be provided in future versions of ERIKA Enterprise.
+
+
+
+Using Interrupt handlers with ERIKA Enterprise
+----------------------------------------------
+Users of the Altera HAL can continue to use the Altera provided functions for interrupt handling. In particular, the alt_irq_register must be used to provide the registration of an interrupt handler. alt_irq_interruptible and alt_irq_noninterrtptible must be used to handle interrupt nesting. ERIKA Enterprise correctly handles interrupt nesting, performing appropriate checks at the end of the last interrupt to implement task preemption.
+
+
+Startup functions that have to be called when the system starts
+---------------------------------------------------------------
+After the system startup and after the peripheral initialization, each CPU will call as the first instruction the EE_nios2_start function, that register the interprocessor interrupt and implements the startup barrier. That function have to be called by EVERY CPU. If some CPU is missing a call to that function, the startup barrier will not work properly.
+
+After the startup barrier, the user have to call the StartOS primitive o start the RTOS and the multiprogramming environment.
+
+The behavior of the EE_nios2_start function will change in future versions of ERIKA Enterprise.
+
+
+x Peppe: leggi fino qui, quete ultime parti te le spedisco appena possibile 
+non appena le ho tradotte
+---------------------------------------------------------------------------
+
+
+
+
+
+
+An overview of the features offered by RT-Druid and ERIKA Enterprise
+---------------
+(aggiungere un discorso generale sui sistemi multiprocessore)
+
+
+These are some interesting features supported by RT-Druid and ERIKA Enterprise:
+
+- support for the definition, and deployment of software for multiprocessor systems with shared memory
+- support for partitioning of the application functionalities on different processors without great modification to the source code base
+- support for easy change of the partitioning scheme allowing the developer to try and test different partitioning schemes easily
+- support of the migration of code from single processor systems to multiprocessor systems and viceversa
+- support for the Altera toolchains, the Altera HAL, and Altera System Libraries integrated in the ERIKA Enterpise compilation scripts
+
+
+Furure versions of the product will include
+ - schedulability analysis
+ - graphical configurator
+ - ORTI language for kernel awareness
+ - Official OSEK/VDX compliancy
+ - and much much more!
+
+
+Altera Nios II IDE tips & tricks
+--------------------------------
+This is a list of the preferences of the Altera Nios II IDE that needs a modification
+
+- window/preferences/nios2/allow multiple active runs
+  You need to set this option to be able to debug multiprocessor systems
+
+- windows preferences/rundebug/launching/build if required
+  This option can be used disable the application automatic build. Since building a multiprocessor system may require a lot of time, this options waiting time when avoids automatic building when the user has to start different debug sessions without need of recompiling the system
+
+
+- (for this version only) when the user the first time compiles from an OIL file, it has to specify the directory from which the application have to be compiled. That specification have to be done inside the RT-Druid project properties. Next version of the software will provide a graphical interface to configure also this aspect (aggiungere uno screenshot!)
+
+ricordare il fatto che ogni volta che si fa il debugging del sistema il sistema non viene resettato e quindi il valore di inizializzazione non è valido!!!
+
+
+Usage of the Altera HAL device drivers with ERIKA Enterprise
+------------------------------------------------------------
+ERIKA Enterprise currently does not give any customized versions of the Altera HAl device drivers.
+
+In general, the Altera HAL device drivers for multitask application developed with ERIKA Enterprise can be used with care because Altera HAL device drivers are designed for a single task environment, whereas they are now executed on a multitask environment. In particular, some care have to be taken avoiding that more than one task calls a device driver set of primitives concurrently. In these cases, there are two solutions:
+
+- allocate a dedicated tak that is the only one that uses a given device driver primitive (for example, if a CPU has a JTAG UART,  the user should allocate a single task that is responsible for the standard input/standard output operations on that peripheral)
+
+- allow different tasks to use the primitives in a mutual exclusive way. In that case, mutual exclusion can be obtained using a Resource dedicated to the purpose, and using GetResource and ReleaseResource primitives to sequentialize the accesses to the shared resource.
+
+(probabilmente bisognerebbe dare una lista delle primitive fornite da altera per gestire la cosa...)
+

@@ -1,0 +1,251 @@
+\documentclass[12pt,a4paper,normalheadings,titlepage]{scrreprt}
+
+\usepackage{../common/evman}
+\usepackage{graphicx}
+
+\pagestyle{headings}
+
+\def\title{Porting applications over the various conformance classes of \ee}
+\def\subtitle{Quick guide}
+\include{dynamic_version}
+
+\begin{document}
+
+\maketitle
+
+\pagebreak
+
+\tableofcontents
+
+\chapter{Introduction}
+
+The ERIKA Enterprise kernel provides various operating system APIs:
+\begin{itemize}
+\item a minimal multithreading API which
+  offers multithreading and resource usage support for tiny
+  microcontrollers, and
+\item a superset of the minimal API
+  which follows more closely the OSEK/VDX OS specification.
+\end{itemize}
+
+Both APIs allow similar programming capabilities, being able to support
+multithreading applications for small microcontrollers.
+
+However, there are a few differences which have to be taken into
+account when porting an application from the minimal API to the OSEK API and
+viceversa. The purpose of this document is to compare in detail the two APIs,
+for letting the user to choose the development platform more suitable to its 
+needs.
+
+% ------------------------------------------------------
+
+\chapter{Comparison between the various APIs}
+
+\section{System differences}
+
+\subsection{Conformance classes}
+
+\ee\ supports four conformance classes named BCC1, BCC2, ECC1, and
+ECC2. The main idea is that these conformance classes contain a subset
+of the OSEK/VDX API features, allowing a fine tuning of performance vs
+code and memory footprint.
+
+The minimal API supports a conformance class named FP, which is similar to the 
+BCC2 conformance class of \ee\ (or ECC2 if multistack is selected). 
+
+% ------------------------------------------------------
+
+\subsection{Error Handling}
+
+\ee\ primitives typically return error values to inform the correct
+execution of the primitive. There are various error codes returned,
+which may be tuned to reduce the code footprint. In particular, there
+is support for an {\em extended status}, where the primitives return
+all the kind of errors which can be detected, and a {\em standard
+status}, where only part of the errors are raised. 
+
+To reduce the code footprint, the minilal API primitives typically do not return 
+any error code. The system always assumes the correctness of
+parameter values, and acts in a default way upon particular conditions 
+(e.g., task activations are dropped over a given number of pending 
+activations). For this reason, moreover, there is no distinction between 
+{\em extended status} and {\em standard status}. 
+
+\ee\ supports the \fn{ErrorHook} hook function and its macro,
+allowing the access to primitive parameters to cause the
+error. When defined in the OIL file, \fn{ErrorHook} is called
+everytime an error different from \const{E_OK} is returned by a
+primitive. The minimal API does not support neither \fn{ErrorHook} nor its
+macros.
+
+% ------------------------------------------------------
+
+\subsection{PreTaskHook and PostTaskHook}
+
+\ee\ supports the \fn{PreTaskHook} and the \fn{PostTaskHook} hook
+functions. These hooks are called by the kernel whenever a context
+change occurs. The minimal API does not support \fn{PreTaskHook} and
+\fn{PostTaskHook}.
+
+% ------------------------------------------------------
+
+\subsection{System startup}
+
+\ee\ supports system startup using \fn{StartOS}. The application 
+developer has to put a call to \fn{StartOS} within the \fn{main} 
+function to start the system. In this way, the \fn{main} function 
+becomes the Background Task. A call to \fn{StartOS} provoke the 
+execution of the \fn{StartupHook} hook function, the autostart of tasks 
+and alarms if specified inside the OIL file. The \fn{StartOS} primitive 
+is also used to set the application mode. 
+
+The minimal API does not support \fn{StartOS}, \fn{StartupHook}, application modes 
+and the autostart of tasks and alarms. With the minimal API, the kernel is already 
+started at the first instruction of \fn{main}. Even in this case, the 
+\fn{main} function is the Background Task. Task activations and Alarm 
+arming at syystem startup must be done explicitly by the developer. 
+
+\begin{warning}
+When porting an application from the minimal API to the OSEK/VDX API, a call to \fn{StartOS}
+{\em must} be added in the system startup routine (typically \fn{main}).
+\end{warning}
+
+\begin{warning}
+When using the minimal API, remember that activating a task within the \fn{main} 
+always causes a preemption to the activated task. This must be taken 
+into account when more than one task has to be activated at startup. A 
+possible solution is to activate the tasks starting from the 
+highest priority one. 
+\end{warning}
+
+
+% ------------------------------------------------------
+
+\subsection{System Shutdown}
+
+In \ee\ , the user should call \fn{ShutdownOS} when the system must
+end. Calling \fn{ShutdownOS} also causes a call to the
+\fn{ShutdownHook} hook function.
+
+The minimal API does not support \fn{ShutdownOS} and \fn{ShutdownHook}.
+
+
+% ------------------------------------------------------
+
+\section{Tasks}
+
+\subsection{Task termination}
+
+In \ee, a task instance must always terminate with a call to
+\fn{TerminateTask} or to \fn{ChainTask}. Failing to terminate a task
+with one of these primitives brings to an undefined result; typically,
+it provokes an application crash. \fn{TerminateTask} and
+\fn{ChainTask} provide a simple way to clean and throw away the task
+stack.
+
+The minimal API does not support \fn{TerminateTask} and
+\fn{ChainTask}. A task terminates at the last \const{\}} of the task
+function. No explicit stack cleanup functions are supported.
+ 
+\begin{warning}
+When porting an application from the minimal API to the OSEK/VDX API,
+the developer {\em must} add a call to \fn{TerminateTask} at the end
+of every task body.
+\end{warning}
+
+\subsection{Informations on tasks}
+
+\ee\ supports the \fn{GetTaskID} and \fn{GetTaskState} primitives to
+get information about the running task ID and the task statuses.
+
+The minimal API does not support neither \fn{GetTaskID} nor \fn{GetTaskState}. 
+
+\subsection{Basic tasks and extended tasks}
+
+\ee\ distinguishes between {\em Basic} Tasks and {\em Extended}
+Tasks. Basic tasks typically run on a shared stack, whereas extended
+tasks must run on a private stack. Extended tasks are tasks which use
+events and counting semaphores.
+
+The minimal API does not have an explicit dinstinction between basic and extended
+tasks. The designer must take care to call counting semaphores and blocking
+primitives only within tasks with a private stack.
+
+\subsection{Number of pending activations}
+
+Considering the conformance classes BCC1 and ECC1 of \ee, tasks can
+have only one pending activation. In conformance classes BCC2 and
+ECC2, tasks can have more than one pending activation. The maximum
+number of pending activations is specified inside the OIL file and
+can not be changed at runtime. Pending activations of tasks with the
+same priority are processed in a FIFO order, meaning that the ready
+queue enqueues {\em activations} and not {\em tasks}, consuming RAM
+space for each pending activation which have to be stored.
+
+When using the minimal API, tasks store the number of pending activations as an integer value. 
+Therefore, the maximum value is implementation dependent. The developer 
+can not rely on a particular order in the processing of pending 
+activations of tasks with the same priority. 
+
+% ------------------------------------------------------
+
+\section{Interrupt handling}
+
+There is always a distinction between ISR type 1 and type 2.
+
+While \ee\ supports the primitives for disabling interrupts, the
+minimal API does not (please refer to the architecture manual for
+functions to disable interrupts).
+
+% ------------------------------------------------------
+
+\section{Event handling}
+
+\ee\ supports events for the two conformance classes: ECC1 and ECC2. 
+Events are not supported by the minimal API.
+
+% ------------------------------------------------------
+
+\section{Support for non-blocking semaphores}
+
+\ee\ supports the non-blocking counting semaphores primitives in the
+BCC1 and BCC2 conformance classes. BCC1 and BCC2 can also run on a
+monostack configuration.
+
+Semaphore primitives are supported by the minimal API only in the multistack
+configuration.
+
+% ------------------------------------------------------
+
+\section{ORTI support}
+
+If configured, \ee\ maintains information to support ORTI debugger
+awareness. The RT-Druid code generator is able to generate appropriate
+ORTI files which can be interpreted by debuggers such as Lauterbach
+Trace32.
+
+The minimal API does not support ORTI kernel awareness.
+
+\chapter{History}
+
+\begin{tabular}{|p{0.4\columnwidth}|p{0.6\columnwidth}|}
+\hline 
+Version&
+Comment\tabularnewline
+\hline
+\hline 
+1.0.0&
+Initial version of this document.\tabularnewline
+\hline 
+1.0.1&
+Added new versioning mechanism.\tabularnewline
+\hline 
+\end{tabular}
+
+
+%\bibliographystyle{plain}
+%\bibliography{../common/biblio}
+
+\printindex
+
+\end{document}

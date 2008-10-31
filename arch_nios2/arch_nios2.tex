@@ -1,0 +1,37 @@
+\documentclass[12pt,a4paper,normalheadings,titlepage]{scrreprt}
+
+\usepackage{../common/evman}
+\usepackage{graphicx}
+
+\pagestyle{headings}
+
+\def\title{ERIKA Enterprise Manual for the Altera Nios II target}
+\def\subtitle{the multicore RTOS on FPGAs}
+\include{dynamic_version}
+
+\begin{document}
+
+\maketitle
+
+%\thispagestyle{plain}
+
+\pagebreak
+
+\tableofcontents
+
+\include{introduction}
+
+\include{single}
+
+\include{multi}
+
+\include{oil}
+
+\include{history}
+
+\bibliographystyle{plain}
+\bibliography{../common/biblio}
+
+\printindex
+
+\end{document}

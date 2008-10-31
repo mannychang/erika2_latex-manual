@@ -1,0 +1,55 @@
+\chapter{Introduzione all'API minimale}
+
+\section{\ee\ }
+
+Evidence presenta il sistema operativo real-time \ee\, un sistema operativo
+minimale per microcontrollori che fornisce un semplice e compatto ambiente
+di esecuzione multithreading, con il supporto di algoritmi di scheduling
+real-time avanzati e il supporto allo stack sharing.
+
+Il kernel \ee\ e' stato sviluppato con l'intenzione di fornire un insieme
+minimale di primitive che possono essere utilizzate per implementare
+un sistema di ambiente multithreading. Le API minimali di \ee\ costituiscono un
+insieme ridotto delle API OSEK/VDX, che forniscono il supporto per
+funzionalita' quali l'attivazione di thread, la mutua esclusione, gli
+allarmi e i counting semaphores.
+
+Il consorzio OSEK/VDX ha messo a punto il linguaggio di specifica OIL 
+(OSEK Implementation Language) come standard per la configurazione delle
+applicazioni. Esso viene utilizzato per la definizione statica di una 
+serie di componenti e funzionalita' da istanziare in una applicazione.
+\ee\ supporta appieno il linguaggio OIL per la configurazione di 
+applicazioni real-time.
+
+Per far fronte alla complessita' che deriva dalla manipolazione di un file 
+di configurazione scritto in linguaggio OIL, Evidence ha sviluppato un tool
+di configurazione e profiling apposito: \rtd\. \rtd\ permette di 
+configurare una applicazione in ogni sua componente, impostando
+i parametri in modo semplice attraverso una interfaccia visuale 
+che automaticamente genera il codice di configurazione in linguaggio 
+OIL.
+
+Il tipico flusso di progetto e design di una applicazione include la definizione
+di un file di configurazione in linguaggio OIL, che definisce gli oggetti, i 
+componenti che sono utilizzati all'interno dell'applicazione real-time.
+In questa fase, \rtd\ aiuta lo sviluppatore ad impostare i parametri dei singoli
+oggetti e provvede alla generazione del relativo file di configurazione in
+linguaggio OIL, nonche' alla generazione del codice sorgente e dei makefiles
+richiesti per compilare l'applicazione. L'ultimo step prevede l'effettiva 
+compilazione del sorgente e la generazione del codice eseguibile sulla
+macchina target.
+
+Alcune delle features fornite da \ee\ allo sviluppatore, tipiche di un sistema real-time,
+sono le seguenti:
+\begin{itemize}
+  \item Supporto per il multitasking sia di tipo preemptive che non-preemptive;
+  \item Supporto per algoritmi di schedulazione a priorita' fisse;
+  \item Supporto per tecniche di stack sharing e di modelli di task one-shot 
+  al fine di ridurre l'utilizzo di stack da parte del programma;
+  \item Supporto per risorse condivise;
+  \item Supporto per l'attivazione periodica di task per mezzo degli Alarms;
+\end{itemize}
+
+Lo scopo di questo documento e' quello di descrivere in dettaglio le funzionalita' e la
+API di \ee\. Presso il sito web di Evidence e' disponibile ulteriore documentazione
+riguardo al porting di \ee\ per varie architetture e microcontrollori.

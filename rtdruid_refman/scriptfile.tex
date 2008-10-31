@@ -1,0 +1,567 @@
+\chapter{Script File}
+\label{cha:Script-File}
+
+\section{Introduction}
+
+The \rtd\ Toolset provides an uniform way of running a batch
+computation, that supports both non-GUI usage (useful for automatic
+code generation) and an usage that takes advantage of the Eclipse GUI
+%PJ: questo riferimento mi sa non esiste + 
+%described in Chapter \ref{cha:RTDruid-GUI}. 
+. To do that, the \rtd\ Toolset enhanced the support for the Apache Ant
+build tool. Apache Ant has been chosen because:
+
+\begin{itemize}
+\item it allows useful scripting with an expressive power similar to
+  conventional makefiles;
+\item it is expandible with customized features;
+\item it supports seamlessy integration with the Eclipse platform,
+  which has been used as base for the graphical environment of the
+  \rtd\ Toolset.
+\end{itemize}
+It is out of the scope of this section to describe Ant in detail.  For
+more informations about Apache Ant, please refer to
+\url{http://ant.apache.org}; a detailed manual of Ant can be found at
+\url{http://ant.apache.org/manual/intro.html}.
+
+%
+%\begin{lyxgreyedout}
+%Il tool deve capire da solo se e' il caso di usare schedulabilita'
+%con offset o senza?
+%\end{lyxgreyedout}
+
+
+
+\section{Quick introduction to ANT}
+
+
+Ant is a Java-based build tool produced by the Apache
+Foundation\footnote{Small parts of this section are derived from the
+manual available at
+\protect\url{http://ant.apache.org/manual/intro.html}. Please refer to
+it for a complete explaination. }.  Ant build files are somehow
+similar to makefiles, except that they are written as XML files.
+
+
+\paragraph{Targets.}
+
+As in makefiles, Ant can handle ``targets''. Each buildfile contains
+one project and at least one (default) target. Targets contains
+(provoke the execution of) tasks. Each task is run by a Java object
+that implements a particular Task interface. A target can depend on
+other targets.  You might have a target for compiling, for example,
+and a target for creating a distributable. In that sense, ``target''s
+are similar to makefile ``rules''. You can only build a distributable
+when you have compiled first, so the ``distribute'' target depends on
+the ``compile'' target. Ant resolves these dependencies.
+
+
+\paragraph{Tasks.}
+
+A task is a piece of code that can be executed. A task can have
+multiple attributes (or arguments, if you prefer). The value of an
+attribute might contain references to a property. These references
+will be resolved before the task is executed. A task is more or less a
+method of a Java class inside Ant that run whenever it has to be
+executed. We can think as a shell command inside a makefile rule is
+like the invocation of an Ant Task whose behavior is the same as the
+command. The \rtd\ Toolset expanded the Ant tasks providing a set of
+new tasks for doing, for example, schedulability analysis and code
+generation.
+
+
+\paragraph{Types.}
+
+A Type is used whenever the user needs to provide informations to a
+task, or have to represent list of items, files, and so on. For
+example, the execution of the \const{delete} task (for example inside a
+\const{clean} target) needs the list of files to be deleted, that is
+passed using a type.
+
+
+\paragraph{Properties.}
+
+A project can have a set of properties. These might be set in the
+buildfile by the property task, or might be set outside Ant. A
+property has a name and a value; the name is
+case-sensitive. Properties may be used in the value of task
+attributes. This is done by placing the property name between \const{\$\{}
+and \const{\}} in the attribute value. For example, if there is a
+\const{builddir} property with the value \const{build}, then this could be
+used in an attribute like this: \const{\$\{builddir\}/classes}. This is
+resolved at run-time as build/classes. Properties are very similar to
+makefile variables.
+
+
+\paragraph{Case sensitivity.}
+
+In general, the following rules apply for case sensitivity:
+
+%\begin{lyxgreyedout}
+%Penso che tutto il file sia case sensitive, fatta eccezione dei file
+%sotto windows
+%\end{lyxgreyedout}
+
+
+\begin{itemize}
+\item XML element tags in the script files are case sensitive;
+\item attribute values surrounded by brackets are case sensitive;
+\item if attribute values refer to file names, the rules of the host
+  OS applies (e.g. Windows is case insensitive, whereas Linux is case
+  sensitive);
+\item case sensitive words are written in the manual using a
+  \texttt{typewriter} font;
+\end{itemize}
+
+
+
+
+\section{Launching Ant}
+
+Ant can be launched from the command line.
+%, using the \file{rtdruid.sh}
+%script provided inside the \file{bin} directory of the documentation
+%package. 
+For example, to execute the script \file{build.xml} with a
+parameter \const{all} as target (the same as doing \const{make all}
+with makefiles), you should execute the following command (this command works on Windows; we used ``\textbackslash" to split the lines which are too long):
+
+%\begin{lstlisting}
+%rtdruid.sh build.xml all
+%\end{lstlisting}
+
+%For completeness, the rtdruid.sh script simply executes a command
+%like the following:
+
+\begin{lstlisting}
+set CLASSPATH="C:\Programmi\j2sdk1.4.2_05\lib\tools.jar; \
+    C:\Programmi\Evidence\eclipse\startup.jar"
+java org.eclipse.core.launcher.Main                      \
+     -application org.eclipse.ant.core.antRunner all     \
+     -buildfilebuild.xml
+\end{lstlisting}
+
+%java~-cp~\$ECLIPSE\_HOME/startup.jar~org.eclipse.core.launcher.Main~
+%~~~~~-application~org.eclipse.ant.core.antRunner~
+%~~~~~-buildfile~build.xml~mytarget~
+
+%\begin{lyxgreyedout}
+%l'opzione buildfile e' necesaria soltanto se lo script non e' build.xml,
+%build.xml e' il file di default
+%\end{lyxgreyedout}
+
+that is, the \const{antRunner} plugin of Eclipse is started, asking to
+execute the \file{build.xml} script file running the \const{all}
+target. If the \const{-buildfile} option is not specified, the default
+build file is \file{build.xml}.
+% Please refer to section
+%\ref{sec:launching_ant_from_Eclipse} for more informations about how
+%to run the Ant from inside the Eclipse platform GUI.
+
+
+\section{An Ant build script file format example}
+
+An Ant build script is currently composed by an XML file that (more or
+less) sequentially lists the commands run by the Ant. This section
+does not describe in detail the Ant syntax. For details about the
+syntax of an Ant build script, please refer to
+\url{http://ant.apache.org/manual/intro.html}.
+
+The following lines show an Ant script that uses some of the \rtd
+Toolset features.
+
+\begin{lstlisting}
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="rtdruid" default="all" basedir=".">
+
+  <target name="all">
+    <rtdruid.Oil.Configurator 
+      inputfile="conf.oil" 
+      outputdir="Debug"
+    />
+  </target>
+</project>
+\end{lstlisting}
+
+A project named \const{rtdruid} is declared, with one target named \const{all}.
+
+Target \const{all} calls a \const{rtdruid.Oil.Configurator} task,
+which performs the code generation for a given OIL file. In
+particular, the target \const{all} reads the file \file{conf.oil}
+stored in the current directory, and write the outputs inside the
+\file{Debug} directory.
+
+
+
+
+\section{Task ``rtdruid.Oil.Configurator''}
+\label{sec:rtdruid.oil.configurator}
+
+This task can be used to perform the code generation from an OIL
+file. The task accepts two parameters, which are \const{inputfile} (an
+input OIL file) and \const{outputdir} (the output directory where the
+generated files should be stored). If the output directory is created
+if it does not alreday exist.
+
+The typical usage of this ANT task is to exexute it inside the
+application working directory, generating the configuration files in a
+subdirectory. Then, the user can run the makefile which has been
+generated to compile the application.
+
+An example of an \const{rtdruid.Oil.Configurator} task is the following:
+
+\begin{lstlisting}
+...
+    <rtdruid.Oil.Configurator 
+      inputfile="conf.oil" 
+      outputdir="Debug"
+    />
+...
+\end{lstlisting}
+
+
+
+
+
+
+
+%% questo e' il testo della versione presente nel manuale di \rtd originale
+%% \section{An Ant build script file format example}
+
+%% questo era l'esempio alla fine della sezione
+
+%% \begin{lstlisting}
+%% <?xml version="1.0" encoding="UTF-8"?>
+%% <project name="rtdruid" default="all" basedir=".">
+%%   <target name="all">
+%%     <antcall target="t001"/>
+%%     <antcall target="t002"/>
+%%   </target>
+
+%%   <target name="t001">
+%%     <rtdruid.schedulability store="ris1.rtd">
+%%        <filelist dir="./001" files="data1.rtd data2.rtd"/>
+%%        <filelist dir="./003" files="dataA.rtd dataB.rtd"/>
+%%     </rtdruid.schedulability>
+%%   </target>
+
+%%   <target name="t002">
+%%     <rtdruid.schedulability store="ris2.ertd">
+%%        <filelist dir="./002" files="data.rtd"/>
+%%     </rtdruid.schedulability>
+%%   </target>
+%% </project> 
+%% \end{lstlisting}
+
+%% A project named \const{rtdruid} is declared, with three targets:
+%% \texttt{all}, \texttt{t001}, and \texttt{t002}. 
+
+%% The \texttt{all} target simply executes two \texttt{antcall}s. In
+%% practice, the executon of \texttt{all} simply executes target \texttt{t001},
+%% and then \texttt{t002}. Target \texttt{t001} (\texttt{t002} does it
+%% in a similar way) calls a \texttt{rtdruid.schedulability} task, that,
+%% as you can see in Section \ref{sec:rtdruid.schedulability}, performs
+%% the schedulability analysis without considering offsets. In particular,
+%% the target \texttt{t001} reads the files \texttt{data1.rtd} and \texttt{dataA.rtd},
+%% stored in the respective directories, and write the outputs inside
+%% \texttt{ris1.rtd}.
+
+
+%% \section{Common task structure\label{sec:common_task_structure}}
+
+%% Currently, tasks require the specification of a set of input files
+%% and of an output file. Input files are loaded all together to form
+%% the system representation (each file can contain a different part
+%% of the system). The output file is used to save the result of the
+%% analysis.
+
+%% Moreover, each schedulability analysis task allow the possibility
+%% to select the \emph{application mode} which the test is done with.
+
+%% The template DTD structure for a Task is the following:
+
+%% \begin{lyxcode}
+%% <!ELEMENT~rtdruid.xxx~(filelist){*}>
+
+%% <!ATTLIST~rtdruid.xxx
+
+%% ~~mode~~~~~~~~CDATA~\#IMPLIED
+
+%% ~~priorities~~CDATA~\#IMPLIED
+
+%% ~~store~~~~~~~CDATA~\#IMPLIED
+
+%% >
+%% \end{lyxcode}
+%% In particular:
+
+%% \begin{description}
+%% \item [{mode}] represents the application mode that have to be considered
+%% during the analysis. The application mode, for example, influences
+%% the mapping phase and the execution times. If not present, the default
+%% mode is \emph{considered}.
+%% \item [{priorities}] the priority attribute can have the following values:
+
+%% \begin{description}
+%% \item [{user}] proprities are specified by the user (that is the default
+%% value);
+%% \item [{byDeadline}] priorities are assigned to tasks inversely proportional
+%% to their deadlines;
+%% \item [{byPeriod}] priorities are assigned to tasks inversely proportional
+%% to their periods;
+%% \end{description}
+%% \item [{store}] specifies the output file, where all the results need to
+%% be saved. Currently all the data structure obtained by the union of
+%% the input files plus the schedulability results are saved in the same
+%% output file.
+%% \item [{filelist}] allows the specification of the list of input files.
+%% That is one of the predefined Ant type, and it is mainly composed
+%% by the dir and file attributes (both mandatory). The \texttt{dir}
+%% attribute represents the directory that have to be considered as prefix
+%% for the file list listed in the \texttt{file} attribute. Files in
+%% the \texttt{file} attribute are separated using {}``,'' and spaces%
+%% \footnote{File names that contain spaces should not be specified.%
+%% }.
+%% \end{description}
+%% The \RTDruid Toolset does not support the Ant feature that allows
+%% task to be executed concurrently. In general, Tasks can execute concurrently
+%% only if they belong to different Java Virtual Machines.
+
+%% %
+%% \begin{lyxgreyedout}
+%% Il prossimo futuro
+
+%% blocchi di comandi, nel quale è presente una sola struttura dati condivisa
+%% tra tutti i comandi. Ovviamente nell'uscire da un blocco, tutte le
+%% informazioni in esso presenti e/o calcolate vengono perse. I comandi
+%% disponibili (quelli che pensavo di implementare) sono:
+
+%% \begin{enumerate}
+%% \item indicare uno o + file da caricare, eventualmente taggandoli con un
+%% id in modo da caricarli una volta ed utilizzarli eventualmente + volte,
+%% visto che il caricamento con trasformazione richiede abbastanza tempo.
+%% Dopo il primo caricamento, i dati vengono anche inseriti nella struttura
+%% corrente, faccendo un merge con i dati preesistenti (si potrebbe mettere
+%% un flag che abilita o meno la sovvrascrittura di valori settati in
+%% modo diverso).
+
+%% \begin{enumerate}
+%% \item pulire l'albero corrente.
+%% \item ri-inserire nell'albero corrente file gia' caricati (una sorta di
+%% {}``re-load ID'').
+%% \item effettuare dei test di schedulabilita' coi dati presenti nell'albero
+%% corrente (comporta una successiva modifica dell'albero).
+%% \item effettuare dei salvataggi dell'albero corrente, eventualmente indicando
+%% quali sezioni salvare. Nel caso si renda disponibile la scelta di
+%% sotto rami, si potrebbe accettare che l'utente specifichi tutti i
+%% sottorami che vuole salvare (i caratteri jolly potrebbero essere comodi
+%% ma hanno un impatto da non sottovalutare ).
+%% \item Stampare valori dell'albero o fare dei test sui loro valori .... magari
+%% + avanti nel tempo, anche perche' altrimenti diventa un secondo linguaggio
+%% interno al linguaggio di ant.
+%% \end{enumerate}
+%% \end{enumerate}
+%% NOTA 2:
+
+%% In ogni caso, almeno per adesso non e' possibile eseguire piu' test/blocchi/script
+%% in parallelo, in quanto l'albero corrente e' memorizzato in una variabile
+%% statica, quindi comune a tutto l'ambiente. Quest'ulteriore residuo
+%% del vecchio modello andra' eliminato ma non in questa versione.
+
+%% Volendo esaminare alcuni casi :
+
+%% \begin{enumerate}
+%% \item l'uso del costrutto di ant che permette la parallizzazione delle esecuzioni,
+%% che comprende task di rtdruid, e' ovviamente da evitare
+%% \item in assenza del costrutto indicato sopra, le esecuzioni da riga di
+%% comando sono sempre {}``isolate'', in quanto per ciascuna di queste
+%% viene caricato un ambiente distinto, dunque possono essere eseguiti
+%% in parallelo
+%% \item poiche' per mandare in esecuzione uno script ant dall'interfaccia
+%% grafica e' necessario utilizzare lo stesso ambiente di eclipse, non
+%% e' possibile mandare eseguire piu' test in parallelo (compresi i test
+%% lanciati direttamente da menu)
+%% \end{enumerate}
+
+%% \end{lyxgreyedout}
+
+
+
+%% \section{Task {}``rtdruid.Schedulability''\label{sec:rtdruid.schedulability}}
+
+%% This task can be used to perform the schedulability test without considering
+%% task offsets. The system is composed by the composition of different
+%% input files; the result can then be saved on an output file, following
+%% the specification described in Section \ref{sec:common_task_structure}.
+
+%% An example of an \texttt{rtdruid.Schedulability} task is the following:
+
+%% \begin{lyxcode}
+%% ...
+
+%% ~~~<rtdruid.schedulability~store=\char`\"{}results.rtd\char`\"{}>
+
+%% ~~~~~~<!-{}-~NB:~input1.rtd~and~input2.ertd~are~two~different~files!~-{}->
+
+%% ~~~~~~<filelist~dir=\char`\"{}./first\char`\"{}~~files=\char`\"{}input1.rtd~input2.ertd\char`\"{}/>~
+
+%% ~~~~~~<filelist~dir=\char`\"{}./second\char`\"{}~files=\char`\"{}other\_data.rtd\char`\"{}/>
+
+%% ~~~</rtdruid.schedulability>
+
+%% ...
+
+
+%% \end{lyxcode}
+
+%% \section{Task {}``rtdruid.OffsetSchedulability.Exact''}
+
+%% This task can be used to perform the schedulability test considering
+%% task offsets (and an exaustive search). The system is composed by
+%% the composition of different input files; the result can then be saved
+%% on an output file, following the specification described in Section
+%% \ref{sec:common_task_structure}.
+
+%% In this case, an \emph{exaustive} \emph{search} is performed to find
+%% the best offset that makes the system schedulable (that is different
+%% to what happens with Task rtdruid.OffsetSchedulability.Sufficient,
+%% see Section \ref{sec:offset-sufficient-analysis}). 
+
+%% Warning: That search can take a long time to be computed!
+
+%% An example of an \texttt{rtdruid.OffsetSchedulability.Exact} task
+%% is the following:
+
+%% \begin{lyxcode}
+%% ...
+
+%% ~~~<rtdruid.OffsetSchedulability.Exact~priority=\char`\"{}byDeadline\char`\"{}
+
+%% ~~~~store=\char`\"{}../results.rtd\char`\"{}>
+
+%% ~~~~~~<filelist~dir=\char`\"{}.\char`\"{}~files=\char`\"{}some\_data.rtd~myDir/other\_data.rtd\char`\"{}/>
+
+%% ~~~</rtdruid.OffsetSchedulability.Exact>
+
+%% ...
+
+
+%% \end{lyxcode}
+
+%% \section{Task {}``rtdruid.OffsetSchedulability.Sufficient''\label{sec:offset-sufficient-analysis}}
+
+%% This task can be used to perform the schedulability test considering
+%% task offsets (and a partial search). The system is composed by the
+%% composition of different input files; the result can then be saved
+%% on an output file, following the specification described in Section
+%% \ref{sec:common_task_structure}.
+
+%% In this case, only a partial search is done to find a (hopefully)
+%% good offset assignment. Only a partial search is performed, and only
+%% a limited number of tasks are examined together. This task works only
+%% with FP priority assignments.
+
+%% %
+%% \begin{lyxgreyedout}
+%% Per ora solo FP, in futuro anche EDF
+%% \end{lyxgreyedout}
+
+
+%% For this reason, this task adds to the template showed in Section
+%% \ref{sec:common_task_structure} the following two attributes:
+
+%% \begin{description}
+%% \item [{F}] number of tasks that have to be considered together (F stands
+%% for Fixed tasks). Values less than 2 and greater than the number of
+%% tasks in the system are non-sense. This parameter must have a value
+%% between 2 and the number of tasks that are mapped on the RTOS%
+%% \footnote{If more than one RTOS is present, the F value is the same for everyone.
+%% That means that F should be less then the minimum number of tasks
+%% present on all the RTOS (excluding of course RTOSes with no tasks).%
+%% } . The default value is F equal to 2.
+%% \item [{%
+%% \begin{lyxgreyedout}
+%% Per ora il {}``tipo e' disabilitato''\\
+
+
+%% type This is the kind of analysis that have to be used. This attribute
+%% is case insensitive and it can have only the following two values
+%% \texttt{EDF} and \texttt{RT}; \texttt{EDF} is the default value..
+%% \end{lyxgreyedout}
+%% }]~
+%% \end{description}
+%% An example of an \texttt{rtdruid.OffsetSchedulability.Sufficient}
+%% task is the following:
+
+%% \begin{lyxcode}
+%% ...
+
+%% ~~~<rtdruid.OffsetSchedulability.Sufficient~priority=\char`\"{}byDeadline\char`\"{}~
+
+%% ~store=\char`\"{}results.rtd\char`\"{}~F=\char`\"{}3\char`\"{}>
+
+%% ~~~~~~<filelist~dir=\char`\"{}.\char`\"{}~files=\char`\"{}data.rtd\char`\"{}/>
+
+%% ~~~</rtdruid.OffsetSchedulability.Sufficient>
+
+%% ...
+
+
+%% \end{lyxcode}
+
+%% \section{%
+%% \begin{lyxgreyedout}
+%% Non e' presente in questa versione\protect \\
+
+
+%% Task {}``rtdruid.OffsetSchedulability.Assignment''
+
+%% This task can be used to assign offset to tasks, without performing
+%% a schedulability analysis. The system is composed by the composition
+%% of different input files; the result can then be saved on an output
+%% file, following the specification described in Section \ref{sec:common_task_structure}.
+
+%% An example of an \texttt{rtdruid.OffsetSchedulability.Assignment}
+%% task is the following:
+
+%% \begin{lyxcode}
+%% ...
+
+%% ~~~<rtdruid.OffsetSchedulability.Assignment~store=\char`\"{}withOffset.rtd\char`\"{}>
+
+%% ~~~~~~<filelist~dir=\char`\"{}.\char`\"{}~files=\char`\"{}withoutOffset.rtd\char`\"{}/>
+
+%% ~~~</rtdruid.OffsetSchedulability.Assignment>
+
+%% ...
+%% \end{lyxcode}
+
+%% \end{lyxgreyedout}
+%% }
+
+
+%% \section{Task {}``rtdruid.Convert''}
+
+%% This task can be used to convert a file between the two formats (RTD
+%% and ERTD) supported by the \RTDruid Toolset. Moreover, it can be
+%% used to perform a composition of a set of files already existing,
+%% since its input file, as in the task template in Section \ref{sec:common_task_structure},
+%% is a list of files. The mode and priorities attributes are not present.
+
+%% An example of an \texttt{rtdruid.Convert} task is the following:
+
+%% \begin{lyxcode}
+%% ...
+
+%% ~~~<rtdruid.Convert~store=\char`\"{}withOffset.rtd\char`\"{}>
+
+%% ~~~~~~<filelist~dir=\char`\"{}.\char`\"{}~files=\char`\"{}data.rtd\char`\"{}/>
+
+%% ~~~~~~<filelist~dir=\char`\"{}./001\char`\"{}~files=\char`\"{}data1.ertd\char`\"{}/>
+
+%% ~~~~~~<filelist~dir=\char`\"{}./002\char`\"{}~files=\char`\"{}data1.rtd\char`\"{}/>
+
+%% ~~~</rtdruid.Convert>
+
+%% ...
+%% \end{lyxcode}

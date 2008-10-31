@@ -1,0 +1,4 @@
+ARCH_NIOS2_API_TUTORIAL__DIR = arch_nios2_api_tutorial
+ARCH_NIOS2_API_TUTORIAL__MAIN_NAME = arch_nios2_api_tutorial
+ARCH_NIOS2_API_TUTORIAL__MAIN = api_tutorial
+ARCH_NIOS2_API_TUTORIAL__VER = 1_0_6

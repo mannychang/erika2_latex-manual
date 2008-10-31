@@ -1,0 +1,181 @@
+\documentclass[12pt,a4paper,titlepage]{scrreprt}
+%\documentclass[12pt,a4paper,titlepage]{refrep}
+
+\usepackage{evman}
+
+\pagestyle{fancy}
+
+\title{Example of Reference manual}
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{plain}
+
+\tableofcontents
+
+\chapter{API reference}
+\label{sec:api_reference}
+
+This is the first chapter!! 
+
+\section{Types}
+\label{sec:types}
+
+\section{Functions}
+\label{sec:functions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{DeclareTask}
+
+\synopsis{DeclareTask(TaskType TaskID);}
+
+  \begin{fundescription}
+DeclareTask serves as an external declaration of a task. The function
+and use of this service are similar to that of the external
+declaration of variables.
+  \end{fundescription}
+
+  \begin{funparameters}
+    \fpar{TaskID}{Task reference}
+  \end{funparameters}
+
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ActivateTask}
+
+\synopsis{StatusType ActivateTask(TaskType TaskID);}
+
+  \begin{fundescription}
+    The task \vr{TaskID} is transferred from the suspended state into the
+    ready state. The operating system ensures that the task code is being
+    executed from the first statement.
+  \end{fundescription}
+
+  \begin{funparameters}
+    \fpar{TaskID}{Task reference}
+  \end{funparameters}
+
+  \begin{funreturn}
+  \fret{E_OK}{No error}
+  \fret{E_OS_LIMIT}{Too many task activations of \vr{TaskID}}
+  \fret{E_OS_ID}{(Extended) Task \vr{TaskID} is invalid}.
+  \end{funreturn}
+
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{function}{TerminateTask}
+
+\synopsis{StatusType Terminatetask(void)}
+
+  \begin{fundescription}
+    This service causes the termination of the calling task. The
+    calling task is transferred from the running state into the
+    suspended state.
+
+    An internal resource assigned to the calling task is automatically
+    released. Other resources occupied by the task shall have been
+    released before the call to \fn{TerminateTask}. If a resource is
+    still occupied in standard status the behaviour is undefined.
+
+    If the call was successful, \fn{TerminateTask} does not return to
+    the call level and the status can not be evaluated.  If the
+    version with extended status is used, the service returns in case
+    of error, and provides a status which can be evaluated in the
+    application.
+
+    If the service \fn{TerminateTask} is called successfully, it
+    enforces a rescheduling.
+
+    Ending a task function without call to \fn{TerminateTask} or
+    \reffun{ChainTask} is strictly forbidden and may leave the system in
+    an undefined state.
+  \end{fundescription}
+
+  \begin{funparameters}
+  \item No parameters
+  \end{funparameters}
+
+  \begin{funreturn}
+    \fret{no return}{(Standard)}
+    \fret{E_OS_RESOURCE}{(Extended) Task still occupies resources}
+    \fret{E_OS_CALLEVEL}{(Extended) Call at interrupt level}.
+  \end{funreturn}
+
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function}{ChainTask}
+
+\synopsis{StatusType ChainTask(TaskType TaskID);}
+
+  \begin{fundescription}
+This service causes the termination of the calling task. After
+termination of the calling task a succeeding task \vr{TaskID} is
+activated. Using this service, it ensures that the succeeding task
+starts to run at the earliest after the calling task has been
+terminated.
+
+If the succeeding task is identical with the current task, this does
+not result in multiple requests. The task is not transferred to the
+suspended state, but will immediately become ready again.  An internal
+resource assigned to the calling task is automatically released, even
+if the succeeding task is identical with the current task. Other
+resources occupied by the calling shall have been released before
+\fn{ChainTask} is called. If a resource is still occupied in standard
+status the behaviour is undefined.
+
+If called successfully, \fn{ChainTask} does not return to the call level
+and the status can not be evaluated.
+
+In case of error the service returns to the calling task and provides
+a status which can then be evaluated in the application.
+
+If the service \fn{ChainTask} is called successfully, this enforces a
+rescheduling.  Ending a task function without call to
+\reffun{TerminateTask} or \fn{ChainTask} is strictly forbidden and may
+leave the system in an undefined state.
+
+If \const{E_OS_LIMIT} is returned the activation is ignored.  When an extended
+task is transferred from suspended state into ready state all its
+events are cleared.
+  \end{fundescription}
+
+  \begin{funparameters}
+    \fpar{TaskID}{Task reference}
+  \end{funparameters}
+
+  \begin{funreturn}
+  \fret{E_OK}{No error}
+  \fret{E_OS_LIMIT}{Too many task activations of \vr{TaskID}}
+  \fret{E_OS_ID}{(Extended) Task \vr{TaskID} is invalid}.
+  \end{funreturn}
+
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

@@ -1,0 +1,309 @@
+%=====================================================================
+\chapter{OIL Extensions for the Nios II target}
+%=====================================================================
+
+This chapter contains OIL extensions specific for the Nios II target. It
+addresses only the extensions for Nios II.
+
+For a detailed description of the OIL features supported by \ee\ and \rtd,
+which are coomon to all the supported architectures, please refer to the
+\rtd\ Reference Manual. 
+
+%---------------------------------------------------------------------
+\section{Task Extensions}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\subsection{Stack size}
+%---------------------------------------------------------------------
+
+Task stacks can be shared or private. If the system is using shared
+stack spaces, this information is ignored. In case the system is
+configured for private stack spaces, each task needs to declare the
+dimension of its stack space, expressed in bytes, with the following 
+notation.
+
+Definition:
+
+\begin{lstlisting}
+  ENUM [
+    SHARED,
+    PRIVATE_NIOSII {
+      UINT32 SYS_SIZE;
+    }
+  ] STACK = SHARED;
+\end{lstlisting}
+
+Example of declaration:
+
+\begin{lstlisting}
+  STACK = PRIVATE_NIOSII {
+    SYS_SIZE = 0x1000;
+    /* or, alternatively
+    SYS_SIZE = 4096;
+    */
+  }
+\end{lstlisting}
+
+%---------------------------------------------------------------------
+\section{Nios II specific extensions}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\subsection{Configuration parameters}
+%---------------------------------------------------------------------
+
+The \const{NIOS2_DO_MAKE_OBJDUMP} option has the same effect of the
+Nios II preference that produces an objdump of the ELF file on each
+compilation.
+
+The \const{NIOS2\_APP\_CONFIG} and \const{NIOS2\_SYS\_CONFIG} options
+specify the configuration options for the application and for the
+system libraries. Typical values for these options are \const{Debug}
+and \const{Release}. Basically, these options specifies a set of
+configuration parameters used to compile the source code.
+
+The \const{NIOS2\_JAM\_FILE} and \const{NIOS2\_PTF\_FILE} options are
+mandatory and are used to specify the JAM file (in case of debugging
+using the Lauterbach Trace32), and the PTF file used for system
+generation.
+
+Definition:
+
+\begin{lstlisting}
+  STRING NIOS2_SYS_CONFIG;
+  STRING NIOS2_APP_CONFIG;
+  BOOLEAN NIOS2_DO_MAKE_OBJDUMP = FALSE;
+  STRING NIOS2_JAM_FILE;
+  STRING NIOS2_PTF_FILE;
+\end{lstlisting}
+
+Example:
+
+\begin{lstlisting}
+  NIOS2_SYS_CONFIG = "Debug";
+  NIOS2_APP_CONFIG = "Debug";
+  NIOS2_DO_MAKE_OBJDUMP = TRUE;
+  NIOS2_JAM_FILE = "C:/mydirectory/myjamfile.jam";
+  NIOS2_PTF_FILE = "C:/mydirectory/myptffile.ptf";
+\end{lstlisting}
+
+
+%---------------------------------------------------------------------
+\subsection{CPU data}
+%---------------------------------------------------------------------
+
+Extensions to the CPU\_DATA include the following options:
+
+\begin{description}
+\item [{\tt SYSTEM\_LIBRARY\_NAME}] The name of the Altera system
+  library to which the cpu is linked against.
+
+\item [{\tt SYSTEM\_LIBRARY\_PATH}] The path where the Altera system
+  library for the cpu is located.
+
+\item [{\tt IPIC\_LOCAL\_NAME}] The input PIO that is used to raise
+  interprocessor interrupts on the CPU.
+\end{description}
+
+Example:
+
+\begin{lstlisting}
+  CPU_DATA = NIOSII {
+    ID = "cpu2";
+    MULTI_STACK = TRUE {
+      IRQ_STACK = FALSE;
+      DUMMY_STACK = SHARED;
+    };
+
+    APP_SRC = "cpu2_startup.c";
+    STACK_TOP = 0x20004000;
+    SHARED_SYS_SIZE = 1800;
+    SYS_SIZE = 0x1000; 
+
+    SYSTEM_LIBRARY_NAME = "standard_2cpu_cpu2";
+    SYSTEM_LIBRARY_PATH = "C:/altera/kits/.../mylibrary";
+    IPIC_LOCAL_NAME = "IPIC_IN_2";
+  };
+\end{lstlisting}
+
+%---------------------------------------------------------------------
+\subsection{Mutex options}
+%---------------------------------------------------------------------
+
+In the HW configuration of a multiprocessor system the definition of
+an Altera Avalon Mutex Peripheral is required. 
+
+For Nios II versions 6.0 and above, the OIL parameter
+\const{NIOS2\_MUTEX\_BASE} is used to specify the base address of the
+Altera HAL mutex device as it can be found in the \file{system.h}
+file.
+
+Definition:
+
+\begin{lstlisting}
+  STRING NIOS2_MUTEX_BASE;
+\end{lstlisting}
+
+Example:
+
+\begin{lstlisting}
+   NIOS2_MUTEX_BASE = "MUTEX_BASE";
+\end{lstlisting}
+
+For Nios II versions 5.0 and 5.1, the OIL parameter
+\const{MUTEX\_DEVICE\_NAME} is used to specify the name of the Altera
+HAL mutex device as it can be found in the \file{system.h} file.
+
+Definition:
+
+\begin{lstlisting}
+  STRING MUTEX_DEVICE_NAME;
+\end{lstlisting}
+
+Example:
+
+\begin{lstlisting}
+  MUTEX_DEVICE_NAME = "/dev/mutex";
+\end{lstlisting}
+
+%---------------------------------------------------------------------
+\subsection{Startup}
+\label{sec:startup}
+%---------------------------------------------------------------------
+
+Erika-specific parameters for Nios II multiprocessors include a few
+startup options:
+
+\begin{description}
+\item [{\tt STARTUPSYNC}] This item may be declared as \const{TRUE} or
+  \const{FALSE}. If \const{TRUE}, the startup barrier is enabled at
+  system startup, all CPUs start executing the first line of code at
+  the same time instant. The default value is \const{TRUE}.
+
+\item [{\tt USEREMOTETASK}] If set at \const{IFREQUIRED}, a task is
+  declared inside the CPU declaration of the processor where it is
+  going to be executed. If a task handles signals coming from
+  tasks/alarms executing on a remote CPU, the task needs to be
+  declared also in those CPUs as a remote task. If
+  \const{USEREMOTETASK} is set to \const{ALWAYS}, then all tasks are
+  declared in the hosting CPUs and in all the other CPUs, regardless
+  of the fact that they are referred by local code or not. The default
+  value is \const{IFREQUIRED}. When using the value
+  \const{IFREQUIRED}, the user must specify intertask activations
+  using the \const{LINKED} attributes (see section
+  \ref{sec:intertask-notifications}). 
+\end{description}
+
+Definition:
+
+\begin{lstlisting}
+  BOOLEAN STARTUPSYNC = TRUE;
+  ENUM [ALWAYS, IFREQUIRED] USEREMOTETASK = IFREQUIRED; 
+\end{lstlisting}
+
+Example:
+
+\begin{lstlisting}
+  STARTUPSYNC = TRUE;
+  USEREMOTETASK = ALWAYS;
+\end{lstlisting}
+
+
+\subsection{Intertask notifications}
+\label{sec:intertask-notifications}
+If a task needs to activate other tasks or set Events to other
+extended tasks, then a corresponding declaration needs to be added to
+the OIL declaration part. If the tasks are mapped on remote cpus,
+\rtd\ provides the \ee\ kernel with the necessary information so that
+remote signalling mechanisms (instead of local) are used. The OIL
+declaration requires the names/identifiers of the tasks to which the
+signals are directed. This option is typically used to reduce the
+footprint of the kernel configuration data, because the generation of
+the kernel data structure that supports remote activations are
+generated only when needed, saving space in the kernel data structures
+generated by \rtd.
+
+\begin{warning}
+  The specification of these options can be avoided if the option
+  \const{USEREMOTETASK} is used with the \const{ALWAYS} value (see
+  Section \ref{sec:startup}).
+\end{warning}
+
+Definition:
+
+\begin{lstlisting}
+  TASK_TYPE LINKED[];
+\end{lstlisting}
+
+Example:
+\begin{lstlisting}
+CPU mySystem {
+  TASK myTask {
+    LINKED = "task1";
+    LINKED = "task2";
+    ...
+  };
+}
+\end{lstlisting}
+
+
+%---------------------------------------------------------------------
+\subsection{Compiler options}
+%---------------------------------------------------------------------
+
+Nios II supports an additional parameter \const{LDDEPS} that has the
+same meaning of the \const{LDDEPS} parameter in the Altera Makefiles.
+
+Definition:
+
+\begin{lstlisting}
+  STRING LDDEPS[];
+\end{lstlisting}
+
+Example:
+\begin{lstlisting}
+  /* this example includes allthe compilation parameters 
+     for Nios II */
+  CFLAGS = "-DALT_DEBUG -G0";
+  CFLAGS = "-O0 -g";
+  /* The previous two lines are equivalent to 
+   * CFLAGS = "-DALT_DEBUG -G0 -O0 -g";
+   */
+  CFLAGS = "-Wall -Wl,-Map -Wl,project.map";
+  ASFLAGS = "-g";
+  LDDEPS = "\";
+  LIBS = "-lm";
+\end{lstlisting}
+
+%---------------------------------------------------------------------
+\section{OIL Extensions for Multiprocessing}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\subsection{Interprocessor Interrupts Extensions}
+%---------------------------------------------------------------------
+
+When using multiprocessor systems based on Altera Nios II, the user
+must specify the Altera HAL names used to implement 
+interprocessor interrupts.
+
+The user must specify inside the OIL file the name of the global
+Output PIO, by defining the attribute \const{IPIC_GLOBAL_NAME}, and
+the name of the Input PIO local to each CPU with the definition of the
+\const{IPIC_LOCAL_NAME} as specified in the following example:
+
+\begin{lstlisting}
+CPU test_application {
+  OS EE {
+    ...
+    IPIC_GLOBAL_NAME = "IPIC_OUTPUT_PIO";
+    CPU_DATA = NIOSII {
+      ...
+      IPIC_LOCAL_NAME = "IPIC_INPUT_PIO_CPU1";
+    };
+    ...
+  };
+  ...
+};
+\end{lstlisting}

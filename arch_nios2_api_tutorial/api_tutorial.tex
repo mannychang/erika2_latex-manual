@@ -1,0 +1,31 @@
+\documentclass[12pt,a4paper,normalheadings,titlepage]{scrreprt}
+
+\usepackage{../common/evman}
+\usepackage{graphicx}
+
+\pagestyle{headings}
+
+\def\title{ERIKA Enterprise API Tutorial}
+\def\subtitle{for the Altera Nios II Platform}
+\include{dynamic_version}
+
+\begin{document}
+
+\maketitle
+
+\pagebreak
+
+\tableofcontents
+
+\include{api_tutorial_contents}
+\include{api_tutorial_task}
+\include{api_tutorial_resource}
+\include{api_tutorial_event}
+\include{history}
+
+\bibliographystyle{plain}
+\bibliography{../common/biblio}
+
+%\printindex
+
+\end{document}

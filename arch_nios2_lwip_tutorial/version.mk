@@ -1,0 +1,4 @@
+ARCH_NIOS2_LWIP_TUTORIAL__DIR = arch_nios2_lwip_tutorial
+ARCH_NIOS2_LWIP_TUTORIAL__MAIN_NAME = arch_nios2_lwip_tutorial
+ARCH_NIOS2_LWIP_TUTORIAL__MAIN = lwip_tutorial
+ARCH_NIOS2_LWIP_TUTORIAL__VER = 1_0_2

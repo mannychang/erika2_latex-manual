@@ -1,0 +1,331 @@
+\chapter[Basic concepts]{Basic concepts of Real-time programming}
+\label{cha:basics}
+
+In this chapter, the basic concept behind real-time programming are
+presented. We also anticipate the basic mechanisms underlying \ee\ and
+we give an overview of the theory behind the \ee\ real-time services.
+
+%-----------------------------------------------------------------%
+\section{Real-time applications}
+
+A real-time application is a program whose correctness depends not
+only on the correctness of the produced results, but also on the {\em
+time at which they are produced}. If results are produced too late,
+the program is incorrect. 
+
+In a {\em safety critical} real-time application, a late result can
+cause catastrophic consequences. Examples of safety critical
+applications include industrial plant control systems, automotive
+control systems, aerospace systems, etc.
+
+Many real-time applications are less critical. In thses systems, a
+late result does not compromise the functionality. However, the
+performance and the ``quality'' of the produced results depends on
+their timeliness. These systems are often referred to as {\em soft
+real-time}. Examples include telecommunication applications,
+multimedia systems, some control system.
+
+To ensure a correct behaviour, the designer of a real-time system must
+adopt programming techniques and operating system services that
+guarantee a {\em predictable behaviour}. Then, by performing an
+appropriate {\em analysis}, it is possible to know a priori
+(i.e. before delivering the system to the final user) if the timing
+behaviour is correct under all operating conditions.
+
+\ee\ is a real-time operating system that provides {\bf predictable
+behaviour}. This means that it is possible to perform a {\em
+scheduling analysis}\index{scheduling analysis} on programs developed
+with \ee, by means of the {\bf \rtd\ Scheduling Analysis Plug-in}
+(see the \rtd\ reference manual), to know if the application will
+meet the timing constraints.
+
+In most case, real-time systems interact with the external environment
+(e.g. the system to be controlled) and must respond within certain
+intervals of time to external events. As different events may happen
+at different time instants, and must be processed with a different
+priority, a natural choice for these systems is to use concurrent
+programming. Therefore, in many cases a real-time application consists
+of a set of concurrent tasks\index{task} that are managed by the RTOS
+and its ``scheduler''. 
+
+\subsection{Differences between real-time and non-real-time programming}
+
+It is important to underline the main differences between classical
+multitask programming for non-real-time applicatrions, and programming
+with a real-time application with a RTOS in general, and with \ee\ in
+particular. The following issues must be considered in a real-time
+system.
+
+\begin{itemize}
+\item The number of tasks\index{task creation} and their behaviour
+  must be known a-priori. Since the system must be predictable and to
+  enable a {\em scheduling analysis}, it is necessary to estimate the
+  worst-case situation for the system in terms of load. For this
+  reason, the number of tasks and their code is usually fixed before
+  run-time. In \ee, the tasks are created at system start-up and exist
+  during the entire system lifetime. Tasks cannot be created
+  dynamically at run-time.
+
+\item The same rule applies to memory\index{dynamic memory} and shared
+  objects, including alarms\index{alarm} and communication
+  objects. Memory is statically allocated to tasks at compile time,
+  and cannot be dynamically allocated. Mutex\index{mutex}, and in
+  general any communication or synchronization objects is created at
+  system start-up and cannot be dynamically created.
+
+\item Not all synchronization and communication primitives are
+  allowed. For example, generic semaphores are not used in real-time
+  systems, as they could produce the well-known {\em priority
+  inversion}\index{priority inversion} problem. We will present the
+  priority inversion problem in Section \ref{??}. Also, tasks cannot
+  self-suspend for a certain interval of time, as this complicates the
+  analysis and introduces a potential source of unpredictability in
+  the system.
+
+\item Appropriate {\em scheduling algorithms}\index{scheduling
+  algorithm} are used in RTOS, to ensure predictable behaviour. The
+  most commonly used scheduling algorithm is the {\em fixed priority
+  scheduling}, and it is the one used in \ee. Moreover, future version
+  of \ee\ will allow different scheduling algorithms like {\em
+  earliest deadline first} (EDF). Scheduling algorithms will be
+  briefly described in Section \ref{sec:basics_scheduling}.
+
+\item \nb{Altro??}
+
+\end{itemize}
+
+%-----------------------------------------------------------------%
+
+\section{Tasks}
+\label{sec:basics_tasks}
+
+A tasks (or {\em thread})\index{task}\index{thread} is a piece of code
+that execute sequentially. In a real-time applications, tasks are
+usually activated by timers or by external or internal events, and
+must complete their execution before a {\em deadline}\index{deadline}. 
+
+\nb{basic tasks}
+
+\nb{extended tasks}
+
+A task goes though a set of {\em states}\index{task!states}. In Figure
+\ref{fig:ready_diagram}, we report the state diagram of a
+task. Initally, a task is {\em idle} and waits for an activation. When
+a task is activated, it goes into the {\em ready} state. Since more
+than one task can be ready at the same time, a {\em scheduler} selects
+which tasks to execute among the ready tasks (see Section
+\ref{sec:basics_scheduling}). When a task completes its execution, it
+goes back into the idle state waiting for the next activation
+event. The task's code executed between an activation and the time it
+completes and becomes idle again is a task's {\em
+instance}\index{task!instance} or {\em job}\index{task!job}. The
+interval of time between the activation and the corresponding
+completion is called {\em response time}\index{task!response time}. In
+a real-time system, it is important to control the response time of
+all tasks and guarantee that it is always within an interval of time
+called {\em deadline}. More specifically, the {\em relative
+deadline}\index{task!deadline} of a task is the maximum response time
+that is allowed to a task for the system to be correct.
+
+While a task is executing, if it tries to access a shared resource, it
+may be blocked because the resource is busy. In this case, it goes to
+the {\em blocked} state until the resource gets free.
+
+\begin{figure}
+  \begin{center}
+    \nb{immagine mancante!!!}
+   % \includegraphics[width=5cm]{images/ready_diagram.eps}
+  \end{center}
+  \caption{State diagram for a task.}
+  \label{fig:ready_diagram}
+\end{figure}
+
+\nb{Put a typical example of thead code from erika, or remand to the
+next chapter}.
+
+In the real-time literature, tasks are classified according to their
+activation type. A task can be {\em periodic}\index{task!periodic} if
+it is periodically activated by a timer (or by an external events that
+is triggered at constant intervals of time); it can be {\em
+sporadic}\index{task!sporadic} if is is activated by an even that
+occurs at variable intervals of time, but with a minimum interarrival
+time between two consecutive events; or {\em
+aperiodic}\index{task!aperiodic} if such minimum interarrival time
+cannot be specified. Other models include {\em burst} activations,
+recurring etc.
+
+The first time a periodic task is activated is called {\em offset} or
+{\em phase}. As we will briefly explain in the next Section, it is
+often necessary to impose different offsets to periodic tasks, to
+avoid the situation in which they are all activated at the same time.
+In Section \ref{??}, we will present how to program a periodic task in
+\ee.
+
+\section{Scheduling}
+\label{sec:basics_scheduling}
+
+In a multi-task operating system, the {\em scheduler}\index{scheduler}
+selects which task to execute among the set of active tasks. In a
+RTOS, the scheduler is particularly important, as a {\em predictable}
+schedule allows off-line analysis under all operating conditions. In
+particular, it is necessary to compute the worst-case response time
+(or an upper bound to it) of all tasks, to ensure that they will
+complete before their deadline even in the worst possible situation.
+
+The simplest and most common scheduler in RTOS is the {\em Fixed
+Priority Scheduler}, and this scheduler is also the standard scheduler
+for \ee. Another important scheduler is the {\em Earliest Deadline
+First} and it will be available in a future version of \ee.
+
+\subsection{Fixed priority}
+\label{sec:basics_fp}
+
+In fixed priority scheduling, each task is assigned a {\em
+priority}\index{task!priority} between $[0,15]$ \nb{check this}, where
+$15$ is the highest and $1$ the lowest priority: the ready task with
+the highest priority is selected to execute. If two tasks have the
+same priority, they are executed in FIFO order. The logical structure
+used by the fixed priority scheduler is depicted in Figure
+\ref{??}. There are $15$ FIFO queues, one for each priority. When a
+task is activated or unblocked, is inserted at the end of the
+corresponding queue. The first task of the highest priority non-empty
+queue is selected to execute.  The actual implementation of this
+structure in \ee\ has been highly optimized for minimizing the
+overhead.
+
+\begin{figure}
+  \begin{center}
+%%     \includegraphics[width=8cm]{images/ready_queues.eps}
+  \end{center}
+  \caption{Logical structure of the ready queue in fixed priority
+    scheduling.}
+  \label{fig:ready_queues}
+\end{figure}
+
+\nb{schedulability test?}
+
+
+\subsection{Earliest Deadline First}
+\label{sec:basics_edf}
+
+
+
+%-----------------------------------------------------------------%
+
+\section{Interrupt handlers}
+
+Most microcontrollers and processor provide an interrupt mechanisms,
+which is mostly used for asynchronous I/O.
+
+When an external device wants to send some data (or when it has
+completed some operation), it sends an ``interrupt signal'' to the
+processor. Under normal conditions, when the interrupt signal is
+raised, the processor suspends what it was doing and jumps into a
+special section of code that processes the interrupt request. This
+special section of code is usually an function called {\em interrupt
+handler}. When the interrupt handler completes, the processor resumes
+execution from where it was interrupted.
+
+Usually, a processor provide a certain number of ``interrupt
+signals'', one for each device. Each interrupt is identified by an
+interrupt ID. For each interrupt it is possible to ``install'' a {\em
+Interrupt handler}\index{interrupt!handler} routine, which is a
+function that will be invoked each time the corresponding signal is
+activated.
+
+Some interrupt signals are used for RTOS internal purpouses. For
+example, it is common to have a internal or external timer device that
+periodically send interrupts to the processor. The RTOS uses this
+signal and installs its own handler to keep track ot the time.
+
+It is possible to disable interrupts with special processor
+instructions. If interrupts are disabled, when an interrupt signal is
+raised, it remains pending and the processor continues to process what
+is was executing. When interrupts are enabled, the pending interrupts
+are served.
+
+The RTOS usually provides special system calls to
+disable interrupts. \ee\ provides a set of function to enable/disable
+interrupts (see \reffun{DisableAllInterrupts},
+\reffun{EnableAllInterrupts}, \reffun{SuspendAllInterrupts},
+\reffun{ResumeAllInterrupts}, \reffun{SuspendOSInterrupts},
+\reffun{ResumeOSInterrupts}).
+
+Each interrupt signal has a {\em priority}. If more than one interrupt
+signal arrives (or is pending), it is processed in order of
+priority. The priority order of each interrupt depends on the specific
+processor/board. Please see the target manual of your reference
+architecture for more details.
+
+It is possible to {\em nest} interrupts. If the processor is executing
+the interrupt handler of a lower priority interrupt signal, and
+another higher priority interrupt signal is raised, and interrupts are
+enabled, the processor suspend what it was doing to execute the
+handler corresponding to the higher priority interrupt signal. When
+this new handler is completed, the processor resume execution of the
+lower priority handler.
+
+The priority of interrupt handlers is higher than the priority of the
+tasks. Therefore, an interrupt handler always preempts a task (unless
+interrupts are disabled). The logical relationship between task
+priorities and interrupt handlers priorities is shown in Figure
+\ref{???}.
+
+In \ee, interrupt handlers are of two types: 
+
+\begin{itemize}
+\item interrupt handlers of type 1; from these handlers, no RTOS
+  service can be invoked;
+\item interrupt handlers of type 2; from these handler, a certain
+  number of RTOS service can be invoked.
+\end{itemize}
+
+
+%-----------------------------------------------------------------%
+
+\section{Shared resources and blocking times}
+
+
+
+\subsection{Priority Inversion}
+
+\subsection{Stack Resource Policy}
+
+%-----------------------------------------------------------------%
+
+\section{Non preemptive scheduling}
+
+\subsection{Preemption thresholds}
+
+\subsection{Pseudo-resources}
+
+\subsection{Equivalence with SRP}
+
+%-----------------------------------------------------------------%
+
+\section{Communication}
+
+\subsection{CABs}
+
+%-----------------------------------------------------------------%
+
+\section{Application modes}
+
+%-----------------------------------------------------------------%
+
+\section{Multiprocessor scheduling}
+
+\subsection{Allocation}
+
+\subsection{Scheduling}
+
+\subsection{Resource Sharing}
+
+\subsection{Communication}
+
+%-----------------------------------------------------------------%
+
+\section{Bibliography on RT scheduling}
+
+\nb{Citare: Libro di Giorgio e di J. Liu, libro di Alan Burns su FP e
+dei vari su RM analysis. Citare papers più importanti.}

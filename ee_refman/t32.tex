@@ -1,0 +1,88 @@
+%
+% Tool: this chapter should be decoupled from the general ee_refman
+%       and should be put int oa separate manual to be made available 
+%		into the general decomentation section.
+%
+\chapter{ORTI and Lauterbach Trace32 support}
+\label{sec:orti_t32}
+
+\ee\ provides direct support for application debugging using the
+Lauterbach Trace32 debugger \cite{Lauterbach}.
+
+The provided support includes:
+\begin{itemize}
+\item Automatic generation of Trace32 scripts to simplify the load and
+  debugging of \ee\ applications.
+\item Automatic generation of batch scripts for single and multicore
+  Nios II designs. An instance of Trace32 will be started and
+  configurated for each core in the design.
+\item Automatic generation of the ORTI files to enable kernel
+  awareness with Lauterbach Trace32. In this way, all the object
+  declared in the system (Tasks, Resources, Alarms, Stacks, Context
+  switches, ...) can be evaluated from the Trace32 debugger.
+\end{itemize}
+
+This chapter describes the impact of the ORTI usage in \ee\
+applications with respect to the impact to the code footprint of the
+ORTI code, and with respect to the stack usage statistics performed by
+Lauterbach Trace32. More information on how to generate the Lauterbach
+Trace32 scripts, and the ORTI files can be found in the \rtd\
+Reference Manual.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{ORTI and \ee\ footprint}
+The ORTI support provided by Lauterbach Trace32 is a nice feature that
+allow developers to track in a graphical way the kernel objects like
+tasks, resources, alarms, and stacks. When using ORTI, \ee\ is
+configured appropriately by \rtd\ by adding a set of parameters inside
+the makefiles. As a result, the kernel records a set of additional
+information which are then referred inside the ORTI file. For that
+reason, for a maximum reduction of the \ee\ footprint, the ORTI options
+should be disabled.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{ORTI and stack usage statistics}
+Another interesting feature of the ORTI support for Lauterbach Trace32
+is the possibility of tracking the stack usage in the system. To use
+the feature, the user should remind to fill up all the stack space
+with the value \const{0xa5a5a5a5}. That can be usually done by putting
+a call to \reffun{EE_trace32_stack_init} as the first instruction into
+\fn{main} or into \fn{alt_main}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{function2}{EE\_trace32\_stack\_init}{EE_trace32_stack_init}
+  \synopsis{void EE_trace32_stack_init(void);}
+  
+  \begin{fundescription}
+    This inline function can be used on the Altera Nios II platform to
+    fill up the memory space from \const{__alt_stack_limit} to the
+    current stack pointer with the pattern \const{0xa5a5a5a5}.
+
+    The memory region from \const{__alt_stack_limit} to
+    \const{0xa5a5a5a5} is the memory region that is typically
+    allocated as stack space by the Altera System Library.
+
+    This function should be called among the first functions in the
+    system, before any call to \fn{malloc}, because the heap region is
+    typically allocated at the end of the available stack
+    space. Failing to do that may result in overwriting the data
+    structures allocated with malloc, with potential unexpected
+    results and application crashes.
+
+    This function is only useful to get an estimation of the used
+    stack space, and should be used in conjunction with the ORTI stack
+    informations produced for Lauterbach Trace32. If this function is
+    not called, it is likely that Lauterbach Trace32 will return a
+    stack utilization of 100\% for all the stacks defined in the system.
+  \end{fundescription}
+  
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

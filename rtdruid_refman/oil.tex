@@ -1,0 +1,1402 @@
+\chapter{OIL syntax and OIL file generation}
+\label{cha:oil-syntax}
+
+OIL (OSEK Implementation Language) is a part of the OSEK/VDX standard,
+that is used for OS and application configuration. The specification
+of the OIL file structure and syntax is provided in the OSEK/VDX web
+site at \url{http://www.osek-vdx.org} \cite{OSEKOIL}.
+
+In the \rtd\ and in the \ee\ RTOS the configuration of the system is
+defined inside an OIL file. In this chapter we only provide a quick
+introduction of the OIL Language (see \cite{OSEKOIL} for a complete
+description), together with a specification of the specific OIL
+attributes implemented by \rtd.
+
+Standard OIL has no knowledge of multiprocessor systems, nor of 
+distribution of threads and resources. \ee\ provides mechanisms for 
+resource sharing with predictable blocking time in a distributed 
+environment. We defined a set of OIL extensions (see Section 
+\ref{sec:oil-multicore}) which explicitly deals with the additional 
+syntax features that are needed for the definition of a multiprocessor 
+system, including placement of threads and resources. 
+
+\section{OIL Basics}
+
+In \ee\ all the RTOS objects like tasks, alarms, resources, are static
+and predefined at application compile time. To specify which objects
+exists in a particular application, \ee\ uses the OIL Language, which
+is a simple text description language.
+
+Here is an example of the OIL File for the \dspic\ device:
+
+\begin{lstlisting}
+CPU mySystem {
+        OS myOs {
+                EE_OPT = "DEBUG";
+                CPU_DATA = PIC30 {
+                        APP_SRC = "code1.c";
+                        APP_SRC = "code2.c";
+                        MULTI_STACK = FALSE;
+                        ICD2 = TRUE;
+                };
+
+                MCU_DATA = PIC30 {
+                        MODEL = 33FFJ256GP710;
+                };
+
+                BOARD_DATA = EE_FLEX {
+                        USELEDS = TRUE;
+                }
+
+                KERNEL_TYPE = FP;
+        };
+
+        TASK myTask {
+                PRIORITY = 1;
+                STACK = SHARED;
+                SCHEDULE = FULL;
+        };
+
+        TASK myTask {
+                PRIORITY = 1;
+                STACK = SHARED;
+                SCHEDULE = FULL;
+        };
+};
+\end{lstlisting}
+
+The example contains a single object called \const{CPU}, which
+contains all the specifications and the values used by the system. Inside
+the \const{CPU}, are described the objects which are present in
+the application: an \const{OS}, which specifies the global attributes
+for the system, and, in the example, two \const{TASK}s.
+
+The OIL File is parsed by the \rtd\ code generator and, as a result,
+part of the RTOS source code is generated and compiled together with
+the application.
+
+An OIL file consists of two parts: a set of definitions and a set of
+declarations. Definitions are used to define data types, constants and
+kernel objects that need to be provided in the declaration part for
+configuring a specific kernel. In other words, the definition part
+tells the configurator that there exists different objects like
+tasks, resources, and so on, describing their attributes and types,
+like in a C struct declaration. Then, the declaration part is used to
+specify which objects are really present in a particular application.
+
+In \rtd, the definition part of the OIL file is fixed and is
+contained inside the \rtd\ Eclipse Plugins. The definition part
+including all the attributes which can be specified by users is
+included in Appendix \ref{cha:oil-definition}. The user has only to
+provide the declaration part, specifying for a particular application
+the objects to be created.
+
+The OIL file basically contains the description of a set of objects. A
+\const{CPU} is a container of these objects. Other objects include the following:
+\begin{itemize}
+\item \const{OS} is the Operating System which runs on the CPU. This
+  object contains all the global settings which influence the
+  compilation process and the customization of the \ee\ RTOS.
+\item \const{APPMODE} defines the different application mode.
+  These modes are then used to control the autostart
+  feature for tasks and alarms in the OIL file.
+\item \const{TASK} is an application task handled by the OS.
+\item \const{RESOURCE} is a resource (basically a binary mutex) used
+  for mutual exclusion.
+\item \const{EVENT} is a synchronization flag used by extended tasks.
+\item \const{COUNTER} is a software source for periodic / one shot
+  alarms.
+\item \const{ALARM} is a notification mechanism attached to a counter
+  which can be used to activate a task, set an event, or call a
+  function.
+\end{itemize}
+
+All the attributes in the OIL file can be:
+
+\begin{itemize}
+\item numbers, i.e. the \const{PRIORITY} attribute;
+\item strings, i.e. the \const{APP_SRC} attribute;
+\item enumerations, i.e. the \const{KERNEL_TYPE} attribute.
+\end{itemize}
+
+Attributes can have a default value, as well as an {\em automatic}
+value specified with the keyword \const{AUTO}. Some of the attributes
+can be specified more than once in the OIL file, such as the
+\const{APP_SRC}, and the configurator treats them as a {\em set} of
+values; i.e., in the case of \const{APP_SRC}, the set of application
+files to be compiled.
+
+Finally, some items can in reality contain a set of sub-attributes,
+like in a C-language struct definition. For example, \const{CPU_DATA}
+contains a \const{PIC30} object, which is detailed by a set of
+attributes.
+
+\section{The CPU Object}
+
+The CPU object is only used as a container of all the other objects,
+and does not have any specific attribute.
+
+\section{The OS Object}
+
+The \oil{OS} Object is used to define the \ee\ global configuration as
+well as the compilation parameters.
+
+The attributes which can be specified for the \const{OS} object are 
+specified in the following subsections.
+
+\subsection{Compilation attributes}
+
+The OIL file includes a set of fields for controlling the command line
+parameters which are passed to the compiler tools. The meaning of those
+elements is the following:
+
+\begin{itemize}
+\item \oil{EE_OPT} contains a list of additional compilation flags
+  passed to the \ee\ makefile. In practice, the \const{EE_OPT}
+  makefile variable controls which files has to be compiled and with
+  which options. The \const{EE_OPT} attributes are translated in
+  \const{#define}s in the C code.
+\item \oil{CFLAGS} contains the list of additional C compiler options.
+\item \oil{ASFLAGS} contains the list of additional assembly options.
+\item \oil{LDFLAGS} Contains the list of additional linker parameters.
+\item \oil{LDDEPS} Contains the list of additional library
+  dependencies which have to be added to the makefile rules.
+\item \oil{LIBS} Contains the list of additional libraries that needs
+  to be linked.
+\end{itemize}
+
+Example of declaration:
+
+\begin{lstlisting}
+CPU mySystem {
+  OS myOs {
+    EEOPT = "MYFLAG1";
+    EEOPT = "MYFLAG2";
+    CFLAGS = "-G0";
+    CFLAGS = "-O0 -g";
+    CFLAGS = "-Wall -Wl,-Map -Wl,project.map";
+    ASFLAGS = "-g";
+    LIBS = "-lm";
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+\subsection{OSEK attributes}
+The OIL file includes a set of attributes which are part of the
+OSEK/VDX specification. The meaning of those attributes is the
+following:
+
+\begin{itemize}
+\item \oil{STATUS} specifies if the kernel should be compiled with
+  \const{STANDARD} status or \const{EXTENDED} status. With the
+  \const{STANDARD} status, only a subset of the error codes are 
+  reported by the kernel primitives to reduce the system footprint. 
+  This setting only applies to the OSEK/VDX conformance classes.
+\item The settings \oil{STARTUPHOOK}, \oil{ERRORHOOK},
+  \oil{SHUTDOWNHOOK}, \oil{PRETASKHOOK}, \oil{POSTTASKHOOK} specifies
+  which particular hook routine should be included in the kernel.
+\item \oil{USEGETSERVICEID} specifies if the Service ID debugging
+  functionality of the \fn{ErrorHook()} routine should be included in
+  the kernel.
+\item \oil{USEPARAMETERACCESS} specifies if the \fn{ErrorHook()}
+  should have access to the parameters passed to the primitives.
+\item \oil{USERESSCHEDULER} specifies if the kernel includes the
+  \const{RES_SCHEDULER} resource.
+\end{itemize}
+
+Example of declaration:
+
+\begin{lstlisting}
+CPU mySystem {
+  OS myOs {
+    STATUS = STANDARD;
+    STARTUPHOOK = TRUE;
+    ERRORHOOK = TRUE;
+    SHUTDOWNHOOK = TRUE;
+    PRETASKHOOK = FALSE;
+    POSTTASKHOOK = FALSE;
+    USEGETSERVICEID = FALSE;
+    USEPARAMETERACCESS = FALSE;
+    USERESSCHEDULER = TRUE;
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+\subsection{Multi-core attributes}
+The attributes \oil{STARTUPSYNC}, and \oil{USEREMOTETASK} are
+described in the \ee\ Manual for the Altera Nios II target, since they
+are specific for that architecture.
+
+\subsection{Nios II target attributes}
+The attributes \oil{NIOS2_MUTEX_BASE}, \oil{NIOS2_SYS_CONFIG},
+\oil{NIOS2_APP_CONFIG}, \oil{IPIC_GLOBAL_NAME}, \oil{IPIC_LOCAL_NAME},
+\oil{MP_SHARED_RAM}, \oil{MP_SHARED_ROM}, \oil{NIOS2_DO_MAKE_OBJDUMP},
+\oil{SYSTEM_LIBRARY_NAME}, \oil{SYSTEM_LIBRARY_PATH}, \oil{NIOS2_PTF_FILE}, 
+are described in the \ee\ Manual for the Altera Nios II target.
+
+\subsection{CPU\_DATA sections}
+
+The \oil{CPU_DATA} section of the \const{OS} object is used to specify
+the configuration of a core in a single or in a multiple core device.
+
+In general, the OIL file will contain a \const{CPU_DATA} section for
+each core in the system. There is a specific \const{CPU_DATA} section
+for each architecture supported by \ee. 
+
+In particular, the \const{CPU_DATA} sections currently supported are
+\oil{NIOSII}, \oil{PIC30} and \const{AVR_5}, which contain the following
+attributes:
+
+\begin{itemize}
+\item \oil{ID} is a symbolic name uniquely identifying the
+  CPU. The name used for the \const{CPU_ID} attribute must be the same
+  name that is used when allocating objects to a particular CPU.
+
+  CPUs with no name automatically get a default name
+  \const{default_cpu}\index{default\_cpu}. If more than one CPU gets
+  \const{default_cpu}, an error is raised, because different CPUs
+  cannot have the same name.
+
+  \const{default_cpu} is subsumed also when allocating Tasks (see
+  Section \ref{sub:task-mapping-to-cpu}), and counters (see Section
+  \ref{sec:counter-extensions}) to a CPU, and when the Master CPU is
+  assigned (see Section \ref{sub:master-cpu}).
+
+  For single processor systems, it is safe to avoid any declaration of
+  the \const{CPU_ID} field in the entire OIL file. In this way, all
+  the objects will be mapped to the only CPU in the system, named
+  \const{default_cpu}.
+
+  Example of declaration:
+
+\begin{lstlisting}
+CPU mySystem {
+  OS myOs {
+    CPU_DATA = NIOSII {
+      ID = "mycpu";
+      ...
+    }
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+\item \oil{APP_SRC} declares a list of all files containing code to
+  be executed on the CPU.
+
+  Example of declaration:
+
+\begin{lstlisting}
+CPU mySystem {
+  OS myOs {
+    CPU_DATA = NIOSII {
+      APP_SRC = "file1.c";
+      APP_SRC = "file2.c";
+      ...
+    }
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+
+\item \oil{MULTI_STACK} defines if the system supports multiple
+  stacks for the application tasks (\const{TRUE}) or not
+  (\const{FALSE}). The default value is \const{FALSE}.
+
+  If set to \const{TRUE}, it is possible to specify if IRQs are
+  executed using a dedicated stack space. The attribute
+  \oil{IRQ_STACK} is used for this purpose.
+
+  Some architectures also allow the specification of a
+  \oil{DUMMY_STACK}, which specifies if the background task is using
+  a shared stack (\const{SHARED} value) or a dedicated stack segment
+  (\const{PRIVATE} value). \ee\ schedules the \fn{main()}
+  function as a background task, also called ``dummy'' task. For
+  example, the Altera Nios II architecture provides support for the
+  above described mechanism, while the \dspic\ family does not support
+  it.
+
+\item \oil{STACK_TOP} contains the highest address from which the
+  stack space starts. The address can be provided as a symbol,
+  assuming that the symbol is associated to a value in some other part
+  of the OIL declaration or in some application file. For example, in
+  the Altera Nios II HW version of \ee, the typical value for this
+  attribute is \const{__alt_stack_pointer}, that is the symbol used
+  inside the Altera Nios II System libraries as the initial stack
+  pointer.
+
+\item \oil{SYS_SIZE} is used to declare the total size of the memory
+  that is allocated to the task stacks.
+
+\item \oil{SHARED_MIN_SYS_SIZE} used to declare the minimum size of
+  the shared stack space. The dimension of the shared stack space is
+  computed as the difference between the available space
+  (\const{SYS_SIZE}) and the space required for implementing the private
+  stack spaces. \rtd\ guarantees that the remaining size is higher
+  than or equal to the value defined with the
+  \const{SHARED_MIN_SYS_SIZE} directive (an error is raised
+  otherwise). The default value for this attribute is zero.
+
+\item The attributes \oil{ICD2} and \oil{ENABLE_SPLIM} are described
+  in the \ee\ Manual for the Microchip PIC24, dsPIC30 (R) DSC and
+  dsPIC33 (R) DSC targets.
+
+\item The specific attributes about the \oil{AVR_5} architecture are
+  described in the \ee\ Manual for the Atmel AVR5 targets.
+\end{itemize}
+
+Here is an example of a declaration of a Nios II \const{CPU_DATA}:
+
+\begin{lstlisting}
+CPU mySystem {
+  OS myOs {
+    CPU_DATA = NIOSII {
+      ID = "cpu2";
+      MULTI_STACK = TRUE {
+	IRQ_STACK = FALSE;
+	DUMMY_STACK = SHARED;
+      };
+      APP_SRC = "cpu2_startup.c";
+      STACK_TOP = 0x20004000;
+      SHARED_MIN_SYS_SIZE = 1800;
+      SYS_SIZE = 0x1000; 
+      IPIC_LOCAL_NAME = "IPIC_INPUT_CPU0";
+    };
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+The same example can be written in two stages by splitting the
+declaration of the structure. The only requirement is that the
+separate declarations do not contain any conflicting assignment to the
+same field name. The previous example can be rewritten as follows:
+
+\begin{lstlisting}
+CPU mySystem {
+  OS myOs {
+    CPU_DATA = NIOSII {
+      ID = "cpu2";
+      MULTI_STACK = TRUE {
+	IRQ_STACK = FALSE;
+	DUMMY_STACK = SHARED;
+      };
+      APP_SRC = "cpu2_startup.c";
+    };
+    
+    CPU_DATA = NIOSII {
+      ID = "cpu2";
+      STACK_TOP = 0x20004000;
+      SHARED_SYS_SIZE = 1800;
+      SYS_SIZE = 0x1000; 
+      IPIC_LOCAL_NAME = "IPIC_INPUT_CPU0";
+    };
+    
+    CPU_DATA = NIOSII {
+      /* The ID is not defined, this section refers
+         to the "default_cpu" */
+      STACK_TOP = "alt_data_end";
+    };
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+%\item [ARM7]
+%
+%  In case of an ARM7 target, the declaration of a stack space requires
+%  both \const{SYS\_SIZE} e \const{IRQ\_SIZE}, for the system and IRQ
+%  stack, respectively.
+
+\subsection{MCU\_DATA sections}
+
+The \oil{MCU_DATA} section of the \const{OS} object is used to specify
+the configuration of peripherals which are present in a specific
+microcontroller.
+
+The following microcontrollers are supported:
+\begin{itemize}
+\item Microchip PIC24 microcontrollers and dsPIC DSCs. Please refer to
+  the \ee\ Manual for the Microchip PIC24, dsPIC30 (R) DSC and dsPIC33
+  (R) DSC targets.
+\end{itemize}
+
+\subsection{BOARD\_DATA sections}
+
+The \oil{BOARD_DATA} section of the \const{OS} object is used to
+specify the configuration of the board where the microcontroller is
+placed. For example, the board configuration includes the
+configuration of the external devices like leds, buttons, displays,
+and other peripherals.
+
+The following boards are supported:
+\begin{itemize}
+\item \oil{NO_BOARD} is a placeholder to specify that no board
+  configuration is required.
+\item \oil{EE_FLEX} is the Evidence / Embedded Solutions \flex\ Board
+  based on the Microchip \dspic. For details, please refer to the
+  \ee\ Manual for the Microchip PIC24, dsPIC30 (R) DSC and dsPIC33 (R)
+  DSC targets.
+\item \oil{MICROCHIP_EXPLORER16} is the Microchip Explorer 16
+  evaluation board. For details, please refer to the \ee\ Manual for the
+  Microchip PIC24, dsPIC30 (R) DSC and dsPIC33 (R) DSC targets.
+\item \oil{MICROCHIP_DSPICDEM11PLUS} is the Microchip dsPIC Demo Plus
+  1.1 evaluation board. For details, please refer to the \ee\ Manual
+  for the Microchip PIC24, dsPIC30 (R) DSC and dsPIC33 (R) DSC
+  targets.
+\item \oil{ATMEGA_STK50X} is the Atmel STK 500 evaluation board for
+  the AVR5 architecture. For details, please refer to the \ee\ Manual
+  for the Atmel AVR5 targets.
+\item \oil{XBOW_MIB5X0} is the Crossbow MIB 5x0 board used to program
+  wireless sensor network hardware. For details, please refer to the
+  \ee\ Manual for the Atmel AVR5 targets.
+\end{itemize}
+
+\subsection{Library configuration}
+Typical microcontroller applications needs to link external libraries
+to the application code. \ee\ supports both the linking of external
+binary libraries as well as the development of library code that can
+be automatically built by the \ee\ build scripts.
+
+\subsubsection{Linking an external third-party binary library}
+A third-party binary library is typically provided as a binary archive
+with a ``.a'' extension.
+
+If you need to link this kind of library to your executable, just add
+the following lines to the OIL file:
+\begin{lstlisting}
+  CPU mySystem {
+    OS myOs {
+      LDFLAGS = "-Llibrarypath";
+      LIBS = "-llibraryname";
+    };
+  };
+\end{lstlisting}
+
+These lines have the effect to add the proper option to tell the
+linker to load the library you specified.
+
+\subsubsection{Building and using libraries which are integrated in the \ee\ build system}
+
+In this case, the target is to use the library code which is provided
+in the \ee\ build tree. Basicaly, the OIL file can specify a set of
+libraries which are distributed with or are supported by \ee\ and that
+have to be linked together with the application. The specification is
+done by using the \oil{LIB} attribute.
+
+An example of this kind of library are the Scicos library, and other
+communication libraries which can be found under the \file{ee/contrib}
+directory of the \ee\ source tree.
+
+The list of supported libraries depends on the target and
+can be found in the \ee\ Manual for the specific target. 
+
+The \const{LIB} attribute can be used in one of the following ways:
+
+\begin{itemize}
+
+\item
+  This first option helps to build the library files -only-. In
+  particular, \const{LIB} can be used to specify an OIL file which
+  only compiles the supported libraries (that is, the OIL file is used
+  to configure the libraries but {\em not} the application). The
+  following example is an OIL file which only compiles the library
+  \file{mylib.a}:
+
+\begin{lstlisting}
+  CPU mySystem {
+    OS myOs {
+      EE_OPT = "__BUILD_LIBS__";
+      LIB = ENABLE { NAME = "mylib"; };
+      CPU_DATA = PIC30;
+    };
+  };
+\end{lstlisting}
+
+\begin{note}
+To compile {\em all} the libraries which are supported by a particular
+architecture with a single OIL file, the following OIL file
+configuration can be used:
+
+\begin{lstlisting}
+  CPU mySystem {
+    OS myOs {
+      EE_OPT = "__BUILD_ALL_LIBS__";
+      CPU_DATA = PIC30;
+    };
+  };
+\end{lstlisting}
+
+\end{note}
+
+
+\item
+  \const{LIB} can be used for the {\em on-the-fly} creation of the
+  library during the application compilation process. That is, the
+  build process will create the library as well as the \ee\ library
+  \file{libee.a}. After that, the application code will be compiled
+  and linked with all the libraries just created. The following
+  example can be used to compile and link the library \file{mylib.a}.
+
+\begin{lstlisting}
+  CPU mySystem {
+    OS myOs {
+      EE_OPT = "__ADD_LIBS__";
+      LIB = ENABLE { NAME = "mylib"; };
+      ...
+    };
+    ...
+  };
+\end{lstlisting}
+
+\item
+  In this case, an application will be linked with a library which has
+  been generated using a separate OIL file. The following example
+  shows the OIL file which can be used to link an already existing
+  library which is located in the directory
+  \file{librarypath}. \file{librarypath} typically is the \file{Debug}
+  directory of a project used to build a library, as explained in the
+  first bulled of this list.
+
+\begin{lstlisting}
+  CPU mySystem {
+    OS myOs {
+      LDFLAGS = "-Llibrarypath";
+      LIB = ENABLE { NAME = "mylib"; };
+      ...
+    };
+    ...
+  };
+\end{lstlisting}
+
+\item
+  Finally, please note that more than one library can be specified in
+  a OIL file in one of the following two ways:
+\begin{lstlisting}
+  CPU mySystem {
+    OS myOs {
+      LIB = ENABLE { NAME = "mylib1"; };
+      LIB = ENABLE { NAME = "mylib2"; };
+      LIB = ENABLE { NAME = "mylib3"; };
+      ...
+    };
+    ...
+  };
+
+  CPU mySystem {
+    OS myOs {
+      LIB = ENABLE {
+	NAME = "mylib1"; 
+	NAME = "mylib2"; 
+	NAME = "mylib3"; 
+      };
+      ...
+    };
+    ...
+  };
+\end{lstlisting}
+
+\end{itemize}
+
+
+\subsection{Kernel Conformance class}
+
+An explicit declaration of the kernel conformance class is required in
+the \oil{KERNEL_TYPE} definition. The definition is shown below:
+
+\begin{lstlisting}
+  ENUM [
+    FP {
+      BOOLEAN NESTED_IRQ;
+    },
+    EDF {
+      BOOLEAN NESTED_IRQ;
+      STRING TICK_TIME; 
+      BOOLEAN REL_DEADLINES_IN_RAM = FALSE;
+    },
+    BCC1,
+    BCC2,
+    ECC1,
+    ECC2
+  ] KERNEL_TYPE;
+\end{lstlisting}
+
+For the EDF kernel, it is possible to specify the tick
+length. given the tick length for the circular timer, which is then
+used to compute the vaues to put on the relative deadline task
+parameter. The tick time can be specified in various unit measures,
+such as seconds (``s''), milliseconds (``ms''), microseconds (``us''),
+and nanoseconds (``ns''). Please check the manual for the CPU
+architecture you are currently using for the proper configuration of
+the tick parameter. The EDF kernel has an additional option which
+allows to specify that relative deadlines should be stored in RAM and
+not in Flash, to allow them to be changed at runtime.
+
+Some examples of use within the declaration part are the following:
+
+\begin{enumerate}
+
+\item
+  To configure the \const{BCC1} conformance class:
+  \begin{lstlisting}
+    KERNEL_TYPE = BCC1;
+  \end{lstlisting}
+  
+\item
+  To configure the \const{FP} conformance class: 
+  
+  \begin{lstlisting}
+    KERNEL_TYPE = FP;
+  \end{lstlisting}
+  
+  By default, nested IRQs are set to \const{FALSE}.
+  
+\item
+  To configure the \const{EDF} conformance class:
+  
+  \begin{lstlisting}
+    KERNEL_TYPE = EDF { 
+      NESTED_IRQ = TRUE; 
+      TICK_TIME = "10.5ns"; 
+      REL_DEADLINES_IN_RAM = TRUE;
+    };
+  \end{lstlisting}
+  
+  Nested IRQs are set to \const{TRUE}.
+  
+\end{enumerate}
+
+
+
+\subsection{ORTI file generation and kernel awareness with Lauterbach Trace32}
+\label{sub:orti}
+% ripreso in buona parte dall'event demo...
+
+This section describes the steps to use the Lauterbach Trace32 ORTI
+support in \ee. To generate the ORTI information, the
+\oil{ORTI_SECTIONS} attribute has to be specified inside the
+\const{OS} object. The definition of \const{ORTI_SECTIONS} is the following:
+
+\begin{lstlisting}
+  ENUM [
+    NONE,
+    ALL,
+    OS_SECTION,
+    TASK_SECTION,
+    RESOURCE_SECTION,
+    STACK_SECTION,
+    ALARM_SECTION
+  ] ORTI_SECTIONS[];
+\end{lstlisting}
+
+Basically, each ORTI section can be selected separately. If
+\const{ALL} is specified, then all the ORTI sections are generated.
+
+Notice that the ORTI support currently applies only to the Altera Nios
+II target.
+
+\rtd\ provides the possibility to automatically generate an
+ORTI\footnote{ORTI is a standard file format specified by the OSEK/VDX
+consortium.} file.  An ORTI file is basically a text file that
+specifies which data structures the kernel information are stored
+in. The file is parsed by an ORTI--enabled debugger, providing useful
+feedback to the application developer during debug sessions.
+
+Also, \rtd\ automatically produces a set of scripts that can be used
+to automatically launch a Lauterbach Trace32 debugger
+\cite{Lauterbach}. The provided scripts automatically load the FPGA
+hardware, and start a debug session for each CPU in the system.
+
+To enable all these features, you need to specify a JAM file
+name\footnote{JAM is one of the file formats containing the FPGA
+configuration that is accepted by Lauterbach Trace32} inside the OS
+section of the OIL file, as well as the specification of the ORTI
+sections that should be generated, as follows:
+
+\begin{lstlisting}
+CPU test_application {
+  OS EE {
+    ...
+    NIOS2_JAM_FILE = "JAM_filename.jam";
+    ORTI_SECTIONS = ALL;
+  }
+  ...
+}
+\end{lstlisting}
+
+In the above example, \const{ALL} causes the generation of all the
+ORTI information, and \file{JAM_filename.jam} is the path name of 
+the JAM file specified in the \oil{NIOS2_JAM_FILE} attribute. If not
+specified, \file{../../fpga.jam} is used.
+
+As a result of the compilation process, a set of files are produced
+inside the \file{Debug} directory (see Table \ref{tab:t32files} for a
+detailed list).
+
+Please refer to Section \ref{sec:trace32} for information on how to
+use the ORTI Files and launch a Lauterbach Trace32 session.
+
+%
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|p{8cm}|}
+\hline 
+File name&
+Description\tabularnewline
+\hline
+\hline 
+\file{debug.bat}&
+This batch script loads the FPGA hardware and starts a T32 instance
+for each CPU. You can double click it on the Nios II IDE to directly
+launch the debug session.\tabularnewline
+\hline 
+\file{debug\_nojam.bat}&
+This batch script starts a T32 instance for each CPU. You can double
+click it on the Nios II IDE to directly launch the debug session.
+You can use it if the FPGA has been already programmed with the hardware
+contents.\tabularnewline
+\hline 
+\file{t32.cmm}&
+Main PRACTICE script, responsible for loading the JAM file and starting
+all the T32 instances on every CPU.\tabularnewline
+\hline 
+\file{testcase\_data.cmm}&
+Internal file used for automatic testcase generation.\tabularnewline
+\hline 
+\file{t32/{*}}&
+Internal PRACTICE scripts. They are a copy of the files inside 
+\file{components/evidence\_ee/ee/pkg/cpu/nios2} 
+\file{/debug/lauterbach/t32}.\tabularnewline
+\hline 
+\file{cpuname/config.t32}&
+Configuration file for T32. Contains the Multicore configuration 
+information.\tabularnewline
+\hline 
+\file{cpuname/orti.men}&
+Trace32 menu automatically generated using the Lauterbach ORTI menu
+generator.\tabularnewline
+\hline
+\file{cpuname/system.orti}&
+The ORTI file, for each CPU.\tabularnewline
+\hline
+\file{cpuname/t32.cmm}&
+The main script file executed by each CPU.\tabularnewline
+\hline
+\end{tabular}
+\end{center}
+
+\caption{\label{tab:t32files} Files generated for the Lauterbach
+Trace32 support. ({\em cpuname} represents the name of the CPU as specified 
+in the OIL file).}
+\end{table}
+
+
+\section{The Application mode Object}
+The \oil{APPMODE} object is contained by the \const{CPU} object and is
+used to define an application mode.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  APPMODE myAppMode1;
+  APPMODE myAppMode2;
+  APPMODE myAppMode3;
+  ...
+}
+\end{lstlisting}
+
+
+
+
+\section{The Task Object}
+
+The \oil{TASK} object is contained inside the \const{CPU} object and it is used to specify the properties of a task.
+
+\subsection{Autostart attribute}
+The \oil{AUTOSTART} attribute specifies if the task should be
+automatically activated at system startup by the \fn{StartOS()}
+primitive.
+
+If the task must be activated at startup, the \const{AUTOSTART}
+attribute has a value \const{TRUE}. When \const{TRUE}, the
+\const{APPMODE} sub-attribute lists the application modes for which
+the task is autostarted.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  TASK myTask1 {
+    AUTOSTART = TRUE { APPMODE = myAppMode1; };
+    ...
+  };
+  TASK myTask2 {
+    AUTOSTART = FALSE;
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+\subsection{Priority attribute}
+In the FP kernel, the \oil{PRIORITY} attribute specifies the task
+priority. In the EDF kernel, the value specifies the task preemption
+level. The value is used by \rtd\ as a relative ordering of priorities
+and not as an absolute priority value. Higher values correspond to
+higher priorities.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  TASK myTask1 {
+    PRIORITY = 1;
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+\subsection{Relative Deadline attribute}
+The \oil{RELDLINE} attribute specifies the task relative deadline. The
+value is used by \rtd\ to compute the numerical value of the timing
+attribute. The value can be expressed as a timing quantity such as
+seconds (``s''), milliseconds (``ms''), microseconds (``us''), or
+nanoseconds (``ns''). The value is interpreted as a time, and it is
+divided by the \const{TICK_TIME} attribute specified inside the OS
+attribute \const{KERNEL_TYPE} to obtain the final tick value which is
+then programmed inside the microcontroller.
+
+If a number is specified whithout any time unit (e.g. ``1234'' and not
+``1234ms''), then the number is taken ``as is'' and then programmed to
+the target device.
+
+Please remember that, to be complete, the OIL
+file should also include a specification of the preemption level of
+the task by using the \const{PRIORITY} field.
+
+Example:
+
+The following example specifies the preemption level and the relative
+deadline of an EDF task.
+
+\begin{lstlisting}
+CPU test_application {
+  OS myOS {
+    ...
+    KERNEL = EDF;
+  };
+  ...
+  TASK myTask1 {
+    PRIORITY = 3;
+    REL_DEADLINE = "10ms";
+    ...
+  };
+  ...
+  TASK myTask2 {
+    PRIORITY = 4;
+    REL_DEADLINE = "1234";
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+
+\subsection{Activation attribute}
+The \oil{ACTIVATION} attribute specifies the number of pending
+activations which can be stored by a task. It is only used in the
+\const{BCC1}, \const{BCC2}, \const{ECC1}, and \const{ECC2} conformance
+classes.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  TASK myTask1 {
+    ACTIVATION = 3;
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+\subsection{Schedule attribute}
+The \oil{SCHEDULE} attribute specifies if a task is full preemptive or non preemptive.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  TASK myTask1 {
+    SCHEDULE = FULL;
+    ...
+  };
+  TASK myTask2 {
+    SCHEDULE = NON;
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+\subsection{Event attribute}
+The \oil{EVENT} attribute is used to list the Events which belongs to
+a task. It is used in conformance classes \const{ECC1} and
+\const{ECC2}.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  TASK myTask1 {
+    EVENT = "TimerEvent";
+    EVENT = "ButtonEvent";
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+\subsection{Resource attribute}
+The \oiltwo{RESOURCE}{RESOURCEtask} attribute is used to list the
+Resources used by a task.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  TASK myTask1 {
+    RESOURCE = "Resource1";
+    RESOURCE = "Resource2";
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+\subsection{Stack attribute}
+The \oil{STACK} attribute is used to specify if the task stack is shared or of the task should have a separate private stack.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  TASK myTask1 {
+    STACK = SHARED;
+    ...
+  };
+  TASK myTask2 {
+    STACK = PRIVATE {
+      SYS_SIZE = 128;
+    };
+  };
+  ...
+}
+\end{lstlisting}
+
+\subsection{Mapping tasks to CPUs using the CPU ID attribute}
+\label{sub:task-mapping-to-cpu}
+
+The \oiltwo{CPU_ID}{CPU_IDtask} attribute is used to specify the CPU
+to which the task is allocated. The placement of the tasks on the CPUs
+is defined before the compile time and can not be changed during the
+system execution time. If the CPU identifier is missing, then \rtd\
+assumes the default value ``default\_cpu''. An error is generated if
+the CPU identifier specified for the task does not exist in the
+system.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  TASK myTask1 {
+    CPU_ID = "cpu1";
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+
+
+\subsection{Source files for each CPU}
+The source files implementing the tasks can be declared inside the OIL
+file in a dedicated section named \oiltwo{APP_SRC}{APP_SRCtask}. This allows identification of the
+required files when producing the executable code for each CPU. The
+\file{makefile} is automatically generated based on this declaration,
+so that only the files implementing the task executing on the CPU need
+to be compiled. If the task is moved to another CPU, the makefile is
+automatically updated.
+
+Example of declaration:
+
+\begin{lstlisting}
+CPU mySystem {
+  TASK myTask {
+    APP_SRC = "file1.c";
+    APP_SRC = "file2.c";
+    ...
+  }
+  ...
+}
+\end{lstlisting}
+
+\subsection{Intertask notifications}
+\label{sec:intertask-notifications}
+The attribute \oil{LINKED} is related to intertask notifications on
+multicore architectures and is described in the \ee\ Manual for the
+Altera Nios II target.
+
+
+
+
+
+\section{The Resource Object}
+
+The \oil{RESOURCE} object is contained inside the \const{CPU} object
+and it is used to specify the properties of a resource.
+
+The Resource object contains an attribute named \oil{RESOURCEPROPERTY}
+which can take the following values: 
+\begin{itemize}
+\item \const{STANDARD} is the default used for a normal resource. In
+  that case, a set of source files can be specified using the
+  \const{APP_SRC} sub-attribute. These files typically contain the
+  resource data definition.
+\item \const{LINKED} resources are only links/alias for other
+  resources.
+\item \const{INTERNAL} resources are currently not implemented.
+%used for stack sharing techniques
+%, only \const{STANDARD} type resources require the
+%declaration of the source files implementing them. Please note that on
+%a multiprocessor system \const{INTERNAL} resources can only be
+%local. Global Internal resources are forbidden.
+\end{itemize}
+
+Example:
+
+\begin{lstlisting}
+CPU mySystem {
+  RESOURCE mutex {
+    RESOURCEPROPERTY = STANDARD {
+      APP_SRC = "shareddata.c";
+    };
+  };
+  ...
+};
+\end{lstlisting}
+
+\section{The Event Object}
+The \oiltwo{EVENT}{EVENTobj} object is used to define a bit mask which
+then can be used by extended tasks. Events with the same name are
+identical, and have the same mask. Events with the same mask are not
+identical. If the value \const{AUTO} is specified for a mask, then
+\rtd\ automatically computes the mask value.
+
+Example:
+
+\begin{lstlisting}
+CPU mySystem {
+  EVENT myEvent1 {
+    MASK = 0x01;
+  };
+  EVENT mtEvent2 {
+    MASK = AUTO;
+  };
+  ...
+};
+\end{lstlisting}
+
+
+
+\section{The Counter object}
+\label{sec:counter-extensions}
+
+The \oil{COUNTER} object is the timing reference that is used by alarms.
+
+The attributes of a counter are the following:
+\begin{itemize}
+\item \const{CPU_ID} is an indication
+  of the CPU on which the counter is mapped. The default value is
+  \const{default\_cpu}. If the identifier of the CPU does not exist in
+  the system, an error is generated.
+\item \const{MINCYCLE} is currently ignored by \ee.
+\item \const{MAXALLOWEDVALUE} is currently ignored by \ee.
+\item \const{TICKSPERBASE} is currently ignored by \ee.
+%
+% toOl: che significa che vengono ignorati?!?
+%
+\end{itemize}
+
+Example:
+
+\begin{lstlisting}
+CPU mySystem {
+  COUNTER myTimer {
+    MINCYCLE = 32;
+    MAXALLOWEDVALUE = 127;
+    TICKSPERBASE = 23;
+  };
+  ...
+};
+\end{lstlisting}
+
+\section{The Alarm Object}
+
+The \oil{ALARM} Object is used to implement an asynchronous
+notification which can activate a task, set an event or call a
+callback function. Alarms can be autostarted at boot time depending on
+the application mode.
+
+The attributes of an alarm are the following:
+\begin{itemize}
+\item \const{COUNTER} specifies the counter to which the alarm is
+  statically linked.
+\item \const{ACTION} specifies the kind of action which has to be
+  implemented when the alarm fires. The action is specified using one
+  of the following sub-attributes:
+  \begin{itemize}
+  \item \const{ACTIVATETASK} specifies that a task has to be
+    activated. The name of the task must be specified inside the
+    \const{TASK} sub-attribute.
+  \item \const{SETEVENT} specifies that an event has to be set on a
+    task. The task name and event must be specified inside the
+    \const{TASK} and \const{EVENT} sub-attributes.
+  \item \const{ALARMCALLBACK} specifies that an alarm callback has to
+    be called. The name of the callback is specified inside the
+    attribute \const{ALARMCALLBACKNAME}.
+  \end{itemize}
+\item \const{AUTOSTART} specifies if the alarm has to be autostarted
+  at system startup. If \const{TRUE}, the alarm properties and the
+  application modes for which the alarm should be autostarted have to be
+  specified in the sub-attributes \const{ALARMTIME}, \const{CYCLETIME},
+  and \const{APPMODE}.
+\end{itemize}
+
+\section{Notes on source files}
+
+If a system object (CPU, TASK or RESOURCE) is implemented by more than
+one source file, all the corresponding file names need to appear in
+one or more corresponding OIL declarations (not necessarily in order,
+as shown by the following examples for a CPU, a task and a resource):
+
+\begin{lstlisting}
+  CPU_DATA = NIOSII {
+    ID = "cpu0";
+    APP_SRC = "cpu0_src0.c";
+  };
+  CPU_DATA = NIOSII {
+    ID = "cpu0";
+    APP_SRC = "cpu0_src1.c";
+    APP_SRC = "cpu0_src2.c";
+    APP_SRC = "cpu0_src3.c";
+    APP_SRC = "cpu0_src4.c";
+  };
+\end{lstlisting}
+
+\begin{lstlisting}
+  TASK thread1 {
+    CPU_ID = "cpu1";
+    APP_SRC = "thread1_a.c";
+    APP_SRC = "thread1_b.c";
+    APP_SRC = "thread1_c.c";
+  };
+\end{lstlisting}
+
+\begin{lstlisting}
+  RESOURCE mutex {
+    RESOURCEPROPERTY = STANDARD {
+      APP_SRC = "res_a.c";
+      APP_SRC = "res_b.c";
+    };
+  };
+\end{lstlisting}
+
+It is possible, even if we discourage its use, to list several file
+names in the same declaration, separated by spaces:
+
+\begin{lstlisting}
+  APP_SRC = "cpu0_src1.c cpu0_src2.c";
+\end{lstlisting}
+
+If a file name appears more than once, all declarations following the
+first one are ignored.
+
+\section{OIL extensions for multiprocessing}
+\label{sec:oil-multicore}
+
+\subsection{Partitioning support}
+When developing a multiprocessor application, the developer faces the
+job of mapping a multitask application on the CPUs that are available
+in the system.  That mapping procedure involves the partitioning of
+the application tasks into the CPUs, meeting all application
+constraints.
+
+As the starting point, each CPU runs a copy of \ee, and all the copies 
+of \ee\ on the CPUs have the same configuration. Depending on the 
+application needs, for example, the kernel can be configured to have 
+monostack or multistack support, which is useful when dealing with 
+blocking primitives, and to support debugging features such as hooks, 
+and extended error status report. All these features are set at the same 
+time for all CPUs. For example, the case where a CPU runs with monostack 
+support while other CPUs run with multistack support is not possible. 
+
+From the OIL configuration point of view, the developer defines a set
+of CPUs in the OIL configuration file using the \const{CPU_DATA}
+sections inside the \const{OS} object, and the job of partitioning
+consists in placing the OIL objects into the existing CPUs.
+
+The OIL Objects that must be explicitly mapped to a processor are
+Tasks and Counters. As explained in Sections
+\ref{sub:task-mapping-to-cpu} and \ref{sec:counter-extensions} the OIL
+extensions implemented by \rtd\ allow the specification of the CPU to
+which a \const{TASK} or \const{COUNTER} is allocated by using the
+attribute \const{CPU_ID}. The link between the particular object (Task
+or Counter) and the CPU is {\em static} and specified at compile time,
+and cannot be changed at runtime.
+
+Other OIL Objects are automatically mapped by the system. In
+particular, Resources will be {\em local} if the tasks using them are
+allocated to the same CPU or {\em global} otherwise. Alarms are linked
+to a Counter (that in turn is mapped to a CPU). However, please note
+that Alarm notifications can result in activation of remote tasks, and
+setting of events on remote tasks.
+
+Finally, other objects are local and are replicated on each CPU. Hooks
+and Application Modes fall in this category. This means that each CPU
+will have its own copy of the hook routines, and each CPU will be
+initialized passing an appropriate Application Model. It is
+responsibility of the application developer that all CPUs are
+initialized with the same Application mode.
+
+
+\subsection{Master CPU}
+\label{sub:master-cpu}
+%
+%\nb{PJ: questo lo ho spiegato bene anche nella parte multiprocessore,
+%forse conviene riprenderlo da li o citare quello!!!}
+%
+
+When designing multiprocessor systems, the user must specify which CPU
+acts as ``Master CPU''\footnote{For details about the role of the Master CPU
+please look at the Multiprocessor Sections of the \ee\ manuals}. Here
+is the definition of the \oil{MASTER_CPU} attribute:
+
+\begin{lstlisting}
+  STRING MASTER_CPU = "default_cpu";
+\end{lstlisting}
+
+The default value for the \const{MASTER_CPU} attribute is
+\const{default_cpu}\index{default\_cpu}. 
+
+Example:
+\begin{lstlisting}
+  MASTER_CPU = "cpu0";
+\end{lstlisting}
+
+
+
+
+\subsection{Specification of the source files.}
+
+In order to make easier the change among different application 
+partitionings, each
+system object should be implemented in a separate file. Then, each
+file is specified into the OIL file as the implementation of the
+corresponding object, such as \const{CPU_DATA}, \const{TASK},
+\const{RESOURCE}. \rtd\ uses the information to create the
+\file{subdir.mk} files that are used by the makefile scripts to
+compile the source code.
+
+\rtd\ generates a \file{subdir.mk} file for each CPU, including all
+the files that refer to the objects allocated to the CPU.
+
+When a source file is specified inside a \const{CPU_DATA} element, the
+file is inserted in the \file{subdir.mk} of that CPU.
+
+When a source file is specified inside a \const{TASK} element, the
+file is inserted in the CPU where the task is allocated.
+
+When a source file is specified inside a \const{RESOURCE} element, the
+file is inserted in the CPU where all the tasks using it are allocated
+in case it is a local resource, or on the Master CPU if it is a global
+resource.
+
+A source file name can be specified more than once inside the OIL
+file. However, it will be inserted at most once for each CPU.
+
+To better understand this situation, consider the following example:
+
+\begin{lstlisting}
+CPU test_application {
+
+  OS EE {
+    MASTER_CPU = "cpu0";			
+
+    CPU_DATA = NIOSII {
+      ID = "cpu0";
+      APP_SRC = "cpu0.c";
+    };
+
+    CPU_DATA = NIOSII {
+      ID = "cpu1";
+      APP_SRC = "cpu1.c";
+    };
+  };
+
+  TASK task0 {
+    CPU_ID = "cpu0";
+    APP_SRC = "task0.c";
+    RESOURCE = globalmutex;
+  };
+
+  TASK task1 {
+    CPU_ID = "cpu1";
+    APP_SRC = "task1.c";
+    RESOURCE = globalmutex;
+    RESOURCE = localmutex;
+  };
+
+  TASK task2 {
+    CPU_ID = "cpu1";
+    APP_SRC = "task2.c";
+    RESOURCE = localmutex;
+  };
+  
+  RESOURCE globalmutex {
+    RESOURCEPROPERTY = STANDARD { APP_SRC = "globalmutex.c"; };
+  };
+
+  RESOURCE localmutex {
+    RESOURCEPROPERTY = STANDARD { APP_SRC = "localmutex.c"; };
+  };
+};
+\end{lstlisting}
+
+\const{cpu0}'s \file{subdir.mk} will include the files
+\file{cpu0.c}, \file{task0.c}, and \file{globalmutex.c};
+\const{cpu1}'s \file{subdir.mk} will include the files \file{cpu1.c},
+\file{task1.c}, \file{task2.c}, and \file{localmutex.c}.
+
+
+

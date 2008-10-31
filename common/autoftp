@@ -1,0 +1,7 @@
+open 66.71.180.212
+user ux031212
+cd httpdocs/download/manuals/include
+mput *.php
+cd ../pdf
+mput *.pdf
+bye

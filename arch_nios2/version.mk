@@ -1,0 +1,4 @@
+ARCH_NIOS2__DIR = arch_nios2
+ARCH_NIOS2__MAIN_NAME = arch_nios2
+ARCH_NIOS2__MAIN = arch_nios2
+ARCH_NIOS2__VER = 1_2_1

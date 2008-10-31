@@ -1,0 +1,4 @@
+ARCH_NIOS2_FIFO_TUTORIAL__DIR = arch_nios2_fifo_tutorial
+ARCH_NIOS2_FIFO_TUTORIAL__MAIN_NAME = arch_nios2_fifo_tutorial
+ARCH_NIOS2_FIFO_TUTORIAL__MAIN = fifo_tutorial
+ARCH_NIOS2_FIFO_TUTORIAL__VER = 1_1_0

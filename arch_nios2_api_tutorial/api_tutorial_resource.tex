@@ -1,0 +1,101 @@
+\chapter{Resource and Application Mode API Example}
+
+
+
+The \emph{Resource and Application Mode API Example} is a simple demo
+that shows the usage of the following primitives:
+\begin{itemize}
+\item \fn{GetActiveApplicationMode};
+\item \fn{GetResource};
+\item \fn{ReleaseResource}; 
+\end{itemize}
+The demo also uses \fn{ActivateTask} and
+other task related primitives. Please refer to Section
+\ref{cha:taskapi} for a better explanation of these primitives.
+
+\section{Demo structure}
+
+The demo consists of two tasks, \fn{LowTask} and \fn{HighTask} that
+share a \emph{resource}.  \fn{LowTask} is a periodic low priority
+task, activated by a timer, with a \emph{long} execution time. Almost
+all its execution time is spent inside a critical section on the
+resource (that is, between a call to \fn{GetResource} and
+\fn{ReleaseResource}). To show this behavious, LED 0 is turned on when
+\fn{LowTask} is inside the critical section.
+
+\fn{HighTask} is a high priority task that increments (decrements) a
+counter depending on the application mode being \const{ModeIncrement}
+(\const{ModeDecrement}). The task is \emph{aperiodic}, and is
+activated by the ISR linked to the button. Most of the execution time
+of \fn{HighTask} is spent inside a critical section on the shared
+resource. To show this behaviour, LED 1 is turned on when
+\fn{HighTask} is inside the critical section. 
+
+The application uses \emph{Application Mode}s to implement a task
+behavior dependent on the Application Mode. When the application
+starts, it checks the first pin of the Button PIO to select one out of
+the two different application modes (\const{ModeIncrement} or
+\const{ModeDecrement}).
+
+An {\em Application Mode} is basically a system configuration that is
+selected when the application starts. Application modes are set at
+application startup, and are not changed after the call to
+\fn{StartOS()}.  Application modes can be used to model particular
+application configurations such as "Debug Mode", "Normal Mode", and so
+on. The application tasks can read the application mode using
+\fn{GetActiveApplicationMode}, and adjust their behavior depending on
+the particular mode. Please also note that the \const{AUTOSTART}
+property in the OIL file for tasks and alarms may have different
+values for each application mode.
+
+After the call to \fn{StartOS()}, all the calls to \fn{printf} are
+always done in mutual exclusion inside the \const{mutex} critical
+section, to ensure that there is no concurrency issues between the
+various \fn{printf} calls.
+
+\fn{HighTask} and \fn{LowTask} are configured to share the same stack
+by setting the following line inside the OIL task properties:
+\begin{lstlisting}
+STACK = SHARED;
+\end{lstlisting}
+As a result, only a single stack will be used, with a dimension that
+(in this case) is the sum of the stack space required by both
+tasks. In general, by appropriately using priorities and preemption
+thresholds the stack space can be reduced significantly.
+
+Access to shared resources is managed by using the implementation of
+the Immediate Priority Ceiling protocol in \ee. 
+%
+% TBD Forse una citazione non guasterebbe.
+% da mettere quando sara' pronto il capitolo sullo scheduling nel
+% manuale di ERIKA 
+%
+In practice, whenever \fn{LowTask} locks the resources with primitive
+\fn{GetResource()}, its priority is raised to the one of
+\fn{HighTask}. This fact prevents \fn{HighTask} from preempting
+\fn{LowTask} while in the critical section, ensuring data consistency.
+Of course, \fn{LowTask} will return to its priority when calling
+\fn{ReleaseResource()} and the scheduler will be called to check
+whether a preemption is necessary.
+ 
+\section{Running the example}
+Compile and run the application as usual. When the application starts,
+the Button PIO is read, and the appropriate mode is passed to
+\fn{StartOS}. let's suppose that the Button is not pressed: the
+application will start with the application mode set to
+\const{ModeIncrement}.
+
+Each click of the first button in the evaluation board activates
+\fn{HighTask}: if \fn{LowTask} is already executing in critical
+section, \fn{HighTask} will have to wait for \fn{LowTask} to complete
+its critical section before being able to execute.
+
+Pressing the button too fast will activate \fn{HighTask} too fast. In
+that case, it is likely that some activation will be lost (as it
+happened in the Task API Example).
+  
+Starting the application with the first Button pressed, causes
+\fn{StartOS} to be called with the \const{ModeDecrement} application
+mode. In this example, the application mode simply influences the
+increment or decrement of a counter, as it can be seen looking at the
+console outputs.

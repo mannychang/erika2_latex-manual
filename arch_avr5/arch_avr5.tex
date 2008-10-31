@@ -1,0 +1,33 @@
+\documentclass[12pt,a4paper,normalheadings,titlepage]{scrreprt}
+
+\usepackage{../common/evman}
+\usepackage{graphicx}
+
+\pagestyle{headings}
+
+\def\title{ERIKA Enterprise Manual for the Atmel AVR5 targets}
+\def\subtitle{AVR microcontrollers gets real-time!}
+\include{dynamic_version}
+	
+\begin{document}
+
+\maketitle
+
+%\thispagestyle{plain}
+
+\pagebreak
+
+\tableofcontents
+
+\include{introduction}
+\include{avr5}
+\include{stk50x}
+\include{mib5x0}
+\include{history}
+
+\bibliographystyle{plain}
+\bibliography{../common/biblio}
+
+\printindex
+
+\end{document}

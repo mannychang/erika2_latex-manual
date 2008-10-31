@@ -1,0 +1,59 @@
+
+\chapter{Introduction}
+\label{cha:intro}
+
+This document provides the user with a basic understanding of the
+architecture, the features and the operations of the \rtd\ Code
+generator tool and the associated
+%OSEK
+\ee\ Kernel.
+
+The Code generator tool is part of the \rtd\ design framework for
+architecture level modeling. The \rtd\ toolset consists of a {\em
+core} component, required for all operations, and a number of plugins
+providing time verification and automatic generation of the
+implementation of real-time embedded software.
+
+The modular structure of RT-Druid is now fully integrated with the
+open Eclipse framework. The Eclipse environment can easily be extended
+with third party components and plug-ins, further improving the
+configurability and extensibility of \rtd{}.
+
+
+%The Code generator component is currently available for OSEK/VDX real-time
+%OS implementations only.
+
+This user guide document covers the code generation plugin. It
+consists of an overview, explaining the architectural concepts, the
+standards and the inputs and outputs of the code generator tool. In
+the first section: Overview of \rtd\ Code Generator and \ee, the tool
+and the
+%OSEK
+real-time \ee\ OS are introduced, the code generation process is
+outlined and the relationships among the products and the Eclipse
+development environment are explained. 
+%The second section Overview of
+%OSEK provides a basic understanding of the OSEK standard for
+%automotive applications and its real-time features.
+
+The second part contains the basic information for operating with the
+tool and providing the right configuration input for the following
+code generation phase. Chapter \ref{cha:creating-rtdruid-project}
+explains the basic steps that are necessary to start an Rt-Druid
+project and how to define the basic configuration info that is
+required by the tool. A fundamental part of the configuration tool is
+contained in the OIL input file. Syntax and methods for
+generating the OIL description of the system are the subject of
+Chapter \ref{cha:oil-syntax}.
+
+The \ee\ specific extensions to the OIL language that are necessary to
+define task placement and other features of multiprocessor systems are
+described in Section \ref{sec:oil-multicore}.
+
+The operations that are required for the code generation phase,
+together with a detailed description of the input and output data at
+each step is the subject of the Chapter \ref{cha:code-generation}.
+The kernel configuration and the explanation of the programming model
+that needs to be used for \rtd/\ee\ applications are also described in
+Chapter \ref{cha:code-generation}.
+

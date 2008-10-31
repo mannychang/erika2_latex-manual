@@ -1,0 +1,5155 @@
+#LyX file created by tex2lyx 1.5.3
+\lyxformat 247
+\begin_document
+\begin_header
+\textclass article
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\paperfontsize default
+\spacing single
+\papersize default
+\use_geometry false
+\use_amsmath 0
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%-----------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+chapter{Internals of the genaretd code}
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%
+\backslash
+label{ch:internals}
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%-----------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+
+Palette descriptions
+\end_layout
+
+\begin_layout Standard
+
+this section contains a brief description of the blocks available in each palette.
+\end_layout
+
+\begin_layout Subsection
+
+MCHP16 Sources
+\end_layout
+
+\begin_layout Standard
+\align center
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="12" columns="2">
+<features islongtable="true">
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="none" valignment="top" rightline="true" width="7cm">
+<row topline="true">
+<cell multicolumn="1" alignment="none" valignment="top" topline="true" usebox="none" special="|c|">
+\begin_inset Text
+
+\begin_layout Standard
+
+Palette MCHP16 Sources
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block symbol 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_clock.png
+	BoundingBox 0 0 74 71
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is the main system clock. It has two internal parameters, the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Period
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ which gives the system periodicity, and an 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Init time
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ which can be used to specify an initial offset. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_constant.png
+	BoundingBox 0 0 82 79
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+A constant value, specified in an internal parameter 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_blackarrow.png
+	BoundingBox 0 0 54 48
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Input port. The number of the port is specified in an internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_redarrow.png
+	BoundingBox 0 0 48 56
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Event input port. The number of the port is specified in an internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_sine.png
+	BoundingBox 0 0 109 80
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block generates a sine wave. The input parameters allow the specification of 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Amplitude
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Frequency
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Phase
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Bias
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, and 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Delay
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_square.png
+	BoundingBox 0 0 106 75
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+A square wave generator. The input parameters allow the specification of 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Amplitude
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Period
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Impulse width
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Bias
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, and 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Delay
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_step.png
+	BoundingBox 0 0 106 75
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+A step input. The input parameters are 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Amplitude
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, and 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Delay
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_random.png
+	BoundingBox 0 0 111 75
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+A random number generator. The input parameters are 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Amplitude
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, and 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Seed
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_counterbidi.png
+	BoundingBox 0 0 118 87
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+A counter. The input parameters are the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Minimum
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ value, the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Maximum
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ value, and the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Rule
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ (1=Decrement, 2=Decrement). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sources_countermodulo.png
+	BoundingBox 0 0 111 89
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+A modulo counter. The input parameters are the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+initial state
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+, which should be 
+\begin_inset Formula $\geq 0$
+\end_inset
+
+, and the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Modulo
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ number. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+% -----------------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Sources
+\end_layout
+
+\begin_layout Standard
+\align center
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="12" columns="2">
+<features islongtable="true">
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="none" valignment="top" rightline="true" width="7cm">
+<row topline="true">
+<cell multicolumn="1" alignment="none" valignment="top" topline="true" usebox="none" special="|c|">
+\begin_inset Text
+
+\begin_layout Standard
+
+Palette 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Sources
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block symbol 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_flexadc.png
+	BoundingBox 0 0 114 77
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to an analog input pin of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+ADC pin
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ (from 1 to 8). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_flexgpin.png
+	BoundingBox 0 0 106 78
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to an digital input pin of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+GPIO pin
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ (from 1 to 8). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_dmbadcin.png
+	BoundingBox 0 0 112 76
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to an analog input pin of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Demo daughter board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+ADC pin
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ (from 1 to 8). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_dmbdigin.png
+	BoundingBox 0 0 109 75
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to an digital input pin of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Demo daughter board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+GPIO pin
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ (from 1 to 8). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_dmbbutton.png
+	BoundingBox 0 0 116 74
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to a button of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Demo daughter board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Button
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ (from 1 to 4). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_dmbpot.png
+	BoundingBox 0 0 104 76
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to the potentiometer analog input of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Demo daughter board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Potentiometer
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ (from 1 to 4). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_dmbencin.png
+	BoundingBox 0 0 109 76
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to the encoder input of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Demo daughter board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Potentiometer
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ (from 1 to 2). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_dmbacc.png
+	BoundingBox 0 0 106 71
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to the accelerometer input of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Demo daughter board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+Channel
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ (1=x, 2=y, 3=z). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_dmbldr.png
+	BoundingBox 0 0 112 72
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to the light sensor of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Demo daughter board. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sources_dmbtemp.png
+	BoundingBox 0 0 104 73
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block maps to the temperature sensor of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Demo daughter board. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+% --------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+MCHP16 Sinks
+\end_layout
+
+\begin_layout Standard
+\align center
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="8" columns="2">
+<features islongtable="true">
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="none" valignment="top" rightline="true" width="7cm">
+<row topline="true">
+<cell multicolumn="1" alignment="none" valignment="top" topline="true" usebox="none" special="|c|">
+\begin_inset Text
+
+\begin_layout Standard
+
+Palette MCHP16 Sinks
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block symbol 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sinks_scope.png
+	BoundingBox 0 0 86 72
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a scope block, which can be used to display signals during simulation. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sinks_mscope.png
+	BoundingBox 0 0 95 73
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a multiple scope block, which can be used to display signals during simulation. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sinks_scope2.png
+	BoundingBox 0 0 83 75
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a scope block, which can be used to display signals during simulation. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sinks_scope3.png
+	BoundingBox 0 0 77 72
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a scope block, which can be used to display signals during simulation. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sinks_red.png
+	BoundingBox 0 0 47 66
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is an event output block, which has an internal parameter which is the port number. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_sinks_black.png
+	BoundingBox 0 0 52 47
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is an output block, which has an internal parameter which is the port number. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+% ----------------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Sinks
+\end_layout
+
+\begin_layout Standard
+\align center
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="12" columns="2">
+<features islongtable="true">
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="none" valignment="top" rightline="true" width="7cm">
+<row topline="true">
+<cell multicolumn="1" alignment="none" valignment="top" topline="true" usebox="none" special="|c|">
+\begin_inset Text
+
+\begin_layout Standard
+
+Palette 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+Sinks
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block symbol 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_flexled.png
+	BoundingBox 0 0 111 75
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This blocks controls the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+system led. The led is on when the input is greater than 
+\begin_inset Formula $0.5$
+\end_inset
+
+. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_flexgpout.png
+	BoundingBox 0 0 111 73
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block controls an output pin of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+board. it has an internal parameter which is the ouput pin. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_flexpwm.png
+	BoundingBox 0 0 113 74
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block comntrols a PWM output of the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+flex
+\end_layout
+
+\end_inset
+
+
+\begin_inset InsetSpace \space{}
+board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+PWM
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ pin (from 1 to 4). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_flexlcd.png
+	BoundingBox 0 0 111 74
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block controls the LCD which is attached to the first prototype of the demo daughter board (this hardware is no more available, and the block is here for historical usage). If used with the Demo daughter board, it controls the LCD of that board. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_dmbled.png
+	BoundingBox 0 0 122 79
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block controls one of the eight LEDs of the Demo Daughter board. The internal parametre specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+LED number
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_dmbdigout.png
+	BoundingBox 0 0 112 78
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block controls one of the eight digita output pins of the Demo Daughter board. The internal parameter specifies the 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+const
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+pin
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_dmbpwmout.png
+	BoundingBox 0 0 110 73
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block controls one of the PWM outputs of the Demo Daughter board. the internal parameter specifies the pin number (from 1 to four). 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_dmblcd.png
+	BoundingBox 0 0 110 72
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block controls the LCD on the Demo Daughter Board. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_dmbdac.png
+	BoundingBox 0 0 110 70
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block controls one of the two DAC outputs. The internal parameter specifies the number of the DAC channel. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/flex_sinks_dmbbuzzer.png
+	BoundingBox 0 0 113 73
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block controls the buzzer mounted on the Demo Daughter board. The input value is the frequency of the buzzer sound. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+% --------------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+MCHP16 Non Linear
+\end_layout
+
+\begin_layout Standard
+\align center
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="16" columns="2">
+<features islongtable="true">
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="none" valignment="top" rightline="true" width="7cm">
+<row topline="true">
+<cell multicolumn="1" alignment="none" valignment="top" topline="true" usebox="none" special="|c|">
+\begin_inset Text
+
+\begin_layout Standard
+
+Palette MCHP16 Non Linear
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block symbol 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_product.png
+	BoundingBox 0 0 104 107
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+The result of this block is the multiplication or division of its inputs. the number and the operation done on each input is specified in the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_division.png
+	BoundingBox 0 0 96 105
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+The result of this block is the multiplication or division of its inputs. the number and the operation done on each input is specified in the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_exponential.png
+	BoundingBox 0 0 94 85
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+If 
+\begin_inset Formula $u$
+\end_inset
+
+ is the input, the block returns 
+\begin_inset Formula $a^u$
+\end_inset
+
+, where 
+\begin_inset Formula $a$
+\end_inset
+
+ is the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_inverse.png
+	BoundingBox 0 0 89 66
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block returns the inverse of the input. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_abs.png
+	BoundingBox 0 0 94 66
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This returns the absolute value of the input. Te intrnal parameter specifies if the zero-crossing option has been selected. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_sign.png
+	BoundingBox 0 0 92 63
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This returns the sign of the input. Te internal parameter specifies if the zero-crossing option has been selected. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_min.png
+	BoundingBox 0 0 90 65
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block returns the minimum or maximum value of the input. the internal parameters allow the specification of the operation (min or max) the zero-crossing option and the number of inputs. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_max.png
+	BoundingBox 0 0 94 66
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block returns the minimum or maximum value of the input. the internal parameters allow the specification of the operation (min or max) the zero-crossing option and the number of inputs. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_saturation.png
+	BoundingBox 0 0 98 84
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements a saturation. The internal parameters allow the specification of an Upper and lower limit, as well as the zero crossing option. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_deadband.png
+	BoundingBox 0 0 96 81
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block specifies a deadband zone, which is specified using the internal parameters. The internal parameters can also specify the zero-crossing option. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_hysteresis.png
+	BoundingBox 0 0 94 85
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Tis block implements an hysteresis. The internal parameters specifies when the hysteresis starts and ends, and the two values of the output. The zero crossing option can also be selected. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_backlash.png
+	BoundingBox 0 0 103 79
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+- 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_ratelimiter.png
+	BoundingBox 0 0 132 69
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+- 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_nonlinear_mathexpr.png
+	BoundingBox 0 0 125 72
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block allows the computation of a generic Scilab expression, specified in the input parameters. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+% ----------------------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+MCHP16 Logic
+\end_layout
+
+\begin_layout Standard
+\align center
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="15" columns="2">
+<features islongtable="true">
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="none" valignment="top" rightline="true" width="7cm">
+<row topline="true">
+<cell multicolumn="1" alignment="none" valignment="top" topline="true" usebox="none" special="|c|">
+\begin_inset Text
+
+\begin_layout Standard
+
+Palette MCHP16 logic
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block symbol 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_dlatch.png
+	BoundingBox 0 0 106 113
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements a D-latch. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_dflipflop.png
+	BoundingBox 0 0 97 112
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements a D Flip-Flop. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_jkflipflop.png
+	BoundingBox 0 0 99 106
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+this block implements a JK Flip Flop. An initial value can be specified using the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_srflipflop.png
+	BoundingBox 0 0 95 108
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements an SR Flip Flop.An initial value can be specified using the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_truetable.png
+	BoundingBox 0 0 97 87
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implementa a Truth table. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_clearbit.png
+	BoundingBox 0 0 93 68
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block can be used to clear a bit in the integer input. The bit to clear is specified using the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_setbit.png
+	BoundingBox 0 0 96 70
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block can be used to set a bit in the integer input. The bit to clear is specified using the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_upperhalf.png
+	BoundingBox 0 0 131 70
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block can be used to extract a set of bits taken from the upper part of the input. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_shift.png
+	BoundingBox 0 0 124 67
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements an arithmetic shift operation. The number of bits to shift can be specified in the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_intmul.png
+	BoundingBox 0 0 92 64
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements an integer multiplication. The data type and the behavior in case of an overflow (Nothing, Saturate, Error) are specified using internal parameters. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_int8.png
+	BoundingBox 0 0 118 65
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block converts an input type to int8. The input type is specified in the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_int16.png
+	BoundingBox 0 0 118 63
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block converts an input type to int16. The input type is specified in the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_logic_int32.png
+	BoundingBox 0 0 123 67
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block converts an input type to int32. The input type is specified in the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+% ----------------------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+MCHP16 Linear
+\end_layout
+
+\begin_layout Standard
+\align center
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="20" columns="2">
+<features islongtable="true">
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="none" valignment="top" rightline="true" width="7cm">
+<row topline="true">
+<cell multicolumn="1" alignment="none" valignment="top" topline="true" usebox="none" special="|c|">
+\begin_inset Text
+
+\begin_layout Standard
+
+Palette MCHP16 Linear
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block symbol 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_multip.png
+	BoundingBox 0 0 87 65
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implement a proportional gain. The gain value is specified in the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_subtract.png
+	BoundingBox 0 0 87 93
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements a sum/subtraction of different inputs. The sign vector and the overflow rules can be specified in the internal parameters. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_intmultip.png
+	BoundingBox 0 0 94 85
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implement a proportional gain with integer inputs. The gain value is specified in the internal parameter. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_intsubtract.png
+	BoundingBox 0 0 91 104
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements a sum/subtraction of different integer inputs. The sign vector and the overflow rules can be specified in the internal parameters. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_sh.png
+	BoundingBox 0 0 83 74
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a sample and hold block. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_z.png
+	BoundingBox 0 0 86 71
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a delay of 1 sample. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_intsh.png
+	BoundingBox 0 0 88 83
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a sample and hold block for integer inputs. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_intz.png
+	BoundingBox 0 0 89 89
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a delay of 1 sample, for integer inputs. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_integral.png
+	BoundingBox 0 0 97 82
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a continuous integral block. internal parameters specify the initial condition, reinitialization, saturation, upper and lower limit. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_derivate.png
+	BoundingBox 0 0 95 80
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+this is a continuous derivate. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_pid.png
+	BoundingBox 0 0 91 60
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a PID block. The three constants can be specified as internal parameters. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_contdelay.png
+	BoundingBox 0 0 121 64
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a delay block. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_vardelay.png
+	BoundingBox 0 0 106 77
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a variable delay. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_shift.png
+	BoundingBox 0 0 104 85
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+this is a shift register. Initial length and values of the shift register can be specified using the internal variables. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_fracts.png
+	BoundingBox 0 0 110 79
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a continuous transfer function. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_matrixs.png
+	BoundingBox 0 0 151 69
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a continuous linear system. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_fractz.png
+	BoundingBox 0 0 102 84
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a discrete transfer function. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_linear_matrixz.png
+	BoundingBox 0 0 145 77
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a discrete linear system. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+% ----------------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+MCHP16 Branching
+\end_layout
+
+\begin_layout Standard
+\align center
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="16" columns="2">
+<features islongtable="true">
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="none" valignment="top" rightline="true" width="7cm">
+<row topline="true">
+<cell multicolumn="1" alignment="none" valignment="top" topline="true" usebox="none" special="|c|">
+\begin_inset Text
+
+\begin_layout Standard
+
+Palette MCHP16 Branching
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block symbol 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_mux.png
+	BoundingBox 0 0 63 97
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block multiplexes a number of inputs togerther to form a vector. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_merge.png
+	BoundingBox 0 0 49 93
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block merges a number of inputs togerther to form a vector. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_demux.png
+	BoundingBox 0 0 54 84
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block demultiplexes the inputs. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_extractor.png
+	BoundingBox 0 0 92 72
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block only extracts one entry of the input vector. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_switch.png
+	BoundingBox 0 0 102 77
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements a switch. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_control.png
+	BoundingBox 0 0 104 75
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements an M-port switch. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_s2v.png
+	BoundingBox 0 0 94 96
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block transforms a scalar value to a vector. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_switch1.png
+	BoundingBox 0 0 95 79
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block implements a connected switch. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_goto.png
+	BoundingBox 0 0 66 68
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block labels an input. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_from.png
+	BoundingBox 0 0 62 64
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block takes the output from a labeled signal. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_gototag.png
+	BoundingBox 0 0 68 98
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a Goto tag visibility block. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_redgoto.png
+	BoundingBox 0 0 57 75
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block labels an event signal. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_redfrom.png
+	BoundingBox 0 0 49 62
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block takes the input from a labeled event signal. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_branching_redgototag.png
+	BoundingBox 0 0 49 62
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This is a Goto tag visibility block for event signals. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+% ----------------------------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+MCHP16 Typeconversion
+\end_layout
+
+\begin_layout Standard
+\align center
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="8" columns="2">
+<features islongtable="true">
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="none" valignment="top" rightline="true" width="7cm">
+<row topline="true">
+<cell multicolumn="1" alignment="none" valignment="top" topline="true" usebox="none" special="|c|">
+\begin_inset Text
+
+\begin_layout Standard
+
+Palette MCHP16 Typeconversion
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block symbol 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_typeconversion_doubletoint8.png
+	BoundingBox 0 0 133 86
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block converts the input from double to int8. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_typeconversion_doubletoint16.png
+	BoundingBox 0 0 117 78
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block converts the input from double to int16. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_typeconversion_doubletoint32.png
+	BoundingBox 0 0 112 75
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block converts the input from double to int32. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_typeconversion_int8todouble.png
+	BoundingBox 0 0 119 80
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block converts the input from int8 to double. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_typeconversion_int16todouble.png
+	BoundingBox 0 0 119 77
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block converts the input from int16 to double. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename images/scicos_blocks/mchp16_typeconversion_int32todouble.png
+	BoundingBox 0 0 122 80
+
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+This block converts the input from int32 to double. 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

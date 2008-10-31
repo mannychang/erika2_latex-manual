@@ -1,0 +1,225 @@
+\chapter{Task API Example}
+\label{cha:taskapi}
+
+The Task API Example, also called the {\em Christmas Tree} example, is
+a simple demo that shows the usage of the following primitives:
+\begin{itemize}
+\item \fn{DeclareTask};
+\item \fn{ActivateTask};
+\item \fn{TerminateTask};
+\item \fn{Schedule}.
+\end{itemize}
+
+
+
+\section{Demo structure}
+
+The demo consists of two tasks, \fn{Task1} and \fn{Task2}.
+\fn{Task1} repeatedly puts on and off a sequence of LEDs, like a
+Christmas Tree. \fn{Task2} simply turns on and off a LED, and is
+activated by the press of a button. Task2 is de facto a {\em
+  disturbing} task that, depending on the configuration parameters,
+may preempt \fn{Task1}.
+
+The demo can be compiled in four different configurations, showing in
+each case a different scheduling behavior. To select a configuration,
+please look at the end of the OIL file containing the configuration of
+the example, and uncomment {\em only one} configuration at a time.
+
+\section{Configuration 1: Full preemptive}
+
+This configuration is characterized by the following properties:
+\begin{itemize}
+\item An Altera HAL alarm \fn{Task1_alarm_callback} is linked to the
+  System Clock (typically an Altera Interval Timer). The alarm simply
+  activates \fn{Task1}.
+\item Each instance of \fn{Task1} simply shows a {\em Christmas Tree},
+  that is, \fn{Task1} controls a sequence of LEDs blinking from LED 0
+  to LED 5.
+\item each time the first button in the board is pressed, \fn{Task2}
+  is activated.
+\item \fn{Task2} always preempts \fn{Task1} (it has higher
+  priority). \fn{Task2} does the following actions:
+  \begin{itemize}
+  \item LED 6 or LED 7 blink alternatively;
+  \item a string is printed to the JTAG UART displaying the number of
+    alarms fired, the number of button interrupt fired, the number of
+    times Task2 has run.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Running configuration 1}
+
+The behavior of the two tasks in configuration 1 can be evaluated
+looking at the evaluation board LEDs together with the console output.
+
+When the demo starts, the first string that appears on the console is
+the banner
+\begin{lstlisting}
+Welcome to the ERIKA Enterprise Christmas Tree!
+\end{lstlisting}
+meaning the application has started correctly.
+
+After that, the main() function calls \fn{StartOS()}. \fn{StartOS} is
+an \ee\ primitive that initializes the \ee\ environment. The call to
+\fn{StartOS()} must precede any call to the \ee\ API functions.
+
+\fn{StartOS} automatically activates \fn{Task2}. This can be
+configured by modifying the following property of \fn{Task2} in the
+OIL configuration file:
+
+\begin{lstlisting}
+AUTOSTART = TRUE;
+\end{lstlisting}
+
+As a result, \fn{Task2} runs, blinking LED 6 and printing the following string:
+\begin{lstlisting}
+Task2 - Timer:   0 Button:   0 Task2:   1  
+\end{lstlisting}
+
+\begin{itemize}
+\item The first number is the number of times the HAL alarm has run so
+  far.  Every execution of the alarm callback activates \fn{Task1}, that in
+  turn blinks LED 0 to 5.
+
+\item The second number displays the number of executions of the
+  button interrupt.  Every time the button is pressed or released, an
+  interrupt is generated. The interrupt activates \fn{Task2}.
+  
+\item The third number displays the number of times \fn{Task2} has
+  run.  As we will see later, the number may differ from the number of
+  button activations.
+\end{itemize}
+
+Now press the first button in the evaluation board {\em for MORE THAN
+ONE SECOND}, and release it.  As a result, two lines are printed on
+the console.  The first line corresponds to the \fn{Task2} activation
+issued by the interrupt generated when you pressed the button.  The
+second line correspond to the \fn{Task2} activation issued by the
+interrupt generated when you released the button.
+
+Moreover, looking at the LEDs on the evaluation board, every time you
+press or release the button, LEDs 6 or 7 blink regardless of the
+current status of the Christmas Tree (that is, the current code being
+run by \fn{Task1}).
+
+The behavior happens because \fn{Task2} has an {\em higher priority}
+than \fn{Task1}: when \fn{Task2} is activated, it has a higher
+priority than \fn{Task1}, and as a result \fn{Task2} "preempts"
+\fn{Task1}\footnote{Please note that this behavior will change in
+Configuration 2, 3, and 4.}.
+
+Now please press the button rapidly a few times. As a result, a few
+lines are printed on the console. As it can be seen looking at the
+number printed for button presses and \fn{Task2} executions, the
+number of \fn{Task2} Activations are less than the number of Button
+IRQs. The behavior happens because the OIL file for configuration 1
+contains the line:
+\begin{lstlisting}
+KERNEL_TYPE = BCC1;
+\end{lstlisting}
+
+\noindent that is, \ee\ is configured with a \const{BCC1} conformance class,
+which forces every task to maintain only one activation at a
+time. \fn{Task2} activations issued when \fn{Task2} is in the ready
+queue or is running are {\em lost} (in that case the \fn{ActivateTask}
+primitive returns \const{E_OS_LIMIT}). We will address this issue in
+Configuration 4.
+
+You are now ready to proceed to Configuration 2.
+
+To change configuration, go at the end of the OIL file, and leave
+uncommented only the Configuration you want to try.  After that,
+please rebuild the application.
+
+\section{Configuration 2: Non preemptive}
+
+This configuration differs from Configuration 1 only for the fact
+\fn{Task1} is configured as {\em NON preemptive} in the OIL file by
+using
+\begin{lstlisting}
+SCHEDULE = NON;
+\end{lstlisting}
+in the task attributes of the OIL file.
+
+\subsection{Running configuration 2}
+The effect of \fn{Task1} being non-preemptive is that \fn{Task2} only
+runs when \fn{Task1} (the Christmas Tree) is not running. The fact can
+be perceived by looking at the board LEDs: LEDs 6 or 7 only blinks
+when the Christmas Tree is off, that is when \fn{Task1} ended its
+current activation.
+
+If compared with configuration 1, the lines printed on the console by
+\fn{Task2} show the correct number of alarm executions, with the
+correct number of alarm and button interrupts, meaning that interrupts
+are handled also when a non-preemptive task is running.
+
+On the other side, the number of times \fn{Task2} has run could be
+less than in configuration 1 because some more activations could have
+been lost due to the fact \fn{Task2} cannot preempt \fn{Task1}.
+
+
+
+\section{Configuration 3: Preemption points.}
+
+This configuration differs from configuration 2 for the fact
+\fn{Task1} calls \fn{Schedule()} in the middle of the display of the
+Christmas Tree.  To implement that, the OIL file specifies a global 
+
+\begin{lstlisting}
+EE_OPT = "MYSCHEDULE";
+\end{lstlisting}
+option, that translates in a 
+\begin{lstlisting}
+#define MYSCHEDULE
+\end{lstlisting}
+statement in the generated files when compiling the application source
+code (see the automatically generated file
+\file{Debug/default_cpu/eecfg.h} inside your project directory). Then,
+\fn{Task1} source code includes a conditional compiler directive to
+add the call to \fn{Schedule()}.
+
+
+\subsection{Running configuration 3}
+This configuration shows the usage of the
+\fn{Schedule()} primitive, which can be used to implement a preemption
+point inside a non-preemptive task.
+
+In particular, \fn{Task2} can now preempt \fn{Task1} in the middle of
+the Christmas tree (between the blinking of LED 2 and LED 3). The fact
+is visible looking at the board LEDs: if the button is pressed while
+LED 0, 1, or 2 are on, then in any case LED 6 (or 7) will blink
+between the blink of LED 2 and 3.
+
+
+\section{Configuration 4: Multiple Activations.}
+This configuration differs from configuration 3 because \fn{Task2} has
+now the possibility of storing a few pending activations. To do that,
+the number of pending activations for \fn{Task2} is set to 6 by having the line
+\begin{lstlisting}
+ACTIVATION = 6;
+\end{lstlisting}
+to control the pending activations of \fn{Task2} and the line
+\begin{lstlisting}
+KERNEL_TYPE = BCC2;
+\end{lstlisting}
+to set the kernel conformance class to \const{BCC2}.
+
+\subsection{Running configuration 4}
+When running configuration 4, \fn{Task2} now stores up to 6 pending
+activations, which means that if the task is activated more than once
+(by pressing and releasing the button rapidly a few times) while Task1
+is running , then \fn{Task2} is executed consecutively for a
+corresponding number of times up to the maximum number of pending
+activations specified in the OIL File.
+
+\section{Configuration 5: Minimal configuration.}
+This configuration differs from configuration 1 because the system is running with the \const{FP} conformance class. As a result, pending activations are stored inside an integer, and for that reason no activations are lost when clicking the button.
+
+\subsection{Running configuration 5}
+When running configuration 5, \fn{Task2} now stores all your pending
+activations, which means that if the task is activated more than once
+(by pressing and releasing the button rapidly a few times) while Task1
+is running , then \fn{Task2} is executed consecutively for a
+corresponding number of times. Pleae note that the order of
+activations of tasks with the same priority is not maintained as it is with conformance class \const{BCC2} and \const{ECC2}.

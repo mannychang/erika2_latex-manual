@@ -1,0 +1,243 @@
+\chapter{Introduction}
+
+This short tutorial shows how to build a simple multiprocessor
+application on the Altera Nios II platform composed of a producer
+\const{WriteTask} task that periodically sends information (an
+\const{alt_u32} 32-bit unsigned integer) to a consumer
+\const{ReadTask} task. The information is sent using a shared data
+structure that implements a FIFO queue.
+
+The demo is organised as follows: the writer task \const{WriteTask}
+writes one item every second, while the reader task \const{ReadTask}
+reads one item every two seconds. A third task called
+\const{ButtonReadTask} is also present. Its behavior is to flush all
+the content of the FIFO queue.
+
+The demo focuses on the following features:
+\begin{itemize}
+\item The allocation of the shared memory used to implement the FIFO
+  queue is completely handled by the \ee\ makefile scripts. There is
+  not any need for explicitly allocating or reserving memory
+  areas. This marks a remarkable difference, for instance, from Altera
+  Mailboxes.
+\item Task allocation to a particular CPU can be changed by changing
+  only the \const{CPU_ID} field of a task inside the OIL File. The
+  code of the tasks remains unchanged when changing the used
+  partitioning.
+\end{itemize}
+
+This tutorial assumes the reader's familiarity with design of
+multiprocess systems, as introduced in Altera document named
+{}``Creating Multiprocessor Nios II systems tutorial'' available on
+the Altera web site \cite{Altera-multicpu-tutorial}, and with the 2
+CPU \ee\ tutorial included inside the \ee\ manual
+\cite{Evidence-multicpu-tutorial}.
+
+\chapter{Running the tutorial}
+
+The following basic steps will guide you in running the application
+included in this tutorial:
+
+\begin{enumerate}
+\item First of all, the hardware design. The hardware design that is
+  needed to run this demo is the same 2-CPU Nios II hardware design
+  used for the 2 CPU \ee\ tutorial. Please refer to the 2 CPU \ee\
+  tutorial inside the \ee\ multicore tutorial
+  \cite{Evidence-multicpu-tutorial} for information on the creation of
+  multiprocessor designs compatible with \ee. In the following points,
+  we suppose that the location of the hardware design is the same as
+  specified in the 2 CPU \ee\ tutorial. If not, remember to change the
+  OIL directories accordingly as explained in the section ``Updating
+  the OIL File'' of that tutorial.
+
+\item Then, you need to create two Altera System Libraries. Again,
+  these libraries are the same as in the 2 CPU \ee\ tutorial
+  \cite{Evidence-multicpu-tutorial}. Please refer to it for more
+  information.
+
+\item From the File menu of the Nios II IDE select ``New
+  Project...''. Choose ``RT-Druid Nios Project'' from the Evidence tab
+  of the New Project Dialog box. A dialog box appears. Choose the FIFO
+  Template. Name the project \file{demo_fifo} and press the Finish
+  button.
+
+\item Right click on the project name, and select ``Build Project''.
+  The demo application will be compiled, and two ELF binaries will be
+  produced.
+
+\item To run the demo, please follow the instruction described in the
+  \ee\ 2 CPU tutorial \cite{Evidence-multicpu-tutorial}: two debug
+  configuration (one for each CPU) will be created along with a
+  multiprocessor collection. After that, you have to program the FPGA,
+  and run the just created multiprocessor collection.
+\end{enumerate}
+
+The result of the application run is the following:
+
+\begin{enumerate}
+\item The \fn{WriteTask} is activate once every second. The ReadTask
+  is activated once every two seconds. Each activation prints a
+  message to the JTAG UART. As a result, the FIFO read frequency is half
+  the FIFO write frequency.
+\item After a few seconds, the FIFO fills up (by default it can store
+  only 8 items), the \fn{WriteTask} starts failing the write
+  operation, printing the message \const{FIFO buffer full!}.
+\item At that point, pressing one of the buttons causes the activation
+  of the \fn{ButtonReadTask}, that reads all the buffer. One click of
+  the button typically activates the task twice (at the press and at
+  the release of the button).
+\end{enumerate}
+
+Here is a typical execution trace copied from the Nios II consoles for
+CPU 0:
+
+\begin{lstlisting}
+...
+Hello from CPU 0!
+WriteTask: written 1
+WriteTask: written 2
+WriteTask: written 3
+WriteTask: written 4
+WriteTask: written 5
+WriteTask: written 6
+WriteTask: written 7
+WriteTask: written 8
+WriteTask: written 9
+WriteTask: written 10
+WriteTask: written 11
+WriteTask: written 12
+WriteTask: written 13
+WriteTask: written 14
+WriteTask: written 15
+WriteTask: FIFO buffer full!
+WriteTask: written 17
+WriteTask: FIFO buffer full!
+WriteTask: written 19
+WriteTask: FIFO buffer full!
+ButtonReadTask: read 11
+ButtonReadTask: read 12
+ButtonReadTask: read 13
+ButtonReadTask: read 14
+ButtonReadTask: read 15
+ButtonReadTask: read 17
+ButtonReadTask: read 19
+ButtonReadTask: FIFO buffer empty, ending task!
+ButtonReadTask: FIFO buffer empty, ending task!
+WriteTask: written 21
+WriteTask: written 22
+WriteTask: written 23
+WriteTask: written 24
+...
+\end{lstlisting}
+
+...and for CPU 1:
+
+\begin{lstlisting}
+...
+Hello from CPU 1
+ReadTask: read 1
+ReadTask: read 2
+ReadTask: read 3
+ReadTask: read 4
+ReadTask: read 5
+ReadTask: read 6
+ReadTask: read 7
+ReadTask: read 8
+ReadTask: read 9
+ReadTask: read 10
+ReadTask: read 21
+ReadTask: read 22
+...
+\end{lstlisting}
+
+
+\chapter{Final comments}
+
+This short chapter contains some details about the design choices used
+when developing the example, that we think useful for people that want
+to design \ee\ applications.
+
+\paragraph{Partitioning the software}
+
+\rtd\ and \ee\ allow an easy partitioning of the application
+software. Changing the partitioning of the tasks into the CPUs is very
+simple: you just need to change the \const{CPU_ID} parameter in the
+task section of the OIL file.
+
+For example, you can put all the three tasks to CPU 0, or the tasks to
+CPU 1, or choose an intermediate partitioning. In all these cases,
+multiprocessor resource handling and task activations will be hided by
+\ee, without changing the application software.  Please note that a
+different partitioning scheme does not require a change in the
+application source code, but only in the OIL configuration file.
+
+To test a different partitioning, just change the OIL File, recompile
+and rerun the demo.
+
+\paragraph{Resource usage.}
+The simple implementation of the FIFO queue presented in this tutorial
+shows a typical usage of the \fn{GetResource} and \fn{ReleaseResource}
+primitives for the implementation of a simple non-blocking shared data
+structure. The demo defines a \const{fifo_t} abstract data type, and
+uses two resources for each instance FIFO queue: a first resource is
+passed to the FIFO write function to handle concurrent accesses from
+different writers, whereas the second resource is passed to the FIFO
+read function to handle concurrent accesses from different writers.
+
+Using two resources means that read and write operations can proceed
+in parallel, in the same way as it happens for the Altera Mailbox.
+
+The main difference with the Altera Mailbox is that if the tasks using
+the resources are allocated to the same CPU, then the Altera
+Mutex peripheral is not used at all.
+
+\paragraph{Using a single resource.}
+To limit the resource usage, the FIFO can work using a single resource
+for both readers and writers. The behavior in this case will be that
+only one task (writer or reader) will get access to the FIFO at the
+same time.
+
+\paragraph{Implementing a Blocking (spinning) FIFO.}
+The Altera Mailbox exports two functions called
+\fn{altera_avalon_mailbox_post} and
+\fn{altera_avalon_mailbox_pend}. The behavior of these function is to
+actively spin until the FIFO becomes empty.  This approach leads to
+satisfactory results on multiprocessor platforms where some CPU write
+and the other read; however, it does not allow a flexible partitioning
+of the code, that needs to be modified when the partitioning
+changes. To extend the example to have a spinning read primitive like
+in the Altera Mailbox, you need to put a cycle outside the read or
+write function, in a way similar to what happens to the
+\fn{ButtonReadTask} task.
+
+The implementation of a blocking (not spinning) primitive requires the
+usage of the ECC1 or ECC2 \ee\ configuration, and the usage of the
+\fn{WaitEvent} primitive. Consider that implementing such kind of
+primitive requires a disabling of the stack sharing mechanism for the
+tasks using the FIFO.
+
+\paragraph{Activating the tasks upon reads and writes.}
+Instead of actively spinning waiting for the arrival of a data on the
+FIFO, another nice technique that can be used in this case is to map
+the read of the FIFO to a particular task, and to activate it every
+time there is a new data written on the FIFO. When considering this
+approach, you need to take into account the overhead introduced by
+interprocessor interrupts that may possible occurr upon remote task
+activations".
+
+\paragraph{Passing Resource IDs as parameters.}
+The FIFO functions provided in the example receives as a parameter the
+Resource that have to be locked when accessing the data structure for
+read or write operations.
+
+The Resource IDs are not passed to the initialization function called
+in the Master CPU because some Resource IDs may be in general not in
+the scope of the Master CPU. That situation happens when the resource
+becomes local to a CPU other than the Master CPU\footnote{That is, all
+the tasks using the Resource are allocated to a CPU other than the
+Master CPU.}.
+
+In general, Resource IDs of Global Resources are in the scope of {\em
+all} the CPUs in a multiprocessor Nios II design. Resource IDs of
+Local Resources are in the scope of the particular CPU only.
+

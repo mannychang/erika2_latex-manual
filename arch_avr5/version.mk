@@ -1,0 +1,4 @@
+ARCH_AVR5__DIR = arch_avr5
+ARCH_AVR5__MAIN_NAME = arch_avr5
+ARCH_AVR5__MAIN = arch_avr5
+ARCH_AVR5__VER = 1_0_0

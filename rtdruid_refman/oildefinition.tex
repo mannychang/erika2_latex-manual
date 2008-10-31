@@ -1,0 +1,680 @@
+\chapter{OIL definition}
+\label{cha:oil-definition}
+
+\noindent
+\lstinline!  OIL_VERSION = "2.4";              ! \newline
+\lstinline!                                    ! \newline
+\lstinline!  IMPLEMENTATION ee {               ! \newline
+\lstinline!    !\quad \quad\refoillst{OS} {    ! \newline
+\lstinline!      STRING !\refoillst{EE_OPT}[]; ! \newline
+\lstinline!      STRING !\refoillst{CFLAGS}[]; ! \newline
+\lstinline!      STRING !\refoillst{ASFLAGS}[];! \newline
+\lstinline!      STRING !\refoillst{LDFLAGS}[];! \newline
+\lstinline!      STRING !\refoillst{LDDEPS}[]; ! \newline
+\lstinline!      STRING !\refoillst{LIBS}[];   ! \newline
+\lstinline!                                    ! \newline
+\lstinline!      ENUM [STANDARD, EXTENDED] !\refoillst{STATUS} = STANDARD;! \newline
+\lstinline!                                    ! \newline
+\lstinline!      BOOLEAN !\refoillst{STARTUPHOOK} = FALSE;    ! \newline
+\lstinline!      BOOLEAN !\refoillst{ERRORHOOK} = FALSE;      ! \newline
+\lstinline!      BOOLEAN !\refoillst{SHUTDOWNHOOK} = FALSE;   ! \newline
+\lstinline!      BOOLEAN !\refoillst{PRETASKHOOK} = FALSE;    ! \newline
+\lstinline!      BOOLEAN !\refoillst{POSTTASKHOOK} = FALSE;   ! \newline
+\lstinline!      BOOLEAN !\refoillst{USEGETSERVICEID} = FALSE;! \newline
+\lstinline!      BOOLEAN !\refoillst{USEPARAMETERACCESS} = FALSE;! \newline
+\lstinline!      BOOLEAN !\refoillst{USERESSCHEDULER} = TRUE; ! \newline
+\lstinline!      ! \newline
+%\lstinline!      // multi-core parameters                     ! \newline
+\lstinline!      BOOLEAN !\refoillst{STARTUPSYNC} = FALSE;    ! \newline
+\lstinline!      ENUM [ALWAYS, IFREQUIRED] !\refoillst{USEREMOTETASK} = IFREQUIRED;! \newline
+\lstinline!      STRING !\refoillst{MP_SHARED_RAM} = "";      ! \newline
+\lstinline!      STRING !\refoillst{MP_SHARED_ROM} = "";      ! \newline
+\lstinline!      ! \newline
+\lstinline!      STRING !\refoillst{NIOS2_MUTEX_BASE};        ! \newline
+\lstinline!      STRING !\refoillst{IPIC_GLOBAL_NAME};        ! \newline
+\lstinline!      STRING !\refoillst{NIOS2_SYS_CONFIG};        ! \newline
+\lstinline!      STRING !\refoillst{NIOS2_APP_CONFIG};        ! \newline
+\lstinline!      BOOLEAN !\refoillst{NIOS2_DO_MAKE_OBJDUMP} = FALSE;! \newline
+\lstinline!      STRING !\refoillst{NIOS2_JAM_FILE};          ! \newline
+\lstinline!      STRING !\refoillst{NIOS2_PTF_FILE};          ! \newline
+\lstinline!                                                   ! \newline
+%\lstinline!      // -------------------------------------     ! \newline
+%\lstinline!                                                   ! \newline
+\lstinline!      STRING !\refoillst{MASTER_CPU} = "default_cpu";! \newline
+\lstinline!                                                   ! \newline
+\lstinline!      ENUM [                                       ! \newline
+%\lstinline!	ARM7 {! \newline
+%\lstinline!          STRING ID = "default_cpu";! \newline
+%\lstinline!          STRING APP_SRC[];! \newline
+%\lstinline!          ! \newline
+%\lstinline!          STRING THUMB_SRC[];! \newline
+%\lstinline!          ! \newline
+%\lstinline!          BOOLEAN [! \newline
+%\lstinline!            TRUE {! \newline
+%\lstinline!              BOOLEAN [! \newline
+%\lstinline!		TRUE {! \newline
+%\lstinline!                  UINT32 SYS_SIZE;! \newline
+%\lstinline!                  //UINT32 IRQ_SIZE;! \newline
+%\lstinline!                },! \newline
+%\lstinline!                FALSE! \newline
+%\lstinline!              ] IRQ_STACK;! \newline
+%\lstinline!              ENUM [! \newline
+%\lstinline!                SHARED,! \newline
+%\lstinline!                PRIVATE {! \newline
+%\lstinline!                  UINT32 SYS_SIZE;! \newline
+%\lstinline!                  //UINT32 IRQ_SIZE;! \newline
+%\lstinline!                }! \newline
+%\lstinline!              ] DUMMY_STACK;! \newline
+%\lstinline!            },! \newline
+%\lstinline!            FALSE! \newline
+%\lstinline!          ] MULTI_STACK = FALSE;! \newline
+%\lstinline!          ! \newline
+%\lstinline!          UINT32 STACK_TOP;! \newline
+%\lstinline!          UINT32 STACK_BOTTOM;! \newline
+%\lstinline!          UINT32 SYS_SIZE;    // available space for all user stacks! \newline
+%\lstinline!          UINT32 IRQ_SIZE;    // available space for all irq stacks! \newline
+%\lstinline!          UINT32 SVC_SIZE;! \newline
+%\lstinline!          UINT32 FIQ_SIZE;! \newline
+%\lstinline!          UINT32 ABT_SIZE;! \newline
+%\lstinline!          UINT32 UND_SIZE;! \newline
+%\lstinline!          UINT32 SHARED_MIN_SYS_SIZE;    // size of shared stack! \newline
+%\lstinline!          //UINT32 SHARED_MIN_IRQ_SIZE;    // size of shared stack! \newline
+%\lstinline!! \newline
+%\lstinline!        },! \newline
+%\lstinline!        JANUS {! \newline
+%\lstinline!          STRING ID = "default_cpu";! \newline
+%\lstinline!          STRING APP_SRC[];! \newline
+%\lstinline!          ! \newline
+%\lstinline!          STRING THUMB_SRC[];! \newline
+%\lstinline!          ! \newline
+%\lstinline!          BOOLEAN [! \newline
+%\lstinline!            TRUE {! \newline
+%\lstinline!              BOOLEAN [! \newline
+%\lstinline!                TRUE {! \newline
+%\lstinline!                  UINT32 SYS_SIZE;! \newline
+%\lstinline!                  UINT32 IRQ_SIZE;! \newline
+%\lstinline!                },! \newline
+%\lstinline!                FALSE! \newline
+%\lstinline!              ] IRQ_STACK;! \newline
+%\lstinline!              ENUM [! \newline
+%\lstinline!                SHARED,! \newline
+%\lstinline!                PRIVATE {! \newline
+%\lstinline!                  UINT32 SYS_SIZE;! \newline
+%\lstinline!                  UINT32 IRQ_SIZE;! \newline
+%\lstinline!                }! \newline
+%\lstinline!              ] DUMMY_STACK;! \newline
+%\lstinline!            },! \newline
+%\lstinline!            FALSE! \newline
+%\lstinline!          ] MULTI_STACK = FALSE;! \newline
+%\lstinline!          ! \newline
+%\lstinline!          UINT32 STACK_TOP;! \newline
+%\lstinline!          UINT32 STACK_BOTTOM;! \newline
+%\lstinline!          UINT32 SYS_SIZE;    // available space for all user stacks! \newline
+%\lstinline!          UINT32 IRQ_SIZE;    // available space for all irq stacks! \newline
+%\lstinline!          UINT32 SVC_SIZE;! \newline
+%\lstinline!          UINT32 FIQ_SIZE;! \newline
+%\lstinline!          UINT32 ABT_SIZE;! \newline
+%\lstinline!          UINT32 UND_SIZE;! \newline
+%\lstinline!          UINT32 SHARED_MIN_SYS_SIZE;    // size of shared stack! \newline
+%\lstinline!          UINT32 SHARED_MIN_IRQ_SIZE;    // size of shared stack! \newline
+%\lstinline!! \newline
+%\lstinline!        },! \newline
+\lstinline!        !\quad \quad\refoillst{NIOSII} {             ! \newline
+\lstinline!          STRING !\refoillst{ID} = "default_cpu";    ! \newline
+\lstinline!          STRING !\refoillst{APP_SRC}[];             ! \newline
+\lstinline!                                                     ! \newline
+\lstinline!          BOOLEAN [                                  ! \newline
+\lstinline!            TRUE {                                   ! \newline
+\lstinline!              BOOLEAN [                              ! \newline
+\lstinline!                TRUE {                               ! \newline
+\lstinline!                  UINT32 SYS_SIZE;                   ! \newline
+\lstinline!                },                                   ! \newline
+\lstinline!                FALSE                                ! \newline
+\lstinline!              ] !\refoillst{IRQ_STACK};              ! \newline
+\lstinline!              ENUM [                                 ! \newline
+\lstinline!                SHARED,                              ! \newline
+\lstinline!                PRIVATE {                            ! \newline
+\lstinline!                  UINT32 SYS_SIZE;                   ! \newline
+\lstinline!                }                                    ! \newline
+\lstinline!              ] !\refoillst{DUMMY_STACK};            ! \newline
+\lstinline!            },                                       ! \newline
+\lstinline!            FALSE                                    ! \newline
+\lstinline!          ] !\refoillst{MULTI_STACK} = FALSE;        ! \newline
+\lstinline!                                                     ! \newline
+\lstinline!          STRING !\refoillst{STACK_TOP};             ! \newline
+\lstinline!          UINT32 !\refoillst{SYS_SIZE};              ! \newline
+\lstinline!          UINT32 !\refoillst{SHARED_MIN_SYS_SIZE};   ! \newline
+\lstinline!                                                     ! \newline
+\lstinline!          STRING !\refoillst{SYSTEM_LIBRARY_NAME};   ! \newline
+\lstinline!          STRING !\refoillst{SYSTEM_LIBRARY_PATH};   ! \newline
+\lstinline!                                                     ! \newline
+\lstinline!	     STRING !\refoillst{IPIC_LOCAL_NAME};       ! \newline
+\lstinline!                                                     ! \newline
+\lstinline!        },                                           ! \newline
+%\lstinline!        MPC5 {! \newline
+%\lstinline!          STRING ID = "default_cpu";! \newline
+%\lstinline!          STRING APP_SRC[];! \newline
+%\lstinline!          ! \newline
+%\lstinline!          BOOLEAN [! \newline
+%\lstinline!            TRUE {! \newline
+%\lstinline!              BOOLEAN [! \newline
+%\lstinline!                TRUE {! \newline
+%\lstinline!                  UINT32 SYS_SIZE;! \newline
+%\lstinline!                },! \newline
+%\lstinline!                FALSE! \newline
+%\lstinline!              ] IRQ_STACK;! \newline
+%\lstinline!              ENUM [! \newline
+%\lstinline!                SHARED,! \newline
+%\lstinline!                PRIVATE {! \newline
+%\lstinline!                  UINT32 SYS_SIZE;! \newline
+%\lstinline!                }! \newline
+%\lstinline!              ] DUMMY_STACK;! \newline
+%\lstinline!            },! \newline
+%\lstinline!            FALSE! \newline
+%\lstinline!          ] MULTI_STACK = FALSE;! \newline
+%\lstinline!          ! \newline
+%\lstinline!          UINT32 STACK_BOTTOM;! \newline
+%\lstinline!! \newline
+%\lstinline!          UINT32 SYS_SIZE;    // available space for all user stacks! \newline
+%\lstinline!          UINT32 SHARED_MIN_SYS_SIZE;    // size of shared stack! \newline
+%\lstinline!          ! \newline
+%\lstinline!          /* Irq Handlers */! \newline
+%\lstinline!          STRING HANDLER_IRQ0;! \newline
+%\lstinline!          STRING HANDLER_LVL0;! \newline
+%\lstinline!          STRING HANDLER_IRQ1;! \newline
+%\lstinline!          STRING HANDLER_LVL1;! \newline
+%\lstinline!          STRING HANDLER_IRQ2;! \newline
+%\lstinline!          STRING HANDLER_LVL2;! \newline
+%\lstinline!          STRING HANDLER_IRQ3;! \newline
+%\lstinline!          STRING HANDLER_LVL3;! \newline
+%\lstinline!          STRING HANDLER_IRQ4;! \newline
+%\lstinline!          STRING HANDLER_LVL4;! \newline
+%\lstinline!          STRING HANDLER_IRQ5;! \newline
+%\lstinline!          STRING HANDLER_LVL5;! \newline
+%\lstinline!          STRING HANDLER_IRQ6;! \newline
+%\lstinline!          STRING HANDLER_LVL6;! \newline
+%\lstinline!          STRING HANDLER_IRQ7;! \newline
+%\lstinline!          STRING HANDLER_LVL7;! \newline
+%\lstinline!! \newline
+%\lstinline!        },! \newline
+\lstinline!        !\quad \quad\refoillst{PIC30} {              ! \newline
+\lstinline!          STRING !\refoillst{ID} = "default_cpu";    ! \newline
+\lstinline!          STRING !\refoillst{APP_SRC}[];             ! \newline
+\lstinline!                                                     ! \newline
+\lstinline!          BOOLEAN [                                  ! \newline
+\lstinline!            TRUE {                                   ! \newline
+\lstinline!              BOOLEAN [                              ! \newline
+\lstinline!                TRUE {                               ! \newline
+\lstinline!                  UINT32 SYS_SIZE;                   ! \newline
+\lstinline!                },                                   ! \newline
+\lstinline!                FALSE                                ! \newline
+\lstinline!              ] !\refoillst{IRQ_STACK};              ! \newline
+%\lstinline!              //ENUM [! \newline
+%\lstinline!                //    SHARED,! \newline
+%\lstinline!                //    PRIVATE {! \newline
+%\lstinline!                  //        UINT32 SYS_SIZE;! \newline
+%\lstinline!                  //    }! \newline
+%\lstinline!                //] DUMMY_STACK;! \newline
+\lstinline!            },                                       ! \newline
+\lstinline!            FALSE                                    ! \newline
+\lstinline!          ] !\refoillst{MULTI_STACK} = FALSE;        ! \newline
+\lstinline!                                                     ! \newline
+%\lstinline!          //UINT32 STACK_BOTTOM;! \newline
+%\lstinline!! \newline
+%\lstinline!          //UINT32 SYS_SIZE;    // available space for all user stacks! \newline
+%\lstinline!          //UINT32 SHARED_MIN_SYS_SIZE;    // size of shared stack! \newline
+%\lstinline!! \newline
+\lstinline!          BOOLEAN !\refoillst{ICD2} = FALSE;         ! \newline
+\lstinline!          BOOLEAN !\refoillst{ENABLE_SPLIM} = TRUE;  ! \newline
+\lstinline!	                                                ! \newline
+\lstinline!        },                                           ! \newline
+\lstinline!        !\quad \quad\refoillst{AVR_5} {              ! \newline
+\lstinline!          STRING ID = "default_cpu";                 ! \newline
+\lstinline!          STRING APP_SRC[];                          ! \newline
+\newline
+\lstinline!          BOOLEAN [                                  ! \newline
+\lstinline!            TRUE {                                   ! \newline
+\lstinline!              BOOLEAN [                              ! \newline
+\lstinline!                TRUE {                               ! \newline
+\lstinline!                  UINT32 SYS_SIZE;                   ! \newline
+\lstinline!                },                                   ! \newline
+\lstinline!                FALSE                                ! \newline
+\lstinline!              ] IRQ_STACK;                           ! \newline
+\lstinline!              ENUM [                                 ! \newline
+\lstinline!                SHARED,                              ! \newline
+\lstinline!                PRIVATE {                            ! \newline
+\lstinline!                  UINT32 SYS_SIZE;                   ! \newline
+\lstinline!                }                                    ! \newline
+\lstinline!              ] DUMMY_STACK;                         ! \newline
+\lstinline!            },                                       ! \newline
+\lstinline!            FALSE                                    ! \newline
+\lstinline!          ] MULTI_STACK = FALSE;! \newline
+\newline
+\lstinline!          UINT32 STACK_BOTTOM;! \newline
+\newline
+\lstinline!          UINT32 SYS_SIZE;    // available space for all user stacks! \newline
+\lstinline!          UINT32 SHARED_MIN_SYS_SIZE;    // size of shared stack! \newline
+\lstinline!          ! \newline
+\lstinline!          ENUM [STOP, DIV1, DIV8, DIV32, DIV64, DIV256, DIV1024] TIMER0 = STOP;! \newline
+\lstinline!          ENUM [STOP, DIV1, DIV8,        DIV64, DIV256, DIV1024] TIMER1 = STOP;! \newline
+\lstinline!          ENUM [STOP, DIV1, DIV8,        DIV64, DIV256, DIV1024] TIMER2 = STOP;! \newline
+\lstinline!          ENUM [STOP, DIV1, DIV8,        DIV64, DIV256, DIV1024] TIMER3 = STOP;! \newline
+\lstinline!	  ! \newline
+\lstinline!	  ! \newline
+\lstinline!! \newline
+\lstinline!          /* Interrupt Handlers * /! \newline
+\lstinline!          STRING HANDLER_IRQ0;	// external interrupt request 0! \newline
+\lstinline!          STRING HANDLER_IRQ1;	// external interrupt request 1! \newline
+\lstinline!          STRING HANDLER_IRQ2;	// external interrupt request 2! \newline
+\lstinline!          STRING HANDLER_IRQ3;	// external interrupt request 3! \newline
+\lstinline!          STRING HANDLER_IRQ4;	// external interrupt request 4! \newline
+\lstinline!          STRING HANDLER_IRQ5;	// external interrupt request 5! \newline
+\lstinline!          STRING HANDLER_IRQ6;	// external interrupt request 6! \newline
+\lstinline!          STRING HANDLER_IRQ7;	// external interrupt request 7! \newline
+\lstinline!          ! \newline
+\lstinline!          STRING HANDLER_T0_MATCH;	// Timer/Counter 0 Compare Match! \newline
+\lstinline!          STRING HANDLER_T0_OVERFLW;	// Timer/Counter 0 Overflow! \newline
+\lstinline!          STRING HANDLER_T1_EVENT;	// Timer/Counter 1 Capture Event! \newline
+\lstinline!          STRING HANDLER_T1_MATCH_A;	// Timer/Counter 1 Compare Match A! \newline
+\lstinline!          STRING HANDLER_T1_MATCH_B;	// Timer/Counter 1 Compare Match B! \newline
+\lstinline!          STRING HANDLER_T1_MATCH_C;	// Timer/Counter 1 Compare Match C! \newline
+\lstinline!          STRING HANDLER_T1_OVERFLW;	// Timer/Counter 1 Overflow! \newline
+\lstinline!          STRING HANDLER_T2_MATCH;	// Timer/Counter 2 Compare Match! \newline
+\lstinline!          STRING HANDLER_T2_OVERFLW;	// Timer/Counter 2 Overflow! \newline
+\lstinline!          STRING HANDLER_T3_EVENT;	// Timer/Counter 3 Capture Event! \newline
+\lstinline!          STRING HANDLER_T3_MATCH_A;	// Timer/Counter 3 Compare Match A! \newline
+\lstinline!          STRING HANDLER_T3_MATCH_B;	// Timer/Counter 3 Compare Match B! \newline
+\lstinline!          STRING HANDLER_T3_MATCH_C;	// Timer/Counter 3 Compare Match C! \newline
+\lstinline!          STRING HANDLER_T3_OVERFLW;	// Timer/Counter 3 Overflow! \newline
+\lstinline!! \newline
+\lstinline!          STRING HANDLER_SPI; 	// SPI Serial Transfer Complete! \newline
+\lstinline!          ! \newline
+\lstinline!          STRING HANDLER_US0_RX;  	// USART0 Rx complete! \newline
+\lstinline!          STRING HANDLER_US0_EMPTY;	// USART0 Data Register Empty! \newline
+\lstinline!          STRING HANDLER_US0_TX;  	// Usart0 Tx complete! \newline
+\lstinline!          ! \newline
+\lstinline!          STRING HANDLER_US1_RX;  	// USART1 Rx complete! \newline
+\lstinline!          STRING HANDLER_US1_EMPTY;	// USART1 Data Register Empty! \newline
+\lstinline!          STRING HANDLER_US1_TX;  	// Usart1 Tx complete! \newline
+\lstinline!          ! \newline
+\lstinline!          STRING HANDLER_ADC; 	// ADC Conversion Complete! \newline
+\lstinline!          STRING HANDLER_EEPROM;	// EEPROM Ready! \newline
+\lstinline!          STRING HANDLER_ANALOG_COMP;	// Analog Comparator! \newline
+\lstinline!          STRING HANDLER_2WSI;	// Two-wire serial Interface! \newline
+\lstinline!          STRING HANDLER_SPM_READY;	// Store program Memory Ready! \newline
+\lstinline!          */! \newline
+\lstinline!          ! \newline
+%\lstinline!          ENUM [! \newline
+%\lstinline!            HANDLER_IRQ0 {	// external interrupt request 0! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_IRQ1 {	// external interrupt request 1! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_IRQ2 {	// external interrupt request 2! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_IRQ3 {	// external interrupt request 3! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_IRQ4 {	// external interrupt request 4! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_IRQ5 {	// external interrupt request 5! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_IRQ6 {	// external interrupt request 6! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_IRQ7 {	// external interrupt request 7! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	      ! \newline
+%\lstinline!	    }, HANDLER_T0_MATCH {	// Timer/Counter 0 Compare Match! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T0_OVERFLW {	// Timer/Counter 0 Overflow! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T1_EVENT {	// Timer/Counter 1 Capture Event! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T1_MATCH_A {	// Timer/Counter 1 Compare Match A! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T1_MATCH_B {	// Timer/Counter 1 Compare Match B! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T1_MATCH_C {	// Timer/Counter 1 Compare Match C! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T1_OVERFLW {	// Timer/Counter 1 Overflow! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T2_MATCH {	// Timer/Counter 2 Compare Match! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T2_OVERFLW {	// Timer/Counter 2 Overflow! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T3_EVENT {	// Timer/Counter 3 Capture Event! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T3_MATCH_A {	// Timer/Counter 3 Compare Match A! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T3_MATCH_B {	// Timer/Counter 3 Compare Match B! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T3_MATCH_C {	// Timer/Counter 3 Compare Match C! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_T3_OVERFLW {	// Timer/Counter 3 Overflow! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	      ! \newline
+%\lstinline!	    }, HANDLER_SPI { 	// SPI Serial Transfer Complete! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	      ! \newline
+%\lstinline!	    }, HANDLER_US0_RX {  	// USART0 Rx complete! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_US0_EMPTY {	// USART0 Data Register Empty! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_US0_TX {  	// Usart0 Tx complete! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	      ! \newline
+%\lstinline!	    }, HANDLER_US1_RX {  	// USART1 Rx complete! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_US1_EMPTY {	// USART1 Data Register Empty! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_US1_TX {  	// Usart1 Tx complete! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	      ! \newline
+%\lstinline!	    }, HANDLER_ADC { 	// ADC Conversion Complete! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_EEPROM {	// EEPROM Ready! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_ANALOG_COMP {	// Analog Comparator! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_2WSI {	// Two-wire serial Interface! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }, HANDLER_SPM_READY {	// Store program Memory Ready! \newline
+%\lstinline!              STRING FUNCTION;! \newline
+%\lstinline!              INT32[1,2] TYPE = 1;! \newline
+%\lstinline!	    }! \newline
+%\lstinline!	    ! \newline
+%\lstinline!          ] HANDLER[];! \newline
+%\lstinline!        }! \newline
+%\lstinline!        ! \newline
+\lstinline!      ] !\refoillst{CPU_DATA}[];! \newline
+\lstinline!! \newline
+\lstinline!      ENUM [! \newline
+%\lstinline!	! \newline
+%\lstinline!        SAMSUNG_KS32C50100 {! \newline
+%\lstinline!          STRING IRQ_EXT0;                   /* Ext 0 */! \newline
+%\lstinline!          STRING IRQ_EXT1;                   /* Ext 1 */! \newline
+%\lstinline!          STRING IRQ_EXT2;                   /* Ext 2 */! \newline
+%\lstinline!          STRING IRQ_EXT3;                   /* Ext 3 */! \newline
+%\lstinline!          STRING IRQ_UART0TX;                /* UART0 Tx */! \newline
+%\lstinline!          STRING IRQ_UART0RX;                /* UART0 Rx & error*/! \newline
+%\lstinline!          STRING IRQ_UART1TX;                /* UART1 Tx */! \newline
+%\lstinline!          STRING IRQ_UART1RX;                /* UART1 Rx & error*/! \newline
+%\lstinline!          STRING IRQ_GDMA0;                  /* GDMA ch. 0 */! \newline
+%\lstinline!          STRING IRQ_GDMA1;                  /* GDMA ch. 1 */! \newline
+%\lstinline!          STRING IRQ_TIMER0;                 /* Timer 0 */! \newline
+%\lstinline!          STRING IRQ_TIMER1;                 /* Timer 1 */! \newline
+%\lstinline!          STRING IRQ_HDLCATX;                /* HDLC A Tx */! \newline
+%\lstinline!          STRING IRQ_HDLCARX;                /* HDLC A Rx */! \newline
+%\lstinline!          STRING IRQ_HDLCBTX;                /* HDLC B Tx */! \newline
+%\lstinline!          STRING IRQ_HDLCBRX;                /* HDLC B Rx */! \newline
+%\lstinline!          STRING IRQ_ETHBDMATX;              /* Ethernet BDMA Tx */! \newline
+%\lstinline!          STRING IRQ_ETHBDMARX;              /* Ethernet BDMA Rx */! \newline
+%\lstinline!          STRING IRQ_ETHMACTX;               /* Ethernet MAC Tx */! \newline
+%\lstinline!          STRING IRQ_ETHMACRX;               /* Ethernet MAC Rx */! \newline
+%\lstinline!          STRING IRQ_I2C;                    /* I2C-bus */! \newline
+%\lstinline!          STRING IRQ_NO_PENDING;             /* No Pending Interrupt */! \newline
+%\lstinline!	},! \newline
+\lstinline!	 PIC30 {                                ! \newline
+\lstinline!	   ENUM [                               ! \newline
+\lstinline!	     CUSTOM {                           ! \newline
+\lstinline!	       STRING MODEL;                    ! \newline
+\lstinline!	       STRING LINKERSCRIPT;             ! \newline
+\lstinline!	       STRING DEV_LIB;                  ! \newline
+\lstinline!	       STRING INCLUDE_C;                ! \newline
+\lstinline!	       STRING INCLUDE_S;                ! \newline
+\lstinline!	     },                                 ! \newline
+\lstinline!             PIC24FJ128GA006, PIC24FJ128GA008,  ! \newline
+\lstinline!             PIC24FJ128GA010, PIC24FJ32GA002,   ! \newline
+\lstinline!             PIC24FJ32GA004, PIC24FJ64GA002,    ! \newline
+\lstinline!             PIC24FJ64GA004, PIC24FJ64GA006,    ! \newline
+\lstinline!             PIC24FJ64GA008, PIC24FJ64GA010,    ! \newline
+\lstinline!             PIC24FJ96GA006, PIC24FJ96GA008,    ! \newline
+\lstinline!             PIC24FJ96GA010, PIC24HJ128GP206,   ! \newline
+\lstinline!             PIC24HJ128GP210, PIC24HJ128GP306,  ! \newline
+\lstinline!             PIC24HJ128GP310, PIC24HJ128GP506,  ! \newline
+\lstinline!             PIC24HJ128GP510, PIC24HJ256GP206,  ! \newline
+\lstinline!             PIC24HJ256GP210, PIC24HJ256GP610,  ! \newline
+\lstinline!             PIC24HJ64GP206, PIC24HJ64GP210,    ! \newline
+\lstinline!             PIC24HJ64GP506, PIC24HJ64GP510,    ! \newline
+\newline
+\lstinline!             PIC30F1010, PIC30F2010,            ! \newline
+\lstinline!             PIC30F2011, PIC30F2012,            ! \newline
+\lstinline!             PIC30F2020, PIC30F2021,            ! \newline
+\lstinline!             PIC30F2022, PIC30F2023,            ! \newline
+\lstinline!             PIC30F3010, PIC30F3011,            ! \newline
+\lstinline!             PIC30F3012, PIC30F3013,            ! \newline
+\lstinline!             PIC30F3014, PIC30F4011,            ! \newline
+\lstinline!             PIC30F4012, PIC30F4013,            ! \newline
+\lstinline!             PIC30F5011, PIC30F5013,            ! \newline
+\lstinline!             PIC30F5015, PIC30F5016,            ! \newline
+\lstinline!             PIC30F6010, PIC30F6010A,           ! \newline
+\lstinline!             PIC30F6011, PIC30F6011A,           ! \newline
+\lstinline!             PIC30F6012, PIC30F6012A,           ! \newline
+\lstinline!             PIC30F6013, PIC30F6013A,           ! \newline
+\lstinline!             PIC30F6014, PIC30F6014A,           ! \newline
+\lstinline!             PIC30F6015,                        ! \newline
+\newline
+\lstinline!             PIC33FJ128GP206, PIC33FJ128GP306,  ! \newline
+\lstinline!             PIC33FJ128GP310, PIC33FJ128GP706,  ! \newline
+\lstinline!             PIC33FJ128GP708, PIC33FJ128GP710,  ! \newline
+\lstinline!             PIC33FJ128MC506, PIC33FJ128MC510,  ! \newline
+\lstinline!             PIC33FJ128MC706, PIC33FJ128MC708,  ! \newline
+\lstinline!             PIC33FJ128MC710, PIC33FJ256GP506,  ! \newline
+\lstinline!             PIC33FJ256GP510, PIC33FJ256GP710,  ! \newline
+\lstinline!             PIC33FJ256MC510, PIC33FJ256MC710,  ! \newline
+\lstinline!             PIC33FJ64GP206, PIC33FJ64GP306,    ! \newline
+\lstinline!             PIC33FJ64GP310, PIC33FJ64GP706,    ! \newline
+\lstinline!             PIC33FJ64GP708, PIC33FJ64GP710,    ! \newline
+\lstinline!             PIC33FJ64MC506, PIC33FJ64MC508,    ! \newline
+\lstinline!             PIC33FJ64MC510, PIC33FJ64MC706,    ! \newline
+\lstinline!             PIC33FJ64MC710                     ! \newline
+\lstinline!	   ] MODEL;                             ! \newline
+\lstinline!	 }                                      ! \newline
+\lstinline!      ] !\refoillst{MCU_DATA};               ! \newline
+\lstinline!                                             ! \newline
+\lstinline!      ENUM [                                 ! \newline
+\lstinline!	   !\quad \quad\refoillst{NO_BOARD},    ! \newline
+\lstinline!	   !\quad \quad\refoillst{EE_FLEX} {    ! \newline
+\lstinline!          BOOLEAN USELEDS = FALSE;           ! \newline
+\lstinline!          BOOLEAN USELCD = FALSE;            ! \newline
+\newline						
+\lstinline!          ENUM [                             ! \newline
+\lstinline!            DEMO {                           ! \newline
+\lstinline!               ENUM [                        ! \newline
+\lstinline!                ACCELEROMETER,               ! \newline
+\lstinline!                ADC_IN,                      ! \newline
+\lstinline!                BUTTONS,                     ! \newline
+\lstinline!                BUZZER,                      ! \newline
+\lstinline!                DAC,                         ! \newline
+\lstinline!                ENCODER,                     ! \newline
+\lstinline!                IR,                          ! \newline
+\lstinline!                LCD,                         ! \newline
+\lstinline!                LEDS,                        ! \newline
+\lstinline!                PWM_OUT,                     ! \newline
+\lstinline!                PWM_MOTOR,                   ! \newline
+\lstinline!                SENSORS,                     ! \newline
+\lstinline!                TRIMMER,                     ! \newline
+\lstinline!                USB,                         ! \newline
+\lstinline!                ZIGBEE,                      ! \newline
+\newline					
+\lstinline!                ALL                          ! \newline
+\lstinline!              ] OPTIONS[];                   ! \newline
+\lstinline!            },                               ! \newline
+\lstinline!            MULTI {                          ! \newline
+\lstinline!              ENUM [                         ! \newline
+\lstinline!                 ETHERNET,                   ! \newline
+\lstinline!                EIB,                         ! \newline
+\lstinline!                ALL                          ! \newline
+\lstinline!              ] OPTIONS[];                   ! \newline
+\lstinline!            },                               ! \newline
+\lstinline!            STANDARD {                       ! \newline
+\lstinline!              ENUM [                         ! \newline
+\lstinline!                LEDS, LCD, ALL               ! \newline
+\lstinline!              ] OPTIONS[];                   ! \newline
+\lstinline!            }                                ! \newline
+\lstinline!          ] TYPE = STANDARD;                 ! \newline
+\lstinline!        },                                   ! \newline
+\lstinline!	   !\quad \quad\refoillst{MICROCHIP_EXPLORER16} {  ! \newline
+\lstinline!	     BOOLEAN USELEDS;                   ! \newline
+\lstinline!	     BOOLEAN USEBUTTONS;                ! \newline
+\lstinline!	     BOOLEAN USELCD;                    ! \newline
+\lstinline!	     BOOLEAN USEANALOG;                 ! \newline
+\lstinline!	   }                                    ! \newline
+\lstinline!	   !\quad \quad\refoillst{MICROCHIP_DSPICDEM11PLUS} {  ! \newline
+\lstinline!	     BOOLEAN USELEDS;                   ! \newline
+\lstinline!	     BOOLEAN USEBUTTONS;                ! \newline
+\lstinline!	     BOOLEAN USELCD;                    ! \newline
+\lstinline!	     BOOLEAN USEANALOG;                 ! \newline
+\lstinline!	     BOOLEAN USEAUDIO;                  ! \newline
+\lstinline!	   },                                    ! \newline
+\lstinline!	   !\quad \quad\refoillst{ATMEGA_STK50X},! \newline
+\lstinline!	   !\quad \quad\refoillst{XBOW_MIB5X0}   ! \newline
+\lstinline!      ] !\refoillst{BOARD_DATA} = NO_BOARD;  ! \newline
+%\lstinline!      // -------------------------------------! \newline
+\lstinline!                                             ! \newline
+\lstinline!      ENUM [                                 ! \newline
+\lstinline!        ENABLE {                             ! \newline
+\lstinline!          STRING NAME[];                     ! \newline
+\lstinline!        }                                    ! \newline
+\lstinline!      ] !\refoillst{LIB}[];                  ! \newline
+\lstinline!                                             ! \newline
+\lstinline!      ENUM [                                 ! \newline
+\lstinline!        FP {                                 ! \newline
+\lstinline!          BOOLEAN NESTED_IRQ;                ! \newline
+\lstinline!        },                                   ! \newline
+\lstinline!        EDF {                                ! \newline
+\lstinline!          BOOLEAN NESTED_IRQ;                ! \newline
+\lstinline!          STRING TICK_TIME;                  ! \newline
+\lstinline!          BOOLEAN REL_DEADLINES_IN_RAM = FALSE; ! \newline
+\lstinline!        },                                   ! \newline
+\lstinline!        BCC1,                                ! \newline
+\lstinline!        BCC2,                                ! \newline
+\lstinline!        ECC1,                                ! \newline
+\lstinline!        ECC2                                 ! \newline
+\lstinline!      ] !\refoillst{KERNEL_TYPE};            ! \newline
+\lstinline!                                             ! \newline
+\lstinline!      ENUM [                                 ! \newline
+\lstinline!	   NONE,                                ! \newline
+\lstinline!	   ALL,                                 ! \newline
+\lstinline!	   OS_SECTION,                          ! \newline
+\lstinline!	   TASK_SECTION,                        ! \newline
+\lstinline!	   RESOURCE_SECTION,                    ! \newline
+\lstinline!	   STACK_SECTION,                       ! \newline
+\lstinline!	   ALARM_SECTION                        ! \newline
+\lstinline!      ] !\refoillst{ORTI_SECTIONS}[];        ! \newline
+\lstinline!                                             ! \newline
+\lstinline!    };                                       ! \newline
+\lstinline!                                             ! \newline
+\lstinline!    !\refoillst{APPMODE} {                   ! \newline
+\lstinline!    };                                       ! \newline
+\lstinline!                                             ! \newline
+\lstinline!    !\refoillst{TASK} {                      ! \newline
+\lstinline!      BOOLEAN [                              ! \newline
+\lstinline!        TRUE {                               ! \newline
+\lstinline!          APPMODE_TYPE APPMODE[];            ! \newline
+\lstinline!        },                                   ! \newline
+\lstinline!        FALSE                                ! \newline
+\lstinline!      ] !\refoillst{AUTOSTART};              ! \newline
+\lstinline!                                             ! \newline
+\lstinline!      UINT32 !\refoillst{PRIORITY};          ! \newline
+\lstinline!      UINT32 !\refoillst{RELDLINE};          ! \newline
+\lstinline!      UINT32 !\refoillst{ACTIVATION} = 1;    ! \newline
+\lstinline!                                             ! \newline
+\lstinline!      ENUM [NON, FULL] !\refoillst{SCHEDULE};! \newline
+\lstinline!      EVENT_TYPE !\refoillst{EVENT}[];       ! \newline
+\lstinline!      RESOURCE_TYPE !\refoillsttwo{RESOURCE}{RESOURCEtask}[]; ! \newline
+\lstinline!                                             ! \newline
+%\lstinline!      /* EE specific values */! \newline
+\lstinline!      ENUM [                                 ! \newline
+\lstinline!        SHARED,                              ! \newline
+\lstinline!        PRIVATE {                            ! \newline
+\lstinline!          UINT32 SYS_SIZE;                   ! \newline
+\lstinline!        }                                    ! \newline
+\lstinline!      ] !\refoillst{STACK} = SHARED;         ! \newline
+\lstinline!      STRING !\refoillsttwo{CPU_ID}{CPU_IDtask} = "default_cpu";! \newline
+\lstinline!      STRING !\refoillsttwo{APP_SRC}{APP_SRCtask}[];! \newline
+\lstinline!                                             ! \newline
+%\lstinline!      // current task could send a notification to this list of task:! \newline
+\lstinline!      TASK_TYPE !\refoillst{LINKED}[];       ! \newline
+\lstinline!    };                                       ! \newline
+\lstinline!                                             ! \newline
+\lstinline!    !\refoillst{RESOURCE} {                  ! \newline
+\lstinline!      ENUM [                                 ! \newline
+\lstinline!        STANDARD  {                          ! \newline
+\lstinline!	     STRING APP_SRC[];                  ! \newline   
+\lstinline!        },                                   ! \newline
+\lstinline!        LINKED {                             ! \newline
+\lstinline!          RESOURCE_TYPE LINKEDRESOURCE;      ! \newline
+\lstinline!        },                                   ! \newline
+\lstinline!        INTERNAL                             ! \newline
+\lstinline!      ] !\refoillst{RESOURCEPROPERTY};       ! \newline
+\lstinline!    };                                       ! \newline
+\lstinline!                                             ! \newline
+\lstinline!    !\refoillsttwo{EVENT}{EVENTobj} {        ! \newline
+\lstinline!      UINT32 WITH_AUTO MASK = AUTO;          ! \newline
+\lstinline!    };                                       ! \newline
+\lstinline!                                             ! \newline
+\lstinline!    !\refoillst{COUNTER} {                   ! \newline
+\lstinline!      UINT32 MINCYCLE;                       ! \newline
+\lstinline!      UINT32 MAXALLOWEDVALUE;                ! \newline
+\lstinline!      UINT32 TICKSPERBASE;                   ! \newline
+\lstinline!                                             ! \newline
+\lstinline!      STRING CPU_ID = "default_cpu";         ! \newline
+\lstinline!    };                                       ! \newline
+\lstinline!                                             ! \newline
+\lstinline!    !\refoillst{ALARM} {                     ! \newline
+\lstinline!      COUNTER_TYPE COUNTER;                  ! \newline
+\lstinline!      ENUM [                                 ! \newline
+\lstinline!        ACTIVATETASK {                       ! \newline
+\lstinline!          TASK_TYPE TASK;                    ! \newline
+\lstinline!        },                                   ! \newline
+\lstinline!        SETEVENT {                           ! \newline
+\lstinline!          TASK_TYPE TASK;                    ! \newline
+\lstinline!          EVENT_TYPE EVENT;                  ! \newline
+\lstinline!        },                                   ! \newline
+\lstinline!        ALARMCALLBACK {                      ! \newline
+\lstinline!          STRING ALARMCALLBACKNAME;          ! \newline
+\lstinline!        }                                    ! \newline
+\lstinline!      ] ACTION;                              ! \newline
+\lstinline!                                             ! \newline
+\lstinline!      BOOLEAN [                              ! \newline
+\lstinline!        TRUE {                               ! \newline
+\lstinline!          UINT32 ALARMTIME;                  ! \newline
+\lstinline!          UINT32 CYCLETIME;                  ! \newline
+\lstinline!          APPMODE_TYPE APPMODE[];            ! \newline
+\lstinline!        },                                   ! \newline
+\lstinline!        FALSE                                ! \newline
+\lstinline!      ] AUTOSTART;                           ! \newline
+\lstinline!    };                                       ! \newline
+\lstinline!  };                                         ! \newline

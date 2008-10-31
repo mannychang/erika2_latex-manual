@@ -1,0 +1,474 @@
+\chapter[Introduction]{Introduction}
+\label{cha:introduction}
+
+
+\section{\ee\ on multicores}
+
+Today's embedded systems are continuously being extended to support
+additional and more complex functionality. In many domains
+(automotive, telecommunications, domotics), availability of powerful
+hardware at low prices and cost/time market pressure are pushing for
+integration of functionality on system-on-chip devices capable of
+processing large amount of data in a short time.
+
+Multicore systems are being considered as an economically viable
+alternative to support this increasing computational demand. In this
+context, Evidence proposes OS-level solutions and tools for embedded
+multicore-on-a-chip.
+
+The Evidence \rtd/\ee\ solution, originally developed for small-scale
+OSEK/VDX compatible embedded systems for the automotive powertrain
+market has been ported to the Altera Nios II environment, easing the
+adoption of reconfigurable FPGA capable of supporting multiple
+softcores on the same FPGA.
+
+The \rtd/\ee\ pair has been designed to handle multicore
+development and programming by hiding the use of multicore
+synchronization primitives. With multicore hiding, it is
+possible to seamlessly migrate application code from a single
+processor to multicore without changing a single line of the
+source code.
+
+Hiding helps customers preserving their code base. Retargetting an
+application from single to multicore architectures only requires
+different OIL configurations, but allows retaining the same source
+code in all the configurations.
+
+
+
+
+\subsection{Systems-On-Chip and FPGAs: the future?}
+
+\paragraph{Trends and challenges from the automotive market.}
+Electronic components in today's cars are mandatory elements to
+satisfy tight safety, efficiency and regulation constraints. Current
+vehicle electronics systems consist of up to 100 embedded controllers
+connected in a real-time distributed electronic system with several
+network clusters and electronic control units (ECU). Setup and
+Management of such complex distributed configurations is now the
+rapidly becoming the cost, performance and reliability bottleneck of
+the system. To satisfy tighter cost and packaging constraints the
+number of ECU should be reduced compared to today cars resulting in an
+integration of several functions.
+
+To cope with this issue and the related design efficiency, the AUTOSAR
+\cite{AUTOSAR} industrial initiative is standardizing a common set of
+hardware and software components and an accommodating platform that
+allows the integration of applications provided by different
+sub-system and component makers. This trend and the ever increasing
+application complexity (e.g. x-by-wire) demand architectures with
+multiple computational units.
+
+\paragraph{FPGAs: the opportunity.}
+On the silicon technology side, the continuous scaling provides
+hardware fabrics that allows unprecedented integration of functions in
+a system-on-chip with very high parallelism. This trend promises that,
+in the very near future, even the use of reconfigurable hardware and
+softcores (CPU implemented with FPGAs) will be cost effective for
+selected applications.
+
+Moreover, several CPU providers (Intel,Motorola, IBM, ARM, etc) have
+already announced multi-processor platforms with a winning
+cost/performance trade-off for the consumer and multimedia markets.
+
+The Janus system, developed by ST Microelectronics/Magneti-Marelli
+Powertrain and Parades, is an example of a single-chip dual-processor
+platform for power train applications (featuring two 32-bit ARM
+processors and four memory banks connected by a crossbar switch)
+offering better cost/performance trade-offs than traditional
+architectures.
+
+Reconfigurable platforms, such as Altera FPGAs, are providing soft-core
+solutions like Nios II, offering the opportunity for implementing 4 or
+more CPUs into even the cheapest Altera Cyclone II chips.
+
+
+\section{Solving problems when moving code to multicores}
+The development trends for next generation embedded devices clearly
+states that the future lies to multicore devices on the same chip. In
+particular, power management, leakage power issues, frequency limits,
+cost reduction and other factors are driving many companies toward the
+implementation of multicore system-on-a-chip solutions
+integrating together CPUs, memories, and peripherals.
+
+Altera Nios II is an example of these multicore
+platforms. Thanks to the configurability of FPGAs, developers can
+design multicore in minutes. Although on one side hardware
+design is simplified by tools like Altera SOPCBuilder, on the other
+side application development is made more complex by the fact that the
+application code have to be spread out among different processors.
+
+In particular, partitioning the application among the different CPUs,
+and implementing an efficient communication mechanism between the CPUs
+are one of the first issues to be addressed at the first stages of the
+development process. Unfortunately these choices are very critical for
+later development phases, since changes in the partitioning scheme can
+heavily change application design.
+
+\rtd\ and \ee\ give support to developers to solve the partitioning
+issues in multicore applications based on Altera Nios II,
+enabling the developer to perform code partitioning and then to easily
+change it at later stages in the design.
+
+\subsection{Design and programming.} 
+Design and Programming paradigms must exploit the parallelism of these
+architectures, but programmers are usually not trained for writing
+code executing in parallel on multiple processors, and designers need
+to find the best trade-offs for exploiting computing capabilities
+without incurring in excessive blocking over shared resources or
+because of synchronization.
+
+With \ee, each task can be thought to run on a single processor
+multi threaded environment. Multicore issues like data cache
+disabling and mutual exclusion between different CPUs accessing
+concurrently the same data structures are handled automatically by
+\rtd\ and \ee, simplifying the application design and
+verification.
+
+\subsection{Code placement and resource sharing.}
+The choice of which software has to be placed on which processor is
+usually called code placement or software binding or partitioning.
+
+The task of the final user is to figure out the right communication
+pattern(s) / architecture(s) and to implement it. Today's approach
+used by many development tools is non conclusive, leaving out to the
+designer the job of choosing the best partitioning and communication
+scheme for its application, with the risk of making early decisions
+that may impact heavily on the application code with bad application
+performance.
+
+In reality, changing the code placement must not impact on the way
+people design and program applications. The multicore structure
+must be hided to the user whenever possible, and source code
+compatibility between mono and multicore, with automatic mapping
+of application facilities to the new multicore features. This is
+exactly what the \rtd\ code generator offers, exploiting the
+multicore support provided by \ee.
+
+Future versions of \rtd\ will also enable users to perform
+well-reasoned partitioning choices integrating the results of timing
+analysis of the application with schedulability analysis to guide
+design choices.
+
+\subsection{Porting of legacy code to new architectures and to
+  multicores.}
+
+One of the problems that typically arises when adopting
+multicores is that application rarely start from scratch with a
+multicore approach. More often, new applications are upgrades to
+existing (working) systems that are adapted to particular new
+environment.
+
+\rtd\ and \ee\ helps porting existing legacy code to multicores
+because:
+\begin{itemize}
+\item The kernel API is the same for both single and multicore
+  systems.
+\item A multicore system can be view as an "extension" of a single
+  core. You can add functionality to a system on a separate core,
+  without perturbating too much the application running on the
+  first CPU.
+\item Application code does not have to be changed when changing the
+  partitioning scheme.
+\end{itemize}
+
+\subsection{Resource sharing and OS-level mechanisms.}
+When moving from single processor systems to multicore systems,
+standard programming paradigms used in real-time systems to access
+shared resources does not work anymore.
+
+In particular, all the solutions used to avoid the Priority Inversion
+problem, such as the Immediate Priority Ceiling protocol implemented
+in the OSEK/VDX standard and in other APIs does not scale to
+multicores like Altera Nios II.
+
+\rtd\ and \ee\ offer an innovative way to automatically provide support
+for resource sharing among different processors, automatically
+integrating resource consistency protocols for multicores when a
+resource is shared among different CPUs.
+
+
+
+\section{Multicore API implementation}
+
+While hardware technology is offering the opportunity for greatly
+increased performance, conventional RTOS implementations and standards
+are not yet ready to support multicore architectures. The
+OSEK/VDX standard for Real-Time Operating Systems has gone a long way
+in introducing mechanisms for ensuring predictable (schedulable)
+real-time behavior and has provided the developers of automotive
+applications with a stable and sound API.
+
+Unfortunately, OSEK/VDX was not meant to be and it is not ready to
+cope with the challenges posed by a multicore system.  In
+particular, OSEK/VDX fits best on systems where different processors
+are physically separated and connected through a network (e.g.,
+Flexray, CAN, LIN, etc.), but it does not best fit in systems that
+implement multicores on the same ECU.
+
+In detail, the OIL configuration language supports the definition of
+single processor systems possibly communicating using OSEK COM, but
+provides no support for fundamental multicore issues such as:
+distribution of the computational activities (tasks) among processors;
+multicore communication and synchronization; and multicore
+details hiding for applications compilation and execution.  
+
+\subsection{\ee\ and multicore hiding}
+
+With multicore hiding - that is the possibility to seamlessly
+migrate application code from a single processor to multicore
+without changing the source code - the programmer's view of the
+application is not compromised, meaning that the RTOS API is supported
+without changes and only minimal OIL extensions. Furthermore, \ee\ 
+extends the real-time and memory saving features of automotive RTOS to
+multicore systems.
+
+In detail, \ee\ provides:
+\begin{itemize}
+\item Innovative mechanisms that allow exploiting the main features of
+  Immediate Priority Ceiling in multicore systems.
+\item Predictable real-time behavior.
+\item Kernel features and OIL extensions that allow seamless execution
+  of single processor code in multiple processor architectures.
+\item Tools that support task placement on processors; easy
+  reconfiguration of kernel calls for resource sharing and
+  communication mechanisms from intraprocessor to interprocessor
+  usage.
+\item Minimal footprint in terms of ROM and RAM usage.
+\item Real-time performance (such as interrupt and scheduler
+  latencies, and context switch times) in line with the best market
+  options and the possibility of configuring the kernel for constant
+  time O(1) scheduling.
+\end{itemize}
+
+\ee\ hides the multiple processor structure by providing an automatic
+mapping of the RTOS API calls to the single processor or the multiple
+processor implementation, according to the target of the call. This
+mapping is obtained by exploiting an enhanced remote notification
+mechanism based on multicore interrupts. Remote notification is
+used to provide an implementation to kernel primitives acting on tasks
+(resources) allocated to remote processors. Moreover, the notification
+mechanism is hidden inside the implementation of the \ee primitives,
+maintaining the same interface to the developer both for single and
+for multicore systems.
+
+The additional overhead caused by the remote execution of calls is
+mainly due to the "send" of the remote notification from one side, and
+to the interprocessor interrupt that is raised on the receiving
+side. Most of the overhead of the two calls is due to the internal
+usage of the Altera Avalon Mutex calls. However, this overhead does
+not have a great impact on typical applications where remote
+activations are not as frequent as local activations.  
+
+\subsection{Contention for multicore shared data structures.}
+
+In addition to multicore hiding, the mechanisms typically
+provided by common RTOS for sharing resources with a predictable and
+bounded blocking time, such as the Immediate Priority Ceiling protocol
+and the often related mechanisms for sharing stack space among
+application tasks lose some of their hard real-time properties (such
+as predictable blocking times).
+
+\ee\ implements an advanced protocol used when sharing
+resources among tasks allocated to different processors. The protocol,
+known as Multicore Stack Resource Policy (MSRP), makes internal
+use of spin-locks among different processors to ensure data
+consistency. 
+
+We expect that contention for multicore shared resources among
+different systems will be the main source of overhead in the
+system. To reduce them, critical section for multicore shared
+data structures should be reduced as much as possible, for example
+making local copies of the data structures when possible.
+
+
+\section{Erika Enterprise for the Altera NIOS II platform}
+
+This document describes the details of the \ee\ porting for the Altera
+Nios II platform. Altera Nios II is a powerful soft-core processor,
+which is basically a 32-bit RISC microcontroller especially designed
+for the Altera FPGAs which can be customized to meet high performance
+or low hardware (in terms of Logic Elements) requirements. The Altera
+Nios II core can also be highly customized adding custom peripherals,
+custom assembler instructions, debug features, caches, and other
+features.
+
+As you will note by reading the following pages, \ee\ fully supports
+the various features of the Nios II platform, maintaining the Altera
+workflow based on Quartus II, SOPCBuilder, and Nios II IDE.
+
+\ee\ runs on every typical single core Nios II design without
+requiring any modification to the hardware. All the Nios II HAL
+functions, drivers, and features are retained on a \ee\ system.
+
+On the other hand, \ee\ shows its performance and its ease of use when
+the designer moves from simple single CPU Nios II designs to more
+complex multicore Nios Ii designs. In particular, \ee\ has been
+designed to address in a simple way all the problems that can arise
+when dealing with multicore systems.
+
+Designing multicore System-on-a-chip (SOC) has always been a difficult
+task, because it involves a deep knowledge of hardware details and
+application details that are needed to perform a correct co-design
+between the application parts that have to be implemented in hardware,
+and those that have to be implemented in software. Moreover, in a
+multicore system, the user have to understand how the various software
+functionality maps to the available computational resources, in a way
+to optimize the system performance. Choosing the right partitioning
+scheme for a multicore system is one of the most difficult tasks,
+because a wrong application partition heavily impact on application
+performance and response times. In fact, tuning a multicore design is
+usually made in various design steps. Each design step in fact refers
+to different stages in the application design, and often the result is
+a tradeoff with the design choices that were made earlier in the
+application definition.
+
+The design tools provided by Altera allow designers to easily create
+and test multicore hardware platforms based on the Altera Nios II
+Processor. Basically the developer creates a multicore platform by
+simply inserting CPUs and connecting peripherals using the Altera
+SOPCBuilder Tool. Using this tool the designer can modify the hardware
+architecture easily, adding and removing CPUs, modifying the bus
+connections, and so on. Once the hardware platform has been created
+and generated, the developer can develop the software separately for
+each CPU using the Nios II IDE based on Eclipse. Altera provides a
+nice environment where for each CPU the user can instantiate the
+device drivers of the hardware components connected to the particular
+CPU (using the provided Altera HAL and the System Libraries
+Projects). After that, the user can create a C/C++ application that is
+linked to a single System Library (that is, to a single CPU).
+
+It is our believe that the common workflow during the design of
+complex multicore applications requires a frequent number of change in
+the partitioning of the software among the different CPUs. That is
+typically needed because application requirements often change during
+the development of an embedded system, and the choices that has been
+made earlier in the design may not be the right ones at the end of the
+development. In this sense, the developer must have the power to
+change the software partitioning among processors with little effort,
+as it is currently done for the hardware part in SOPCBuilder, where
+the user can change the hardware configurations with a few mouse
+clicks.
+
+That is exactly what Evidence Srl aims to provide to Altera Nios II
+customers: a way to simply deal with the complexity of multicore
+software development, easing the partitioning of applications on
+different processors, giving the possibility to developers to change
+their partitioning without changing their source code.
+
+Briefly, Evidence Srl provides a powerful design and configuration
+tool named \rtd, and an RTOS, named \ee. The \rtd\ Toolset and \ee\
+RTOS exploit the multicore capabilities of the Altera FPGA boards and
+allow to fully use the power of the multicore designs.
+
+On the host side, \rtd\ offers an integrated view of a multicore
+application under the Nios II IDE, allowing the user to partition the
+application jobs on the different available CPU. To do that, \rtd\
+offers a concept of ``application'' project that spans different CPUs,
+allowing an easy move of features across the execution units. \rtd\ is
+a set of plugins for the Eclipse framework that are integrated with
+the Altera Nios II IDE, giving the possibility to the user to:
+\begin{itemize}
+\item develop a multicore application using an \rtd\ project, that is
+      an Eclipse Project that is able to handle the software for all
+      the CPUs in the multicore system\footnote{A single \rtd\ Project
+      can be viewed as a replacement for the set of Altera Application
+      Projects for each CPU.};
+\item specify one or more partitioning schemes to be used for a
+      multicore system;
+\item generate the configuration code for the \ee\ RTOS;
+\item analyze the results of the partitioning using schedulability
+      analysis \footnote{The schedulability analysis plugin will be
+      available together with the next version of \rtd};
+\end{itemize}
+
+
+On the target side, \ee\ offers a multiprogramming environment that
+can be used to deploy the application architecture defined in \rtd\ on
+the real hardware. \ee\ helps the partitioning job supporting code
+deployment that is independent from the particular CPU, allowing the
+use to move code between CPUs without changing it. \ee\ is a Real-Time
+Operating System (RTOS) that offers a multicore partitioned
+multithread environment that internally takes care of multicore issues
+like activation and run of remote tasks, periodic alarms, and shared
+resources among tasks allocated to different processors. Of course, as
+said before, the restriction to single processor designs is
+supported. \ee\ currently offers support for fixed priority
+scheduling, with preemptive, non preemptive and mixed preemption
+support.
+
+\ee\ is ready for formal compliancy with the OSEK/VDX
+operating system standard.
+
+The main feature in the Evidence approach for Nios II is the fact that
+the \rtd\ Toolset and \ee\ do not change the current Altera
+Workflow. For that reason, users accustomed with the Nios II IDE
+editing and debugging features can easily reuse their knowledge.
+
+Some of the features supported by \rtd\ and \ee\ are:
+
+\begin{itemize}
+\item Support for the definition, and deployment of software for
+      Nios II multicore systems with shared memory.
+\item Support for partitioning of the application functionalities on
+      different processors with negligible modification to the source
+      code base.
+\item Support for easy change of the partitioning scheme allowing the
+      developer to easily try and test different partitioning schemes.
+\item Support for the migration of single processor source code
+      to multicore systems.
+\item Support for the Altera development toolchain: \rtd\ and \ee\ are
+      perfectly integrated with Altera Nios II, reducing the learning
+      curve of the tools.
+\end{itemize}
+
+Specific Altera integration features include:
+\begin{itemize}
+\item Integrated as a component in the Altera HAL;
+\item Compatible with the Altera HAL peripheral drivers and system
+libraries;
+\item Support for nested interrupts;
+\item Support for a RTOS configuration code generator compliant
+with the OSEK OIL specifications;
+\end{itemize}
+
+Moreover, the multicore support of \ee\ includes:
+\begin{itemize}
+\item Advanced software partitioning support:
+\begin{itemize}
+\item developers can decide which task goes on which processor;
+\item developers can move tasks between processors without
+  changing the source code;
+\item Transparent handling of shared resource locks behavior
+  depending on the partitioning of the application;
+\end{itemize}
+\item Interprocessor interrupt support;
+\item Shared resource support using queuing spin locks on top of the
+Altera Mutex Peripheral;
+\item Automatic cache disabling technique without changes to the
+user source code (only changes to data definitions);
+\item Support for multicore scheduling algorithms with bounded
+blocking times on multicore;
+\end{itemize}
+
+The following chapters describe in detail the single and multicore
+support for the Altera Nios II platform that is offered by \ee\ and by
+\rtd, highlighting the various features available and the main
+architecture design requirements of the system.
+
+%
+%
+%
+%\nb{e' il caso di parlare qui di una roadmap dei prodotti Evidence?
+% probabilmente conviene prendere la cosa di petto e mettere 
+% fuori un apposito documento!!!}
+%
+%
+%Future versions of the product will include:
+%\begin{itemize}
+%\item schedulability analysis
+%\item graphical configurator
+%\item ORTI language for kernel awareness
+%\item Official OSEK/VDX compliancy
+%\item and much much more!
+%\end{itemize}

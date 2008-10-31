@@ -1,0 +1,1375 @@
+\chapter[Flex Board]{Flex Board}
+
+\section{Introduction}
+
+This chapter describes the support done in \ee\ for the
+Evidence/Embedded solutions Flex Board.
+
+Flex is an embedded board which can be used by all the developers who
+want to fully exploit the potential of the latest Microchip
+micro-controllers: the \dspic\ family.
+
+Flex is born as a development board where to easily develop and test
+real-time applications for the \dspic\ micro-controller. The
+main features of Flex are:
+\begin{itemize}
+\item robust electronic design;
+\item modular architecture;
+\item availability of a growing number of application notes;
+\item the full support of \ee.
+\end{itemize}
+
+%
+% aggiungere screenshot della board
+%
+
+To configure the usage of the Flex Board, the user has to specify an
+appropriate \const{BOARD_DATA}, as in the following example:
+
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    ...
+  }
+  ...
+\end{lstlisting}
+
+The Flex board supports a set of devices which are directly mounted on
+it, plus a set of additional devices mounted on specific add-on
+boards. These devices can be configured by adding attributes inside
+the \const{BOARD_DATA} section.
+
+The supported devices and the API functions needed to use them are
+described in the following sections.
+
+\begin{warning}
+The current version of the board support for Flex only supports the
+\dspic\ model 33FJ256GP710.
+\end{warning}
+
+\section{System LED}
+
+The Flex Board has a system LED attached to a GPIO pin of the
+microcontroller. To use the system LED on the Flex Board, the
+developer should specify the \const{USELEDS} attribute as TRUE, as in
+the following example:
+
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    USELEDS = TRUE;
+    ...
+  }
+  ...
+\end{lstlisting}
+
+The following subsections will describe the functions available to
+control the Flex System LED.
+
+\begin{function_nopb2}{EE\_leds\_init}{EE_leds_init:flex}
+  \synopsis{void EE_leds_init(void);}
+  
+  \begin{fundescription}
+    The function configures the GPIO pin. The LED starts turned off.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_sys\_on}{EE_led_sys_on}
+  \synopsis{void EE_led_sys_on(void);}
+  
+  \begin{fundescription}
+    The function turns on the LED.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_sys\_off}{EE_led_sys_off}
+  \synopsis{void EE_led_sys_off(void);}
+  
+  \begin{fundescription}
+    The function turns off the LED.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_on}{EE_led_on:flex}
+  \synopsis{void EE_led_on(void);}
+  
+  \begin{fundescription}
+    The function turns on the LED.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_off}{EE_led_off:flex}
+  \synopsis{void EE_led_off(void);}
+  
+  \begin{fundescription}
+    The function turns off the LED.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter[Flex Demo Daughter Board]{Flex Demo Daughter Board}
+
+\section{Introduction}
+
+This chapter describes the support done in \ee\ for the
+Evidence/Embedded solutions Flex Demo Daughter Board.
+
+The Demo Daughter board is a small board that plugs on the Flex Light
+/ Flex Full connectors and which provides a set of devices useful to
+implement small demos and demonstrators of control algorithms.
+
+%\nb{nino, controlla!!!}
+
+The main features of the Flex Demo Daughter board are:
+\begin{itemize}
+\item 8 leds;
+\item 4 buttons;
+\item 1 accelerometer;
+\item 8 Analog Inputs;
+\item 1 buzzer;
+\item 1 DAC;
+\item direct availability of the MCU encoder pins
+\item Infrared receiver;
+\item 16x2 characters LCD;
+\item PWM outputs;
+\item Temperature sensor;
+\item Light sensor;
+\item Trimmer;
+\item Connections to implement the USB communication on the FLEX Full
+\item Zigbee connector for Microchip or Easybee modules.
+\end{itemize}
+
+%
+% aggiungere screenshot della board
+%
+
+To configure the usage of the Flex Demo Daughter Board, the user has
+to specify an appropriate \const{BOARD_DATA}, as in the following
+example:
+
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    TYPE = DEMO {
+	...
+    };
+    ...
+  }
+  ...
+\end{lstlisting}
+
+The supported devices and the API functions needed to use them are
+described in the following sections.
+
+\section{LEDS}
+
+The Flex Demo Daughter board hosts 8 LEDs which are attached to GPIO
+pins. To use the LEDs on the Flex Demo Daughter Board, the developer should
+include the following fragment in the application OIL file:
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    TYPE = DEMO { OPTIONS = LEDS; };
+    ...
+  }
+  ...
+\end{lstlisting}
+
+The following subsections will describe the functions available to
+control the Flex Demo Daughter Board LEDs.
+
+\begin{function_nopb2}{EE\_demoboard\_leds\_init}{EE_demoboard_leds_init:flex}
+  \synopsis{void EE_demoboard_leds_init(void);}
+  
+  \begin{fundescription}
+    The function configures the LEDs, which starts turned off.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_leds}{EE_leds:flex}
+  \synopsis{void EE_leds(EE_UINT8 data);}
+  
+  \begin{fundescription}
+    The function sets the led values using the \const{data} parameter.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_leds\_on}{EE_leds_on:flex}
+  \synopsis{void EE_leds_on(void);}
+  
+  \begin{fundescription}
+    The function turns all the LEDs on.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_leds\_off}{EE_leds_off:flex}
+  \synopsis{void EE_leds_off(void);}
+  
+  \begin{fundescription}
+    The function turns all the LEDs off.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_0\_on}{EE_led_0_on:flex}
+  \synopsis{void EE_led_0_on(void);}
+  
+  \begin{fundescription}
+    The function turns LED 0 on.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_0\_off}{EE_led_0_off:flex}
+  \synopsis{void EE_led_0_off(void);}
+  
+  \begin{fundescription}
+    The function turns LED 0 off.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_1\_on}{EE_led_1_on:flex}
+  \synopsis{void EE_led_1_on(void);}
+  
+  \begin{fundescription}
+    The function turns LED 1 on.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_1\_off}{EE_led_1_off:flex}
+  \synopsis{void EE_led_1_off(void);}
+  
+  \begin{fundescription}
+    The function turns LED 1 off.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_2\_on}{EE_led_2_on:flex}
+  \synopsis{void EE_led_2_on(void);}
+  
+  \begin{fundescription}
+    The function turns LED 2 on.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_2\_off}{EE_led_2_off:flex}
+  \synopsis{void EE_led_2_off(void);}
+  
+  \begin{fundescription}
+    The function turns LED 2 off.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_3\_on}{EE_led_3_on:flex}
+  \synopsis{void EE_led_3_on(void);}
+  
+  \begin{fundescription}
+    The function turns LED 3 on.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_3\_off}{EE_led_3_off:flex}
+  \synopsis{void EE_led_3_off(void);}
+  
+  \begin{fundescription}
+    The function turns LED 3 off.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_4\_on}{EE_led_4_on:flex}
+  \synopsis{void EE_led_4_on(void);}
+  
+  \begin{fundescription}
+    The function turns LED 4 on.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_4\_off}{EE_led_4_off:flex}
+  \synopsis{void EE_led_4_off(void);}
+  
+  \begin{fundescription}
+    The function turns LED 4 off.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_5\_on}{EE_led_5_on:flex}
+  \synopsis{void EE_led_5_on(void);}
+  
+  \begin{fundescription}
+    The function turns LED 5 on.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_5\_off}{EE_led_5_off:flex}
+  \synopsis{void EE_led_5_off(void);}
+  
+  \begin{fundescription}
+    The function turns LED 5 off.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_6\_on}{EE_led_6_on:flex}
+  \synopsis{void EE_led_6_on(void);}
+  
+  \begin{fundescription}
+    The function turns LED 6 on.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_6\_off}{EE_led_6_off:flex}
+  \synopsis{void EE_led_6_off(void);}
+  
+  \begin{fundescription}
+    The function turns LED 6 off.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_7\_on}{EE_led_7_on:flex}
+  \synopsis{void EE_led_7_on(void);}
+  
+  \begin{fundescription}
+    The function turns LED 7 on.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_led\_7\_off}{EE_led_7_off:flex}
+  \synopsis{void EE_led_7_off(void);}
+  
+  \begin{fundescription}
+    The function turns LED 7 off.
+  \end{fundescription}
+\end{function_nopb2}
+
+
+
+
+% -------------------------------------------------------------------
+
+\section{Buttons}
+
+The Flex Demo Daughter Board has a set of four buttons attached to GPIO pins
+of the microcontroller. To use the buttons, the developer should
+include the following fragment in the application OIL file:
+
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    TYPE = DEMO { OPTIONS = BUTTONS; };
+    ...
+  }
+  ...
+\end{lstlisting}
+
+The following subsections will describe the functions available to
+control the Flex Demo Daughter Board buttons.
+
+\begin{function_nopb2}{EE\_buttons\_init}{EE_buttons_init}
+  \synopsis{void EE_buttons_init( void (*isr_callback)(void), EE_UINT8 mask );}
+  
+  \begin{fundescription}
+    The function configures the GPIO pins used by the buttons. Buttons
+    can be configured to be controlled only by using polling functions
+    (no \fn{isr_callback} is specified), or can be configured to raise
+    an interrupt (if \fn{isr_callback} is specified).
+
+    When the \fn{isr_callback} is specified, the \fn{mask} parameter
+    is used to control for which buttons the interrupt will be
+    generated.
+  \end{fundescription}
+  
+  \begin{funparameters}
+    \fpar{isr_callback}{The function is called inside an ISR2 upon a
+      button press.}
+
+    \fpar{mask}{If \fn{isr_callback} is specified, then this parameter
+      controls which buttons will generate an interrupt request. In
+      particular, bit \const{0x01} is used for button S1, bit
+      \const{0x02} is used for button S2, bit \const{0x04} is used for
+      button S3, bit \const{0x08} is used for button S4.}
+  \end{funparameters}
+  
+  \begin{funreturn}
+    \fret{void}{The function does not return a value.}
+  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_button\_get\_S1}{EE_button_get_S1}
+  \synopsis{EE_UINT8 EE_button_get_S1(void);}
+  
+  \begin{fundescription}
+    The function returns the status of the button number S1.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+  \begin{funreturn}
+    \fret{unsigned char}{1 of the button is pressed, 0 otherwise.}
+  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_button\_get\_S2}{EE_button_get_S2}
+  \synopsis{EE_UINT8 EE_button_get_S2(void);}
+  
+  \begin{fundescription}
+    The function returns the status of the button number S2.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+  \begin{funreturn}
+    \fret{unsigned char}{1 of the button is pressed, 0 otherwise.}
+  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_button\_get\_S3}{EE_button_get_S3}
+  \synopsis{EE_UINT8 EE_button_get_S3(void);}
+  
+  \begin{fundescription}
+    The function returns the status of the button number S3.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+  \begin{funreturn}
+    \fret{unsigned char}{1 of the button is pressed, 0 otherwise.}
+  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_button\_get\_S4}{EE_button_get_S4}
+  \synopsis{EE_UINT8 EE_button_get_S4(void);}
+  
+  \begin{fundescription}
+    The function returns the status of the button number S4.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+  \begin{funreturn}
+    \fret{unsigned char}{1 of the button is pressed, 0 otherwise.}
+  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+% -------------------------------------------------------------------
+
+\section{LCD}
+
+The Flex Demo Daughter Board has an alpha-numeric 16 x 2 LCD display mounted
+on the board attached to the GPIO pins of the microcontroller. To use
+the LCD on the board, the developer should
+include the following fragment in the application OIL file:
+
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    TYPE = DEMO { OPTIONS = LCD; };
+    ...
+  }
+  ...
+\end{lstlisting}
+
+The functions available can be used to print character and strings to
+the LCD Display, and to select the current cursor position (which is
+the position where the next character will be printed).
+
+To specify a character position in the LCD, the functions provided
+uses an integer. Numbers from 0 to 15 represents the first line,
+whereas numbers from 15 to 31 represents the second line.
+
+The following subsections will describe the functions available to
+control the Explorer 16 LCD.
+
+
+\begin{function_nopb2}{EE\_lcd\_init}{EE_lcd_init}
+  \synopsis{void EE_lcd_init(void);}
+  
+  \begin{fundescription}
+    The function initializes the LCD display.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_lcd\_command}{EE_lcd_command}
+  \synopsis{void EE_lcd_command(EE_UINT8 cmd);}
+  
+  \begin{fundescription}
+    The function sends a command to the LCD. Most of the LCD functions
+    described in this chapters basically remap to this function. The
+    developer can use this function to implement features which are
+    currently not supported by the LCD API.
+  \end{fundescription}
+  
+  \begin{funparameters}
+    \fpar{cmd}{The LCD command.}
+  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_lcd\_putc}{EE_lcd_putc}
+  \synopsis{void EE_lcd_putc(EE_INT8 data);}
+  
+  \begin{fundescription}
+    The function puts a character on the LCD display, at the current
+    cursor position.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{data}{The character to be printed on the LCD.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+% this function seems to be missing
+%\begin{function_nopb2}{EE\_lcd\_getc}{EE_lcd_getc}
+%  \synopsis{EE_INT8 EE_lcd_getc(void);}
+%  
+%  \begin{fundescription}
+%    The function returns the character which is present at the current
+%    cursor position.
+%  \end{fundescription}
+%  
+%%  \begin{funparameters}
+%%    \fpar{none}{None in this function.}
+%%  \end{funparameters}
+%  
+%  \begin{funreturn}
+%    \fret{char}{The character which is displayed at the current cursor
+%      position.}
+%  \end{funreturn}
+%  
+%%  \begin{funconformance}
+%%  \end{funconformance}
+%\end{function_nopb2}
+
+
+
+\begin{function_nopb2}{EE\_lcd\_puts}{EE_lcd_puts}
+  \synopsis{void EE_lcd_puts(EE_INT8 *buf);}
+  
+  \begin{fundescription}
+    The function prints a string to the display.
+  \end{fundescription}
+  
+  \begin{funparameters}
+    \fpar{buf}{The string to display. It must be a valid C-language
+      string.}
+  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_lcd\_busy}{EE_lcd_busy}
+  \synopsis{unsigned char EE_lcd_busy(void);}
+  
+  \begin{fundescription}
+    The function returns 1 if the display is busy, 0 otherwise. This
+    function can be used to check if the application can send a new
+    command to the LCD, or if the command can not be sent because the
+    LCD is still busy processing the previous command.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+  \begin{funreturn}
+    \fret{unsigned char}{1 if the display is busy, 0 otherwise.}
+  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_lcd\_clear}{EE_lcd_clear}
+  \synopsis{void EE_lcd_clear(void);}
+  
+  \begin{fundescription}
+    The function clears the LCD.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_lcd\_home}{EE_lcd_home}
+  \synopsis{void EE_lcd_home(void);}
+  
+  \begin{fundescription}
+    The function sets the current cursor position to the top left
+    display character.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_lcd\_line2}{EE_lcd_line2}
+  \synopsis{void EE_lcd_line2(void);}
+  
+  \begin{fundescription}
+    The function sets the current cursor position to the bottom left
+    display character.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_lcd\_curs\_right}{EE_lcd_curs_right}
+  \synopsis{void EE_lcd_curs_right(void);}
+  
+  \begin{fundescription}
+    The function sets the current cursor position on the next
+    character on the right.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_lcd\_curs\_left}{EE_lcd_curs_left}
+  \synopsis{void EE_lcd_curs_left(void);}
+  
+  \begin{fundescription}
+    The function sets the current cursor position on the next
+    character on the left.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_lcd\_shift}{EE_lcd_shift}
+  \synopsis{void EE_lcd_shift(void);}
+  
+  \begin{fundescription}
+    The function can be used to enable the shift mode of the LCD. When
+    in shift mode, each character sent provoke the shifting of all the
+    characters of the LCD.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_lcd\_goto}{EE_lcd_goto}
+  \synopsis{void EE_lcd_goto(EE_UINT8 posx, EE_UINT8 posy);}
+  
+  \begin{fundescription}
+    The function sets the current cursor position to $(posx, posy)$.
+  \end{fundescription}
+  
+  \begin{funparameters}
+    \fpar{posx}{The LCD column, from 0 to 15.}
+    \fpar{posy}{The LCD row, 0 or 1.}
+  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+
+% -------------------------------------------------------------------
+
+\section{Analog sensors}
+
+The Flex Demo Daughter Board has a set of analog channels available,
+in particular (in parenthesis the pin assignments): 
+
+\begin{itemize}
+\item Temperature sensor (AN12/RB12);
+\item Light sensor (AN13/RB13);
+\item Trimmer (AN15/RB15);
+\item Accelerometer X axis (AN16/RC1);
+\item Accelerometer Y axis (AN17/RC2);
+\item Accelerometer Z axis (AN18/RC3);
+\item ADC Aux (AN19/RC4).
+\end{itemize}
+
+To use these inputs, the developer should
+include the following fragment in the application OIL file:
+
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    TYPE = DEMO {
+      OPTIONS = ADC_IN;        // for the analog inputs 
+      OPTIONS = ACCELEROMETER; // for the accelerometer
+      OPTIONS = SENSORS;       // for the sensors
+      OPTIONS = TRIMMER;       // for the potentiometer
+  };
+  ...
+\end{lstlisting}
+
+The functions available can be used to start and stop the A/D
+converter, and to read the values from the various sensors.
+
+
+\begin{function_nopb2}{EE\_analog\_init}{EE_analog_init}
+  \synopsis{void EE_analog_init(void);}
+  
+  \begin{fundescription}
+    The function initializes the A/D converter. 
+    The ADC is initialized in polling mode.
+  \end{fundescription}
+  
+%  \begin{funparameters}
+%    \fpar{none}{None in this function.}
+%  \end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_analog\_close}{EE_analog_close}
+  \synopsis{void EE_analog_close(void);}
+  
+  \begin{fundescription}
+    The function turns off the A/D converter. 
+  \end{fundescription}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_adcin\_init}{EE_adcin_init}
+  \synopsis{void EE_adcin_init(void);}
+  
+  \begin{fundescription}
+    The function initializes the A/D converter. 
+    It has the same functionality as \const{EE_analog_init}.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_adcin\_get\_volt}{EE_adcin_get_volt}
+  \synopsis{EE_UINT16 EE_adcin_get_volt(void);}
+  
+  \begin{fundescription}
+    The function reads the ADC Aux channel and returns its value. The
+    A/D converter should have
+    been already initialized using \reffun{EE_adcin_init}.
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT16}{The voltage read from the ADC Aux channel, in millivolt.}
+  \end{funreturn}
+\end{function_nopb2}
+
+
+
+\begin{function_nopb2}{EE\_trimmer\_init}{EE_trimmer_init}
+  \synopsis{void EE_trimmer_init(void);}
+  
+  \begin{fundescription}
+    The function initializes the A/D converter. 
+    It has the same functionality as \const{EE_analog_init}.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_trimmer\_get\_volt}{EE_trimmer_get_volt}
+  \synopsis{EE_UINT16 EE_trimmer_get_volt(void);}
+  
+  \begin{fundescription}
+    The function reads the Trimmer channel and returns its value. The
+    A/D converter should have
+    been already initialized using \reffun{EE_adcin_init}.
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT16}{The voltage read from the Trimmer channel, in millivolt.}
+  \end{funreturn}
+\end{function_nopb2}
+
+
+
+\begin{function_nopb2}{EE\_analogsensors\_init}{EE_analogsensors_init}
+  \synopsis{void EE_analogsensors_init(void);}
+  
+  \begin{fundescription}
+    The function initializes the A/D converter. 
+    It has the same functionality as \const{EE_analog_init}.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_analog\_get\_temperature}{EE_analog_get_temperature}
+  \synopsis{EE_UINT16 EE_nalog_get_temperature(void);}
+  
+  \begin{fundescription}
+    The function reads the temperature sensor and returns its value. The
+    A/D converter should have
+    been already initialized using \reffun{EE_adcin_init}.
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT16}{The voltage read from the temperature sensor, in millivolt.}
+  \end{funreturn}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_analog\_get\_light}{EE_analog_get_light}
+  \synopsis{EE_UINT16 EE_analog_get_light(void);}
+  
+  \begin{fundescription}
+    The function reads the Light sensor and returns its value. The
+    A/D converter should have
+    been already initialized using \reffun{EE_adcin_init}.
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT16}{The voltage read from the Light sensor, in millivolt.}
+  \end{funreturn}
+\end{function_nopb2}
+
+
+
+
+
+\begin{function_nopb2}{EE\_accelerometer\_init}{EE_accelerometer_init}
+  \synopsis{void EE_accelerometer_init(void);}
+  
+  \begin{fundescription}
+    The function initializes the A/D converter. 
+    It has the same functionality as \const{EE_analog_init}, plus some
+    initialization specific for the 3-axis accelerometer..
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_accelerometer\_getglevel}{EE_accelerometer_getglevel}
+  \synopsis{EE_UINT8 EE_accelerometer_getglevel(void);}
+  
+  \begin{fundescription}
+    Description to be done. 
+    %\nb{Nino, provide a description}
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT8}{} %\nb{Nino, provide a description}}
+  \end{funreturn}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_accelerometer\_setglevel}{EE_accelerometer_setglevel}
+  \synopsis{void EE_accelerometer_setglevel(EE_UINT8 level);}
+  
+  \begin{fundescription}
+	Description to be done. 
+	%\nb{Nino, provide a description}
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT8}{}
+%\nb{Nino, provide a description}}
+  \end{funreturn}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_accelerometer\_sleep}{EE_accelerometer_sleep}
+  \synopsis{void EE_accelerometer_sleep(void);}
+  
+  \begin{fundescription}
+    Description to be done. 
+%    \nb{Nino, provide a description}
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT8}{}
+%\nb{Nino, provide a description}}
+  \end{funreturn}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_accelerometer\_wakeup}{EE_accelerometer_wakeup}
+  \synopsis{void EE_accelerometer_wakeup(void);}
+  
+  \begin{fundescription}
+    Description to be done. 
+%    \nb{Nino, provide a description}
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT8}{}
+%\nb{Nino, provide a description}}
+  \end{funreturn}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_accelerometer\_gety}{EE_accelerometer_gety}
+  \synopsis{float EE_accelerometer_gety(void);}
+  
+  \begin{fundescription}
+    Description to be done. 
+%    \nb{Nino, provide a description}
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT8}{}
+%\nb{Nino, provide a description}}
+  \end{funreturn}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_accelerometer\_getz}{EE_accelerometer_getz}
+  \synopsis{float EE_accelerometer_getz(void);}
+  
+  \begin{fundescription}
+    Description to be done. 
+%    \nb{Nino, provide a description}
+  \end{fundescription}
+  
+  \begin{funreturn}
+    \fret{EE_UINT8}{}
+%\nb{Nino, provide a description}}
+  \end{funreturn}
+\end{function_nopb2}
+
+
+
+
+
+
+
+
+\section{Buzzer}
+
+The Flex Demo Daughter Board has a buzzer which can be used to produce
+simple sounds.
+
+To use the buzzer, the developer should
+include the following fragment in the application OIL file:
+
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    TYPE = DEMO {
+      OPTIONS = BUZZER;        // for the analog inputs 
+  };
+  ...
+\end{lstlisting}
+
+The functions available can be used to setup the buzzer, and to play notes.
+
+\begin{warning}
+The buzzer driver uses timer T3.
+\end{warning}
+
+\begin{function_nopb2}{EE\_buzzer\_init}{EE_buzzer_init}
+  \synopsis{void EE_buzzer_init(void);}
+  
+  \begin{fundescription}
+    The function initializes the buzzer.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_buzzer\_set\_freq}{EE_buzzer_set_freq}
+  \synopsis{void EE_buzzer_set_freq(EE_UINT16 new_freq);}
+  
+  \begin{fundescription}
+    The function sets an output frequency for the buzzer. Frequencies
+    should be higher than 10 Hz. No action is taken if the new
+    frequency differs from the previous one by less than 10 Hz.
+  \end{fundescription}
+  
+\begin{funparameters}
+  \fpar{new_freq}{The new buzzer frequency, in Hz.}
+\end{funparameters}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_buzzer\_get\_freq}{EE_buzzer_get_freq}
+  \synopsis{EE_UINT16 EE_buzzer_get_freq(void);}
+  
+  \begin{fundescription}
+    The function returns the current buzer frequency.
+  \end{fundescription}
+  
+\begin{funreturn}
+  \fret{EE_UINT16}{The current buzzer frequency.}
+\end{funreturn}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_buzzer\_mute}{EE_buzzer_mute}
+  \synopsis{void EE_buzzer_mute(void);}
+  
+  \begin{fundescription}
+    The function mutes the buzzer.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_buzzer\_unmute}{EE_buzzer_unmute}
+  \synopsis{void EE_buzzer_unmute(void);}
+  
+  \begin{fundescription}
+    The function unmutes the buzzer.
+  \end{fundescription}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_buzzer\_close}{EE_buzzer_close}
+  \synopsis{void EE_buzzer_close(void);}
+  
+  \begin{fundescription}
+    The function resets the buzzer.
+  \end{fundescription}
+\end{function_nopb2}
+
+
+% -------------------------------------------------------------------
+
+\section{PWM Output}
+
+The Flex Demo Daughter Board has a PWM output which is attached to the
+Output Compare 3 of the Timer 2. %\nb{Nino, please check}
+
+To use the PWM, the developer should
+include the following fragment in the application OIL file:
+
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    TYPE = DEMO {
+      OPTIONS = PWM_OUT;
+  };
+  ...
+\end{lstlisting}
+
+The functions available can be used to start, stop and set the duty
+cycle of the PWM.
+
+
+\begin{function_nopb2}{EE\_pwm\_init}{EE_pwm_init}
+  \synopsis{void EE_pwm_init(EE_UINT16 Period);}
+  
+  \begin{fundescription}
+    The function initializes the PWM, setting also its period.
+  \end{fundescription}
+  
+\begin{funparameters}
+  \fpar{Period}{The PWM period.}
+\end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_pwm\_set\_duty}{EE_pwm_set_duty}
+  \synopsis{void EE_pwm_set_duty(float duty);}
+  
+  \begin{fundescription}
+    The function sets the duty cycle of the PWM.
+  \end{fundescription}
+  
+\begin{funparameters}
+  \fpar{duty}{The PWM duty cycle.}
+\end{funparameters}
+  
+%  \begin{funreturn}
+%    \fret{void}{The function does not return a value.}
+%  \end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_pwm\_close}{EE_pwm_close}
+  \synopsis{void EE_pwm_close(void);}
+  
+  \begin{fundescription}
+    The function shuts down the PWM.
+  \end{fundescription}
+\end{function_nopb2}
+
+
+% -------------------------------------------------------------------
+
+\section{DAC Output}
+
+The Flex Demo Daughter Board has a DAC output connected to the
+Microcontroller I2C port which can be used to convert digital signals
+to analog values.
+
+To use the DAC, the developer should
+include the following fragment in the application OIL file:
+
+\begin{lstlisting}
+  ...
+  BOARD_DATA = EE_FLEX {
+    TYPE = DEMO {
+      OPTIONS = DAC;
+  };
+  ...
+\end{lstlisting}
+
+The functions available can be used to start, stop and set the duty
+cycle of the PWM.
+
+
+\begin{function_nopb2}{EE\_dac\_general\_call}{EE_dac_general_call}
+  \synopsis{EE_INT8 EE_dac_general_call(EE_UINT8 second);}
+  
+  \begin{fundescription}
+    Description to be done. 
+%    \nb{nino, una descrizione!}
+  \end{fundescription}
+  
+\begin{funparameters}
+  \fpar{second}{}
+%\nb{nino, decsrizione!}}
+\end{funparameters}
+  
+\begin{funreturn}
+  \fret{EE_INT8}{}
+%\nb{nino, decsrizione}.}
+\end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_dac\_fast\_write}{EE_dac_fast_write}
+  \synopsis{EE_INT8 EE_dac_fast_write(EE_UINT16 data, EE_UINT8 port, EE_UINT8 power);}
+  
+  \begin{fundescription}
+    Description to be done. 
+%    \nb{nino, una descrizione!}
+  \end{fundescription}
+  
+\begin{funparameters}
+  \fpar{data}{}
+%\nb{nino, decsrizione!}}
+  \fpar{port}{}
+%\nb{nino, decsrizione!}}
+  \fpar{power}{}
+%\nb{nino, decsrizione!}}
+\end{funparameters}
+  
+\begin{funreturn}
+  \fret{EE_INT8}{}
+%\nb{nino, decsrizione}.}
+\end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+
+\begin{function_nopb2}{EE\_dac\_write}{EE_dac_write}
+  \synopsis{EE_INT8 EE_dac_write(EE_UINT16 data, EE_UINT8 port, EE_UINT8 power, EE_UINT8 save);}
+  
+  \begin{fundescription}
+    Description to be done. 
+    %\nb{nino, una descrizione!}
+  \end{fundescription}
+  
+\begin{funparameters}
+  \fpar{data}{}
+%\nb{nino, decsrizione!}}
+  \fpar{port}{}
+%\nb{nino, decsrizione!}}
+  \fpar{power}{}
+%\nb{nino, decsrizione!}}
+  \fpar{save}{}
+%\nb{nino, decsrizione!}}
+\end{funparameters}
+  
+\begin{funreturn}
+  \fret{EE_INT8}{}
+%\nb{nino, decsrizione}.}
+\end{funreturn}
+  
+%  \begin{funconformance}
+%  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{EE\_dac\_init}{EE_dac_init}
+  \synopsis{void EE_dac_init(void);}
+  
+  \begin{fundescription}
+    Description to be done. 
+    %\nb{nino, una descrizione!}
+  \end{fundescription}
+\end{function_nopb2}
