@@ -623,6 +623,18 @@ the \oil{KERNEL_TYPE} definition. The definition is shown below:
       STRING TICK_TIME; 
       BOOLEAN REL_DEADLINES_IN_RAM = FALSE;
     },
+    FRSH {
+      ENUM [
+	CONTRACT {
+	  STRING NAME;
+          UINT32 BUDGET;
+	  UINT32 PERIOD;
+	  STRING CPU_ID;
+        }
+      ] CONTRACTS[];
+      BOOLEAN USE_SYNC_OBJ;
+      STRING TICK_TIME;
+    },
     BCC1,
     BCC2,
     ECC1,
@@ -630,16 +642,27 @@ the \oil{KERNEL_TYPE} definition. The definition is shown below:
   ] KERNEL_TYPE;
 \end{lstlisting}
 
-For the EDF kernel, it is possible to specify the tick
-length. given the tick length for the circular timer, which is then
-used to compute the vaues to put on the relative deadline task
-parameter. The tick time can be specified in various unit measures,
-such as seconds (``s''), milliseconds (``ms''), microseconds (``us''),
-and nanoseconds (``ns''). Please check the manual for the CPU
-architecture you are currently using for the proper configuration of
-the tick parameter. The EDF kernel has an additional option which
-allows to specify that relative deadlines should be stored in RAM and
-not in Flash, to allow them to be changed at runtime.
+For the \const{EDF} and \const{FRSH} kernels, it is possible to
+specify the tick length. given the tick length for the circular timer,
+which is then used to compute the vaues to put on the relative
+deadline task parameter. The tick time can be specified in various
+unit measures, such as seconds (``s''), milliseconds (``ms''),
+microseconds (``us''), and nanoseconds (``ns''). Please check the
+manual for the CPU architecture you are currently using for the proper
+configuration of the tick parameter. The EDF kernel has an additional
+option which allows to specify that relative deadlines should be
+stored in RAM and not in Flash, to allow them to be changed at
+runtime.
+
+For the \const{FRSH} kernel\footnote{The FRSH kernel is the result of
+the IST FP6 FRESCOR Project, \url{http://www.frescor.org}}, a set of
+contracts have to be specified. For each contract, the user has to
+specify the contract name, the budget and period (either in clock
+ticks or using unit measures as for the tick time described above),
+and the \const{CPU_ID} (which must only be specified on multicore
+applications).
+
+For more details on the \const{FRSH} kernel, pelase see
 
 Some examples of use within the declaration part are the following:
 
@@ -672,6 +695,32 @@ Some examples of use within the declaration part are the following:
   \end{lstlisting}
   
   Nested IRQs are set to \const{TRUE}.
+
+\item
+  To configure the \const{FRSH} conformance class:
+  
+  \begin{lstlisting}
+    KERNEL_TYPE = FRSH {
+      TICK_TIME = "20ns";
+      USE_SYNC_OBJ = TRUE;
+      CONTRACTS = CONTRACT {
+	CPU_ID = "cpu1";
+        NAME = "c1";
+        BUDGET = 20000;
+        PERIOD = 100000;
+      };
+      CONTRACTS = CONTRACT {
+	CPU_ID = "cpu3";
+        NAME = "c7";
+        BUDGET = "10ms";
+        PERIOD = "50ms";
+      };
+    };
+  \end{lstlisting}
+
+  In this case, the \const{FRSH} kernel is configured with two
+  contracts on different CPUs. budget and period are specified either
+  with a unit measure or with clock cycles.
   
 \end{enumerate}
 
@@ -702,7 +751,8 @@ Basically, each ORTI section can be selected separately. If
 \const{ALL} is specified, then all the ORTI sections are generated.
 
 Notice that the ORTI support currently applies only to the Altera Nios
-II target.
+II target for the \const{BCC1}, \const{BCC2}, \const{ECC1},
+\const{ECC2}, \const{FRSH} conformance classes.
 
 \rtd\ provides the possibility to automatically generate an
 ORTI\footnote{ORTI is a standard file format specified by the OSEK/VDX
@@ -986,6 +1036,23 @@ CPU test_application {
   TASK myTask1 {
     RESOURCE = "Resource1";
     RESOURCE = "Resource2";
+    ...
+  };
+  ...
+}
+\end{lstlisting}
+
+
+\subsection{Contract attribute}
+The \oiltwo{CONTRACT}{CONTRACTtask} attribute is used to specify the \const{CONTRACT} statically linked to the task. The \const{CONTRACT} name must be one of the contracts listed in the \const{FRSH} \refoillst{KERNEL_TYPE}! section.
+
+Example:
+
+\begin{lstlisting}
+CPU test_application {
+  ...
+  TASK myTask1 {
+    CONTRACT = "Contract1";
     ...
   };
   ...

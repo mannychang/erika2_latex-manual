@@ -416,7 +416,7 @@ system.}
 \end{figure}
 %
 
-\item Finally, Figure \ref{fig:trace32_stack} and Figure
+\item Figure \ref{fig:trace32_stack} and Figure
   \ref{fig:trace32_stackview} show information about the stacks that
   has been configured in the application. In particular, the first
   figure shows the stack name, size, base address, direction, and fill
@@ -439,6 +439,30 @@ system.}
   width=13cm, bb=0 0 960 107]{images/trace32_stackview.png}\end{center}
 \caption{\label{fig:trace32_stackview} A graphical view of the
 application stack usage.}
+\end{figure}
+
+
+\item Finally, whereas the previous figures were relative to the ORTI
+  support provided for the \const{BCC1}, \const{BCC2}, \const{ECC1},
+  \const{ECC2} kernels, Figure \ref{fig:trace32_frsh_orti} and Figure
+  \ref{fig:trace32_frsh_task_graph} show the ORTI support for the
+  \const{FRSH} kernel. In particular, the first figure shows the ORTI
+  support for contracts, VRES, and budgets which are entities
+  specifically introduced for the FRSH kernel, whereas the second
+  figure shows the context changes as interpreted by Trace32
+  considering the value changes of the running task pointer of the
+  kernel logged using the Lauterbach tracer module.
+%
+\begin{figure}
+\begin{center}\includegraphics[%
+  width=11cm, bb=0 0 973 562]{images/trace32_frsh_orti.png}\end{center}
+\caption{\label{fig:trace32_frsh_orti} The ORTI windows for the FRSH Kernel.}
+\end{figure}
+%
+\begin{figure}
+\begin{center}\includegraphics[%
+  width=13cm, bb=0 0 1101 207]{images/trace32_fresh_task_graph.png}\end{center}
+\caption{\label{fig:trace32_frsh_task_graph} An example of context change graphic produced by Lauterbach from the trace data of an application using the FRSH kernel.}
 \end{figure}
 
 \end{itemize}

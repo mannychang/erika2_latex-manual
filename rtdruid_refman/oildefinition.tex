@@ -43,44 +43,41 @@
 \lstinline!      STRING !\refoillst{MASTER_CPU} = "default_cpu";! \newline
 \lstinline!                                                   ! \newline
 \lstinline!      ENUM [                                       ! \newline
-%\lstinline!	ARM7 {! \newline
-%\lstinline!          STRING ID = "default_cpu";! \newline
-%\lstinline!          STRING APP_SRC[];! \newline
-%\lstinline!          ! \newline
-%\lstinline!          STRING THUMB_SRC[];! \newline
-%\lstinline!          ! \newline
-%\lstinline!          BOOLEAN [! \newline
-%\lstinline!            TRUE {! \newline
-%\lstinline!              BOOLEAN [! \newline
-%\lstinline!		TRUE {! \newline
-%\lstinline!                  UINT32 SYS_SIZE;! \newline
-%\lstinline!                  //UINT32 IRQ_SIZE;! \newline
-%\lstinline!                },! \newline
-%\lstinline!                FALSE! \newline
-%\lstinline!              ] IRQ_STACK;! \newline
-%\lstinline!              ENUM [! \newline
-%\lstinline!                SHARED,! \newline
-%\lstinline!                PRIVATE {! \newline
-%\lstinline!                  UINT32 SYS_SIZE;! \newline
-%\lstinline!                  //UINT32 IRQ_SIZE;! \newline
-%\lstinline!                }! \newline
-%\lstinline!              ] DUMMY_STACK;! \newline
-%\lstinline!            },! \newline
-%\lstinline!            FALSE! \newline
-%\lstinline!          ] MULTI_STACK = FALSE;! \newline
-%\lstinline!          ! \newline
-%\lstinline!          UINT32 STACK_TOP;! \newline
-%\lstinline!          UINT32 STACK_BOTTOM;! \newline
-%\lstinline!          UINT32 SYS_SIZE;    // available space for all user stacks! \newline
-%\lstinline!          UINT32 IRQ_SIZE;    // available space for all irq stacks! \newline
-%\lstinline!          UINT32 SVC_SIZE;! \newline
-%\lstinline!          UINT32 FIQ_SIZE;! \newline
-%\lstinline!          UINT32 ABT_SIZE;! \newline
-%\lstinline!          UINT32 UND_SIZE;! \newline
-%\lstinline!          UINT32 SHARED_MIN_SYS_SIZE;    // size of shared stack! \newline
-%\lstinline!          //UINT32 SHARED_MIN_IRQ_SIZE;    // size of shared stack! \newline
-%\lstinline!! \newline
-%\lstinline!        },! \newline
+\lstinline!   	   ARM7 {! \newline
+\lstinline!          STRING ID = "default_cpu";! \newline
+\lstinline!          STRING APP_SRC[];! \newline
+\lstinline!          ! \newline
+\lstinline!          STRING THUMB_SRC[];! \newline
+\lstinline!          ! \newline
+\lstinline!          BOOLEAN [! \newline
+\lstinline!            TRUE {! \newline
+\lstinline!              BOOLEAN [! \newline
+\lstinline!		   TRUE {! \newline
+\lstinline!                  UINT32 SYS_SIZE;! \newline
+\lstinline!                },! \newline
+\lstinline!                FALSE! \newline
+\lstinline!              ] IRQ_STACK;! \newline
+\lstinline!              ENUM [! \newline
+\lstinline!                SHARED,! \newline
+\lstinline!                PRIVATE {! \newline
+\lstinline!                  UINT32 SYS_SIZE;! \newline
+\lstinline!                }! \newline
+\lstinline!              ] DUMMY_STACK;! \newline
+\lstinline!            },! \newline
+\lstinline!            FALSE! \newline
+\lstinline!          ] MULTI_STACK = FALSE;! \newline
+\lstinline!          ! \newline
+\lstinline!          UINT32 STACK_TOP;! \newline
+\lstinline!          UINT32 STACK_BOTTOM;! \newline
+\lstinline!          UINT32 SYS_SIZE;! \newline
+\lstinline!          UINT32 IRQ_SIZE;! \newline
+\lstinline!          UINT32 SVC_SIZE;! \newline
+\lstinline!          UINT32 FIQ_SIZE;! \newline
+\lstinline!          UINT32 ABT_SIZE;! \newline
+\lstinline!          UINT32 UND_SIZE;! \newline
+\lstinline!          UINT32 SHARED_MIN_SYS_SIZE;    // size of shared stack! \newline
+\lstinline!! \newline
+\lstinline!        },! \newline
 %\lstinline!        JANUS {! \newline
 %\lstinline!          STRING ID = "default_cpu";! \newline
 %\lstinline!          STRING APP_SRC[];! \newline
@@ -150,6 +147,20 @@
 \lstinline!                                                     ! \newline
 \lstinline!	     STRING !\refoillst{IPIC_LOCAL_NAME};       ! \newline
 \lstinline!                                                     ! \newline
+\lstinline!  ! \newline
+\lstinline!	     STRING TIMER_FREERUNNING;! \newline
+\lstinline!	     ENUM [! \newline
+\lstinline!	       SINGLE {! \newline
+\lstinline!	         STRING TIMER_IRQ;! \newline
+\lstinline!	       },! \newline
+\lstinline!	       MULTIPLE {! \newline
+\lstinline!		 STRING TIMER_IRQ_BUDGET;! \newline
+\lstinline!		 STRING TIMER_IRQ_RECHARGE;! \newline
+\lstinline!		 STRING TIMER_IRQ_DLCHECK;! \newline
+\lstinline!		 STRING TIMER_IRQ_SEM;! \newline
+\lstinline!            }! \newline
+\lstinline!	     ] FRSH_TIMERS;				! \newline
+\lstinline!             ! \newline
 \lstinline!        },                                           ! \newline
 %\lstinline!        MPC5 {! \newline
 %\lstinline!          STRING ID = "default_cpu";! \newline
@@ -209,12 +220,6 @@
 \lstinline!                },                                   ! \newline
 \lstinline!                FALSE                                ! \newline
 \lstinline!              ] !\refoillst{IRQ_STACK};              ! \newline
-%\lstinline!              //ENUM [! \newline
-%\lstinline!                //    SHARED,! \newline
-%\lstinline!                //    PRIVATE {! \newline
-%\lstinline!                  //        UINT32 SYS_SIZE;! \newline
-%\lstinline!                  //    }! \newline
-%\lstinline!                //] DUMMY_STACK;! \newline
 \lstinline!            },                                       ! \newline
 \lstinline!            FALSE                                    ! \newline
 \lstinline!          ] !\refoillst{MULTI_STACK} = FALSE;        ! \newline
@@ -304,156 +309,180 @@
 \lstinline!          STRING HANDLER_SPM_READY;	// Store program Memory Ready! \newline
 \lstinline!          */! \newline
 \lstinline!          ! \newline
-%\lstinline!          ENUM [! \newline
-%\lstinline!            HANDLER_IRQ0 {	// external interrupt request 0! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_IRQ1 {	// external interrupt request 1! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_IRQ2 {	// external interrupt request 2! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_IRQ3 {	// external interrupt request 3! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_IRQ4 {	// external interrupt request 4! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_IRQ5 {	// external interrupt request 5! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_IRQ6 {	// external interrupt request 6! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_IRQ7 {	// external interrupt request 7! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	      ! \newline
-%\lstinline!	    }, HANDLER_T0_MATCH {	// Timer/Counter 0 Compare Match! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T0_OVERFLW {	// Timer/Counter 0 Overflow! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T1_EVENT {	// Timer/Counter 1 Capture Event! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T1_MATCH_A {	// Timer/Counter 1 Compare Match A! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T1_MATCH_B {	// Timer/Counter 1 Compare Match B! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T1_MATCH_C {	// Timer/Counter 1 Compare Match C! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T1_OVERFLW {	// Timer/Counter 1 Overflow! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T2_MATCH {	// Timer/Counter 2 Compare Match! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T2_OVERFLW {	// Timer/Counter 2 Overflow! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T3_EVENT {	// Timer/Counter 3 Capture Event! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T3_MATCH_A {	// Timer/Counter 3 Compare Match A! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T3_MATCH_B {	// Timer/Counter 3 Compare Match B! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T3_MATCH_C {	// Timer/Counter 3 Compare Match C! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_T3_OVERFLW {	// Timer/Counter 3 Overflow! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	      ! \newline
-%\lstinline!	    }, HANDLER_SPI { 	// SPI Serial Transfer Complete! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	      ! \newline
-%\lstinline!	    }, HANDLER_US0_RX {  	// USART0 Rx complete! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_US0_EMPTY {	// USART0 Data Register Empty! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_US0_TX {  	// Usart0 Tx complete! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	      ! \newline
-%\lstinline!	    }, HANDLER_US1_RX {  	// USART1 Rx complete! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_US1_EMPTY {	// USART1 Data Register Empty! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_US1_TX {  	// Usart1 Tx complete! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	      ! \newline
-%\lstinline!	    }, HANDLER_ADC { 	// ADC Conversion Complete! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_EEPROM {	// EEPROM Ready! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_ANALOG_COMP {	// Analog Comparator! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_2WSI {	// Two-wire serial Interface! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }, HANDLER_SPM_READY {	// Store program Memory Ready! \newline
-%\lstinline!              STRING FUNCTION;! \newline
-%\lstinline!              INT32[1,2] TYPE = 1;! \newline
-%\lstinline!	    }! \newline
-%\lstinline!	    ! \newline
-%\lstinline!          ] HANDLER[];! \newline
-%\lstinline!        }! \newline
-%\lstinline!        ! \newline
+\lstinline!          ENUM [! \newline
+\lstinline!            HANDLER_IRQ0 {	// external interrupt request 0! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_IRQ1 {	// external interrupt request 1! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_IRQ2 {	// external interrupt request 2! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_IRQ3 {	// external interrupt request 3! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_IRQ4 {	// external interrupt request 4! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_IRQ5 {	// external interrupt request 5! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_IRQ6 {	// external interrupt request 6! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_IRQ7 {	// external interrupt request 7! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	      ! \newline
+\lstinline!	    }, HANDLER_T0_MATCH {	// Timer/Counter 0 Compare Match! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T0_OVERFLW {	// Timer/Counter 0 Overflow! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T1_EVENT {	// Timer/Counter 1 Capture Event! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T1_MATCH_A {	// Timer/Counter 1 Compare Match A! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T1_MATCH_B {	// Timer/Counter 1 Compare Match B! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T1_MATCH_C {	// Timer/Counter 1 Compare Match C! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T1_OVERFLW {	// Timer/Counter 1 Overflow! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T2_MATCH {	// Timer/Counter 2 Compare Match! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T2_OVERFLW {	// Timer/Counter 2 Overflow! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T3_EVENT {	// Timer/Counter 3 Capture Event! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T3_MATCH_A {	// Timer/Counter 3 Compare Match A! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T3_MATCH_B {	// Timer/Counter 3 Compare Match B! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T3_MATCH_C {	// Timer/Counter 3 Compare Match C! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_T3_OVERFLW {	// Timer/Counter 3 Overflow! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	      ! \newline
+\lstinline!	    }, HANDLER_SPI { 	// SPI Serial Transfer Complete! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	      ! \newline
+\lstinline!	    }, HANDLER_US0_RX {  	// USART0 Rx complete! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_US0_EMPTY {	// USART0 Data Register Empty! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_US0_TX {  	// Usart0 Tx complete! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	      ! \newline
+\lstinline!	    }, HANDLER_US1_RX {  	// USART1 Rx complete! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_US1_EMPTY {	// USART1 Data Register Empty! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_US1_TX {  	// Usart1 Tx complete! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	      ! \newline
+\lstinline!	    }, HANDLER_ADC { 	// ADC Conversion Complete! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_EEPROM {	// EEPROM Ready! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_ANALOG_COMP {	// Analog Comparator! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_2WSI {	// Two-wire serial Interface! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }, HANDLER_SPM_READY {	// Store program Memory Ready! \newline
+\lstinline!              STRING FUNCTION;! \newline
+\lstinline!              INT32[1,2] TYPE = 1;! \newline
+\lstinline!	    }! \newline
+\lstinline!	    ! \newline
+\lstinline!          ] HANDLER[];! \newline
+\lstinline!        }! \newline
+\lstinline!        ! \newline
 \lstinline!      ] !\refoillst{CPU_DATA}[];! \newline
 \lstinline!! \newline
 \lstinline!      ENUM [! \newline
-%\lstinline!	! \newline
-%\lstinline!        SAMSUNG_KS32C50100 {! \newline
-%\lstinline!          STRING IRQ_EXT0;                   /* Ext 0 */! \newline
-%\lstinline!          STRING IRQ_EXT1;                   /* Ext 1 */! \newline
-%\lstinline!          STRING IRQ_EXT2;                   /* Ext 2 */! \newline
-%\lstinline!          STRING IRQ_EXT3;                   /* Ext 3 */! \newline
-%\lstinline!          STRING IRQ_UART0TX;                /* UART0 Tx */! \newline
-%\lstinline!          STRING IRQ_UART0RX;                /* UART0 Rx & error*/! \newline
-%\lstinline!          STRING IRQ_UART1TX;                /* UART1 Tx */! \newline
-%\lstinline!          STRING IRQ_UART1RX;                /* UART1 Rx & error*/! \newline
-%\lstinline!          STRING IRQ_GDMA0;                  /* GDMA ch. 0 */! \newline
-%\lstinline!          STRING IRQ_GDMA1;                  /* GDMA ch. 1 */! \newline
-%\lstinline!          STRING IRQ_TIMER0;                 /* Timer 0 */! \newline
-%\lstinline!          STRING IRQ_TIMER1;                 /* Timer 1 */! \newline
-%\lstinline!          STRING IRQ_HDLCATX;                /* HDLC A Tx */! \newline
-%\lstinline!          STRING IRQ_HDLCARX;                /* HDLC A Rx */! \newline
-%\lstinline!          STRING IRQ_HDLCBTX;                /* HDLC B Tx */! \newline
-%\lstinline!          STRING IRQ_HDLCBRX;                /* HDLC B Rx */! \newline
-%\lstinline!          STRING IRQ_ETHBDMATX;              /* Ethernet BDMA Tx */! \newline
-%\lstinline!          STRING IRQ_ETHBDMARX;              /* Ethernet BDMA Rx */! \newline
-%\lstinline!          STRING IRQ_ETHMACTX;               /* Ethernet MAC Tx */! \newline
-%\lstinline!          STRING IRQ_ETHMACRX;               /* Ethernet MAC Rx */! \newline
-%\lstinline!          STRING IRQ_I2C;                    /* I2C-bus */! \newline
-%\lstinline!          STRING IRQ_NO_PENDING;             /* No Pending Interrupt */! \newline
-%\lstinline!	},! \newline
-\lstinline!	 PIC30 {                                ! \newline
-\lstinline!	   ENUM [                               ! \newline
-\lstinline!	     CUSTOM {                           ! \newline
-\lstinline!	       STRING MODEL;                    ! \newline
-\lstinline!	       STRING LINKERSCRIPT;             ! \newline
-\lstinline!	       STRING DEV_LIB;                  ! \newline
-\lstinline!	       STRING INCLUDE_C;                ! \newline
-\lstinline!	       STRING INCLUDE_S;                ! \newline
-\lstinline!	     },                                 ! \newline
+\lstinline!	    ! \newline
+\lstinline!        SAMSUNG_KS32C50100 {! \newline
+\lstinline!          STRING IRQ_EXT0;                   /* Ext 0 */! \newline
+\lstinline!          STRING IRQ_EXT1;                   /* Ext 1 */! \newline
+\lstinline!          STRING IRQ_EXT2;                   /* Ext 2 */! \newline
+\lstinline!          STRING IRQ_EXT3;                   /* Ext 3 */! \newline
+\lstinline!          STRING IRQ_UART0TX;                /* UART0 Tx */! \newline
+\lstinline!          STRING IRQ_UART0RX;                /* UART0 Rx & error*/! \newline
+\lstinline!          STRING IRQ_UART1TX;                /* UART1 Tx */! \newline
+\lstinline!          STRING IRQ_UART1RX;                /* UART1 Rx & error*/! \newline
+\lstinline!          STRING IRQ_GDMA0;                  /* GDMA ch. 0 */! \newline
+\lstinline!          STRING IRQ_GDMA1;                  /* GDMA ch. 1 */! \newline
+\lstinline!          STRING IRQ_TIMER0;                 /* Timer 0 */! \newline
+\lstinline!          STRING IRQ_TIMER1;                 /* Timer 1 */! \newline
+\lstinline!          STRING IRQ_HDLCATX;                /* HDLC A Tx */! \newline
+\lstinline!          STRING IRQ_HDLCARX;                /* HDLC A Rx */! \newline
+\lstinline!          STRING IRQ_HDLCBTX;                /* HDLC B Tx */! \newline
+\lstinline!          STRING IRQ_HDLCBRX;                /* HDLC B Rx */! \newline
+\lstinline!          STRING IRQ_ETHBDMATX;              /* Ethernet BDMA Tx */! \newline
+\lstinline!          STRING IRQ_ETHBDMARX;              /* Ethernet BDMA Rx */! \newline
+\lstinline!          STRING IRQ_ETHMACTX;               /* Ethernet MAC Tx */! \newline
+\lstinline!          STRING IRQ_ETHMACRX;               /* Ethernet MAC Rx */! \newline
+\lstinline!          STRING IRQ_I2C;                    /* I2C-bus */! \newline
+\lstinline!          STRING IRQ_NO_PENDING;             /* No Pending Interrupt */! \newline
+\lstinline!	   },! \newline
+\lstinline!        unibo_mparm {! \newline
+\lstinline!          STRING IRQ_EXT0;                   // Ext 0 ! \newline
+\lstinline!          STRING IRQ_EXT1;                   // Ext 1 ! \newline
+\lstinline!          STRING IRQ_EXT2;                   // Ext 2 ! \newline
+\lstinline!          STRING IRQ_EXT3;                   // Ext 3 ! \newline
+\lstinline!          STRING IRQ_UART0TX;                // UART0 Tx ! \newline
+\lstinline!          STRING IRQ_UART0RX;                // UART0 Rx & error! \newline
+\lstinline!          STRING IRQ_UART1TX;                // UART1 Tx ! \newline
+\lstinline!          STRING IRQ_UART1RX;                // UART1 Rx & error! \newline
+\lstinline!          STRING IRQ_GDMA0;                  // GDMA ch. 0 ! \newline
+\lstinline!          STRING IRQ_GDMA1;                  // GDMA ch. 1 ! \newline
+\lstinline!          STRING IRQ_TIMER0;                 // Timer 0 ! \newline
+\lstinline!          STRING IRQ_TIMER1;                 // Timer 1 ! \newline
+\lstinline!          STRING IRQ_HDLCATX;                // HDLC A Tx ! \newline
+\lstinline!          STRING IRQ_HDLCARX;                // HDLC A Rx ! \newline
+\lstinline!          STRING IRQ_HDLCBTX;                // HDLC B Tx ! \newline
+\lstinline!          STRING IRQ_HDLCBRX;                // HDLC B Rx ! \newline
+\lstinline!          STRING IRQ_ETHBDMATX;              // Ethernet BDMA Tx ! \newline
+\lstinline!          STRING IRQ_ETHBDMARX;              // Ethernet BDMA Rx ! \newline
+\lstinline!          STRING IRQ_ETHMACTX;               // Ethernet MAC Tx ! \newline
+\lstinline!          STRING IRQ_ETHMACRX;               // Ethernet MAC Rx ! \newline
+\lstinline!          STRING IRQ_I2C;                    // I2C-bus ! \newline
+\lstinline!          STRING IRQ_NO_PENDING;             // No Pending Interrupt! \newline
+\lstinline!	   },! \newline
+\lstinline!	   PIC30 {                                ! \newline
+\lstinline!	     ENUM [                               ! \newline
+\lstinline!	       CUSTOM {                           ! \newline
+\lstinline!	         STRING MODEL;                    ! \newline
+\lstinline!	         STRING LINKERSCRIPT;             ! \newline
+\lstinline!	         STRING DEV_LIB;                  ! \newline
+\lstinline!	         STRING INCLUDE_C;                ! \newline
+\lstinline!	         STRING INCLUDE_S;                ! \newline
+\lstinline!	       },                                 ! \newline
 \lstinline!             PIC24FJ128GA006, PIC24FJ128GA008,  ! \newline
 \lstinline!             PIC24FJ128GA010, PIC24FJ32GA002,   ! \newline
 \lstinline!             PIC24FJ32GA004, PIC24FJ64GA002,    ! \newline
@@ -505,6 +534,7 @@
 \lstinline!                                             ! \newline
 \lstinline!      ENUM [                                 ! \newline
 \lstinline!	   !\quad \quad\refoillst{NO_BOARD},    ! \newline
+\lstinline!	   !\quad \quad\refoillst{EVALUATOR7T}, ! \newline
 \lstinline!	   !\quad \quad\refoillst{EE_FLEX} {    ! \newline
 \lstinline!          BOOLEAN USELEDS = FALSE;           ! \newline
 \lstinline!          BOOLEAN USELCD = FALSE;            ! \newline
@@ -533,7 +563,7 @@
 \lstinline!            },                               ! \newline
 \lstinline!            MULTI {                          ! \newline
 \lstinline!              ENUM [                         ! \newline
-\lstinline!                 ETHERNET,                   ! \newline
+\lstinline!                ETHERNET,                    ! \newline
 \lstinline!                EIB,                         ! \newline
 \lstinline!                ALL                          ! \newline
 \lstinline!              ] OPTIONS[];                   ! \newline
@@ -578,6 +608,19 @@
 \lstinline!          STRING TICK_TIME;                  ! \newline
 \lstinline!          BOOLEAN REL_DEADLINES_IN_RAM = FALSE; ! \newline
 \lstinline!        },                                   ! \newline
+\lstinline!        FRSH {! \newline
+\lstinline!	     ENUM [! \newline
+\lstinline!	       CONTRACT {! \newline
+\lstinline!		 STRING NAME;! \newline
+\lstinline!		 UINT32 BUDGET;! \newline
+\lstinline!		 UINT32 PERIOD;! \newline
+\lstinline!		 STRING CPU_ID;! \newline
+\lstinline!	       }! \newline
+\lstinline!	     ] CONTRACTS[];! \newline
+\lstinline!	     BOOLEAN USE_SYNC_OBJ;! \newline
+\lstinline!          STRING TICK_TIME;! \newline
+\lstinline!        }! \newline
+\lstinline!! \newline
 \lstinline!        BCC1,                                ! \newline
 \lstinline!        BCC2,                                ! \newline
 \lstinline!        ECC1,                                ! \newline
@@ -614,6 +657,8 @@
 \lstinline!      ENUM [NON, FULL] !\refoillst{SCHEDULE};! \newline
 \lstinline!      EVENT_TYPE !\refoillst{EVENT}[];       ! \newline
 \lstinline!      RESOURCE_TYPE !\refoillsttwo{RESOURCE}{RESOURCEtask}[]; ! \newline
+\lstinline!                                             ! \newline
+\lstinline!      STRING !\refoillsttwo{CONTRACT}{CONTRACTtask};                       ! \newline
 \lstinline!                                             ! \newline
 %\lstinline!      /* EE specific values */! \newline
 \lstinline!      ENUM [                                 ! \newline
