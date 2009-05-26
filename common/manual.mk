@@ -112,7 +112,7 @@ dynamic_version.tex: version.mk
 
 clean:
 	rm -f $(DISTFILES) $(CLEANFILES) $(PHP_DEPS) $(EPS_DIA_FILES) $(EPS_FIG_FILES) theflag
-	rm -f dynamic_version.tex
+	rm -f dynamic_version.tex deps
 
 ###############################################################################
 # Automatic generation of eps files from sources
