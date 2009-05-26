@@ -128,6 +128,75 @@ Example:
 \end{lstlisting}
 
 %---------------------------------------------------------------------
+\subsection{CPU data extensions for FRSH}
+%---------------------------------------------------------------------
+
+The following extensions are used when using the \const{FRSH} kernel:
+
+\begin{lstlisting}
+STRING TIMER_FREERUNNING;
+ENUM [
+  SINGLE {
+    STRING TIMER_IRQ;
+  },
+  MULTIPLE {
+    STRING TIMER_IRQ_BUDGET;
+    STRING TIMER_IRQ_RECHARGE;
+    STRING TIMER_IRQ_DLCHECK;
+    STRING TIMER_IRQ_SEM;
+  }
+] FRSH_TIMERS;
+\end{lstlisting}
+
+Example with \const{MULTIPLE}:
+
+\begin{lstlisting}
+CPU test_application {
+  OS EE {
+    ...
+    CPU_DATA = NIOSII {
+      ...
+      TIMER_FREERUNNING = "HIGH_RES_TIMER_0";
+      FRSH_TIMERS = MULTIPLE {
+        TIMER_IRQ_BUDGET = "TIMER_CAPACITY_0";
+        TIMER_IRQ_RECHARGE = "TIMER_RECHARGING_0";
+        TIMER_IRQ_DLCHECK = "TIMER_DLCHECK_0";
+        TIMER_IRQ_SEM = "TIMER_SEM_0";
+      };
+    };
+  };
+  ...
+};
+\end{lstlisting}
+
+Example with \const{SINGLE}:
+
+\begin{lstlisting}
+CPU test_application {
+  OS EE {
+    ...
+    CPU_DATA = NIOSII {
+      ...
+      TIMER_FREERUNNING = "HIGH_RES_TIMER_0";
+      FRSH_TIMERS = SINGLE {
+        TIMER_IRQ = "TIMER_CAPACITY_0";
+      };
+    };
+  };
+  ...
+};
+\end{lstlisting}
+
+The setting is used to specify the timers that the \const{FRSH}
+implementation will use to handle timer events. In this case, there
+are two possible options: it is possible to specify a single timer
+source that is used to multiplex all the timer events, or as an
+alternative all timer events can be assigned a dedicated hardware
+timer. In the first case, additional software will be loaded for
+multiplexing the interrupt sources, ending up with a slightly bigger
+run-time overhead. In the case of a multicore design, each CPU should have its dedicated timers to handle these events.
+
+%---------------------------------------------------------------------
 \subsection{Mutex options}
 %---------------------------------------------------------------------
 
