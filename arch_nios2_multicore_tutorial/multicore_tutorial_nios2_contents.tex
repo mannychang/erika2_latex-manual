@@ -29,54 +29,54 @@ showing the behavior of the various \ee\ primitives.
 This Section describes how to create a multicore hardware suitable to
 be used with \ee.
 
-%There are two options available: use a template design, or
-%create a design starting from an Altera default example.
+There are two options available: use a template design, or
+create a design starting from an Altera default example.
 
-%\subsection{Importing an already existing hardware design}
-%Evidence Srl provides an already compiled hardware design that can be
-%used to test \ee. The hardware design of the two processor demo are
-%available for download from the Evidence website, under the Literature
-%section.
+\subsection{Importing an already existing hardware design}
+Evidence Srl provides an already compiled hardware design that can be
+used to test \ee. The hardware design of a four processor demo is
+available for download from the Evidence website, under the Nios II
+Download section. Please refer to Figure
+\ref{fig:tutorial_sopcbuilder_4cpu} for a screenshot of the SOPC
+blocks used to create the demo.
 
-%To open the demo, you have select ``Restore Archived Project...''
-%under the Quartus II Project menu. When you select that option, a
-%dialog box appears. Fill the required informations giving the name of
-%the QAR file, and use \file{c:\\altera\\kits\\nios2\\examples\\}
-%\file{\\verilog\\boardname\\evidence_2cpu} as the target directory in
-%your filesystem\footnote{Of course you can select another location for
-%your files. In that case, you will have to modify some directory
-%locations in the OIL configuration file later on in the
-%tutorial.}. \const{boardname} is the name of the board for which the
-%demo was compiled for.
+To open the demo, you have select ``Restore Archived Project...''
+under the Quartus II Project menu. When you select that option, a
+dialog box appears. Fill the required informations giving the name of
+the QAR file. Please remember that you will have to use the directory of the project inside the OIL file.
 
-%The design is basically a modification of the ``standard'' Altera demo
-%available under
-%\file{C:\\altera\\kits\\nios2\\examples\\verilog\\niosII_stratix_1s40\\standard}. The
-%Hardware design is basically a SOPCBuilder block with 2 CPUs, an input
-%PIO for each processor, and an output PIO plus a mutex connected to
-%all the CPU data masters.
+The design is basically a modification of the ``standard'' Altera demo
+available under
+\file{C:\\altera\\81\\nios2eds\\examples\\verilog\\niosII_stratix_2s60_ROHS\\standard}. The
+Hardware design is basically a SOPCBuilder block with 4 CPUs, an input
+PIO for each processor, and an output PIO plus a mutex connected to
+all the CPU data masters. It also includes an SRAM, leds, additional
+timers to run FRSH applications, and a bridge to overcome a bug in the
+Avalon implementation that appears as a bus lock when more than one
+master is present.
 
-%%
-%%
-%%\nb{mettere uno screenshot del sopcbuilder che fa vedere le
-%%periferiche del tutorial}
-%%
-%%
+\begin{figure}
+\begin{center}\includegraphics[%
+  width=11cm, bb=0 0 981
+  1030]{images/frsh_4cpu_sopc_example.png}\end{center}
 
-%The input and output PIOs are then connected together outside the
-%SOPCBuilder block to form the InterProcessor Interrupt Controller
-%(IPIC). Instructions on how to create and connect the various PIO
-%needed for the Interprocessor interrupt 
-%%are in Section \ref{sec:interprocessor-interrupt}.
-%can be found inside the \ee\ reference manual.
+\caption{\label{fig:tutorial_sopcbuilder_4cpu}The SOPCBuilder blocks created for the 4CPU demo available on the Evidence website.}
+\end{figure}
 
-%A SOF file for the example design is already available in the project
-%directory, so there is no need to recompile the system.
+The input and output PIOs are then connected together outside the
+SOPCBuilder block to form the InterProcessor Interrupt Controller
+(IPIC). Instructions on how to create and connect the various PIO
+needed for the Interprocessor interrupt 
+are in Section \ref{sec:interprocessor-interrupt}.
+can be found inside the \ee\ reference manual.
 
-%\subsection{Creating an hardware design from scratch}
+A SOF file for the example design is already available in the project
+directory, so there is no need to recompile the system.
 
-%This subsection describes the steps needed to create an hardware
-%design suitable for \ee. 
+\subsection{Creating an hardware design from scratch}
+
+This subsection describes the steps needed to create an hardware
+design suitable for \ee. 
 
 The result will be a dual processor design
 that will include all the peripheral needed for a proper
@@ -854,5 +854,8 @@ Added new versioning mechanism.\tabularnewline
 \hline 
 1.1.0&
 Support for Nios II 8.0.\tabularnewline
+\hline 
+1.1.1&
+Support for Nios II 8.1, added 4CPU example.\tabularnewline
 \hline
 \end{tabular}
