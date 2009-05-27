@@ -8,7 +8,7 @@ This tutorial has been tested on a \flex\ board produced by Evidence
 and Embedded Solutions and on a Microchip Explorer 16 development
 board from Microchip.
 
-We suppose the reader is familiar with the MPLAB IDE debug environment
+We presume that the reader is familiar with the MPLAB IDE debug environment
 provided by Microchip.
 
 %
@@ -38,7 +38,7 @@ provided by Microchip.
 %% microcontroller.
 
 %-----------------------------------------------------------------
-\chapter{Notes for Windows XP and Windows Vista users}
+\chapter{Note for Windows XP and Windows Vista users}
 \label{ch:vista}
 %-----------------------------------------------------------------
 
@@ -46,13 +46,13 @@ If you are using Windows, and especially if you are using Windows
 Vista, please look carefully at the following warnings:
 
 \begin{warning}
-Do NOT install the Evidence package in a name containing spaces.
-\file{c:/Evidence/Evidence} works.
+The Evidence package installation path should NOT contain directory name with spaces. For e.g. use
+\file{c:/Evidence/Evidence}
 \end{warning}
 
 \begin{warning}
-Do NOT install the Scilab package in a name containing spaces.
-\file{c:/Evidence/scilab-4.1.2} works.
+The Scilab package installation path should NOT contain directory name with spaces. For e.g. use
+\file{c:/Evidence/scilab-4.1.2}
 \end{warning}
 
 \begin{warning}
@@ -68,18 +68,19 @@ Please install cygwin into its default directory, \file{c:/cygwin}.
 
 \begin{warning} Also if from the Windows Vista Explorer your Microchip
 compiler seems to be installed under
-\file{c:/Programmi/Microchip/...}, please remind to specify the REAL
-pathmname. In particular, \file{c:/Programmi} DOES NOT EXISTS, whereas
-the correvct name is \file{c:/Program Files}.  \end{warning}
+\file{c:/Programmi/Microchip/...}, please remember to specify the REAL
+pathname. In particular, \file{c:/Programmi} DOES NOT EXISTS, whereas
+the correct name is \file{c:/Program Files}.
+\end{warning}
 
 
 \chapter{Installing \ee\ and \rtd\ on Microsoft Windows}
 \label{cha:installing}
 
-This chapter will guide the developer to the installation procedure of
+This chapter will guide the developer on the installation procedure of
 \ee\ and \rtd\ for the \dspic\ platform.
 
-The installation of \ee\ and \rtd\ is composed by the following
+The installation of \ee\ and \rtd\ is composed of following
 packages:
 \begin{itemize}
 \item The Eclipse development environment, which is used by \rtd\ to
@@ -109,7 +110,7 @@ To install the software, execute the following steps:
 \begin{enumerate}
 
 \item Install your favourite Java runtime environment, which is needed
-  to run \rtd; in fact, \rtd\ is a plugin of the Eclipse editor, which
+  to run \rtd; as \rtd\ is a plugin of the Eclipse editor, which
   requires Java to be executed.
 
 \item Install the latest version of the Microchip MPLAB IDE; you can
@@ -147,10 +148,10 @@ To install the software, execute the following steps:
 
   \begin{note}
     The \ee\ install package provides a version of the Microchip C30
-    compiler recompiled from the GCC sources made available from
+    compiler recompiled from the GCC sources made available by
     Microchip. Although that compiler is able to compile \ee\
     applications, it does not include Microchip include files and
-    libraries which are only distributed with the Microchip package.
+    libraries which are distributed with the Microchip package only.
   \end{note}
 
 \item The installer will ask for a destination directory. If possible, 
@@ -184,7 +185,7 @@ To install the software, execute the following steps:
   \end{note}
 \end{enumerate}
 
-The rest of this tutorial supposes that the Microchip MPLAB IDE is
+The rest of this tutorial assumes that the Microchip MPLAB IDE is
 installed within the \file{C:\\Programmi\\Microchip} directory and
 that, consequently, the GNU Assembler for \dspic\ is installed within
 \file{C:\\Programmi\\Microchip\\MPLAB ASM30 Suite\\bin}. Please note
@@ -204,7 +205,7 @@ Please follow the next steps:
   inside the Start menu of your Windows machine, choosing 
   \file{Start/Programs/Evidence/RT-Druid}.
   
-\item A dialog box will appear, asking to choose the right
+\item A dialog box will appear, prompting to choose the right
   workspace (see Figure \ref{fig:select-workspace}). 
   Leave the default workpackage directory
   as it is, and proceed by pressing ``OK''.
@@ -255,7 +256,7 @@ The install directories specified in the two textboxes of Figure
 \ref{fig:preferences-pic30} does {\em not} include the \file{bin}
 directory! 
 
-That is, \file{c:\\Programmi\\Microchip\\MPLAB C30} is correct, wheras
+That is, \file{c:\\Programmi\\Microchip\\MPLAB C30} is correct, whereas
 \file{c:\\Programmi\\Microchip\\MPLAB C30\\bin} is not.
 \end{warning}
 
@@ -264,17 +265,17 @@ The install directory of the assembler refers to the assembler
 provided with MPLAB IDE and {\em not} the assembler provided with the
 C30 compiler. The reason is that the directory is used to call the
 assembler and {\em also} to copy the \file{crt0.s} file, which has a
-different position in the two assemblers distributions made by
+different position in the two assembler distributions made by
 Microchip.
 \end{warning}
 
 \begin{warning}
-If you are using a Student Editon of the Microchip C30 compiler which
-has an {\bf expired license}, please check the ``Use EE gcc to resolve
+If you are using a Student Editon of the Microchip C30 compiler with
+an {\bf expired license}, please check the ``Use EE gcc to resolve
 dependencies'' checkbox in Figure \ref{fig:preferences-pic30}.
 \end{warning}
 
-  \begin{figure}[htb]
+\begin{figure}[htb]
 \begin{center}\includegraphics[
   width=8cm, bb=0 0 1024 768]{images/preferences_menu.png}\end{center}
 \caption{Go to the ``Preference'' menu.}
@@ -496,7 +497,7 @@ following steps:
 \end{figure}
 
 \begin{note}
-  If the error depicted in Figure \ref{fig:mymake_cygwin_error} appears (meaning
+  If the error depicted in Figure \ref{fig:mymake_cygwin_error} appears (means
   that \file{mymake_cygwin.bat} is unable to find a file), then please
   follow the instructions at the last point of Chapter
   \ref{cha:installing}.
@@ -577,7 +578,7 @@ following steps:
   You can now start debugging the demo application using MPLAB IDE.
 \end{enumerate}
 
-Figure \ref{fig:explorer16running} shows the Explorer 16 board with the 
+Figure \ref{fig:explorer16running} shows the Explorer 16 board  
 running \file{pic30\\explorer16\\Devices Demo} demo application, which uses the
 Explorer 16 onboard devices to monitor and display the environment temperature.
 
@@ -601,7 +602,8 @@ Please double click this
 message for more information.
 \end{lstlisting}
 
-Please be sure that you entered the debug mode and programmed the device {\em from the Debugger Mode} and not from the Programmer Mode.
+Please make sure that you have entered the debug mode and programmed the 
+device {\em from the Debugger Mode} and not from the Programmer Mode.
 \end{note}
 
 \begin{note}
