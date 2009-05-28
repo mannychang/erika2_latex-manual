@@ -1,133 +1,111 @@
-%
 \begin{table}
-\begin{centering}\begin{tabular}{|c|c|c|c|c|c|}
+\begin{centering}
+\begin{tabular}{|c|c|c|c|c|c|}
 \hline 
-Service&
-\begin{sideways}
+Service & \begin{sideways}
 Background Task%
-\end{sideways}&
-\begin{sideways}
+\end{sideways} & \begin{sideways}
 Task%
-\end{sideways}&
-\begin{sideways}
+\end{sideways} & \begin{sideways}
 ISR1%
-\end{sideways}&
-\begin{sideways}
+\end{sideways} & \begin{sideways}
 ISR2%
-\end{sideways}&
-\begin{sideways}
+\end{sideways} & \begin{sideways}
 Alarm Callback%
 \end{sideways}\tabularnewline
 \hline
 \hline 
-\reffun{ActivateTask}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{ActivateTask} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{Schedule}&
-&
-$\surd$&
-&
-&
-\tabularnewline
+\reffun{Schedule} &  & $\surd$ &  &  & \tabularnewline
 \hline 
-\reffun{GetResource}&
-&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{GetResource} &  & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{ReleaseResource}&
-&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{ReleaseResource} &  & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{CounterTick}&
-&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{CounterTick} &  & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{GetAlarm}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{GetAlarm} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{SetRelAlarm}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{SetRelAlarm} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{SetAbsAlarm}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{SetAbsAlarm} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{CancelAlarm}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{CancelAlarm} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{InitSem}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{InitSem} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{WaitSem}&
-&
-$\surd$&
-&
-&
-\tabularnewline
+\reffun{WaitSem} &  & $\surd$ &  &  & \tabularnewline
 \hline 
-\reffun{TryWaitSem}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{TryWaitSem} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{PostSem}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{PostSem} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline 
-\reffun{GetValueSem}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{GetValueSem} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline
-\reffun{GetTime}&
-$\surd$&
-$\surd$&
-&
-$\surd$&
-\tabularnewline
+\reffun{GetTime} & $\surd$ & $\surd$ &  & $\surd$ & \tabularnewline
 \hline
-\end{tabular}\par\end{centering}
-
+\end{tabular}
+\par\end{centering}
 
 \caption{\label{tab:api-restrictions}This table lists the environments where
 primitives can be called. }
+
+\end{table}
+%
+\begin{table}
+\begin{centering}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline 
+Service & \begin{sideways}
+Background Task%
+\end{sideways} & \begin{sideways}
+Task%
+\end{sideways} & \begin{sideways}
+ISR1%
+\end{sideways} & \begin{sideways}
+ISR2%
+\end{sideways} & \begin{sideways}
+Alarm Callback%
+\end{sideways}\tabularnewline
+\hline
+\hline 
+\reffun{frsh_init} & $\surd$ &  &  &  & \tabularnewline
+\hline 
+\reffun{frsh_strerror} & $\surd$ & $\surd$ &  & $\surd$ & $\surd$\tabularnewline
+\hline 
+\reffun{frsh_contract_get_basic_params} & $\surd$ & $\surd$ &  & $\surd$ & $\surd$\tabularnewline
+\hline 
+\reffun{frsh_contract_get_timing_reqs} & $\surd$ & $\surd$ &  & $\surd$ & $\surd$\tabularnewline
+\hline 
+\reffun{frsh_thread_bind} &  & $\surd$ &  &  & \tabularnewline
+\hline 
+\reffun{frsh_thread_unbind} &  & $\surd$ &  &  & \tabularnewline
+\hline 
+\reffun{frsh_vres_get_vres_id} &  & $\surd$ &  & $\surd$ & \tabularnewline
+\hline 
+\reffun{frsh_vres_get_contract} & $\surd$ & $\surd$ &  & $\surd$ & $\surd$\tabularnewline
+\hline 
+\reffun{frsh_synchobj_signal} &  & $\surd$ &  &  & \tabularnewline
+\hline 
+\reffun{frsh_synchobj_wait} &  & $\surd$ &  &  & \tabularnewline
+\hline 
+\reffun{frsh_synchobj_wait_with_timeout} &  & $\surd$ &  &  & \tabularnewline
+\hline 
+\reffun{frsh_timed_wait} &  & $\surd$ &  &  & \tabularnewline
+\hline 
+\reffun{frsh_config_is_admission_test_enabled} & $\surd$ & $\surd$ &  & $\surd$ & $\surd$\tabularnewline
+\hline 
+\reffun{frsh_vres_get_remaining_budget} & $\surd$ & $\surd$ &  & $\surd$ & $\surd$\tabularnewline
+\hline
+\reffun{frsh_vres_get_usage} & $\surd$ & $\surd$ &  & $\surd$ & $\surd$\tabularnewline
+\hline
+\reffun{frsh_vres_get_budget_and_period} & $\surd$ & $\surd$ &  & $\surd$ & $\surd$\tabularnewline
+\hline
+\end{tabular}
+\par\end{centering}
+
+\caption{\label{tab:api-restrictions-frsh}This table lists the environments
+where FRSH-specific primitives can be called. }
+
 \end{table}

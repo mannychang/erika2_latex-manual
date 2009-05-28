@@ -12,7 +12,10 @@ for synchronization primitives is also provided.
 
 Tasks in \ee\ are scheduled according to fixed priorities, and share
 resources using the Immediate Priority Ceiling protocol (in case of
-the FP kernel) or the SRP protocol (in case of the EDF kernel).
+the FP kernel) or the SRP protocol (in case of the EDF kernel). In the
+case of the FRSH kernel, the scheduling algorithm used is the IRIS
+scheduler \cite{iris}, which implements resource reservation with
+reclaiming based on the IST FP6 FRESCOR project API \cite{frescor}.
 
 On top of task execution there are interrupts, that always preempt the
 running task to execute urgent operations required by
@@ -23,7 +26,7 @@ peripherals. Interrupts can be of two kind, names {\em ISR Type 1} and
 
 
 \subsection{Conformance Classes}
-\ee\ implements the minimal API using two conformance classes:
+\ee\ implements the minimal API using three conformance classes:
 \begin{description}
 \item[FP] The Fixed priority (FP) conformance class includes a set of
   functionalities similar to the \ee\ conformance classes BCC2 or ECC2
@@ -38,7 +41,12 @@ peripherals. Interrupts can be of two kind, names {\em ISR Type 1} and
   deadline which is computed when the task activation is processed
   (which is at the time of the previous instance if the task has
   pending activations). The deadline is coded using the circular timer
-  implementation (see Section \ref{sec:circulartimer}.
+  implementation (see Section \ref{sec:circulartimer}).
+
+\item[FRSH] The FRescor SCheduler (FRSH) conformance class includes
+  the support for an EDF scheduler and, on top of it, an
+  implementation of the IRIS scheduler \cite{iris} together with the
+  implementation of binding/unbinding specific functions.
 \end{description}
 
 
@@ -48,6 +56,16 @@ situations. The complete list of primitives is listed in Table
 \ref{tab:api-restrictions}, together with the locations where it is
 legal to call these functions.
 
+In addition, Table \ref{tab:api-restrictions-frsh} shows the same
+information for the aditional primitives introduced with the
+\const{FRSH} Kernel.
+
+The FRSH implementation is different from FP and EDF in many different
+aspects. For this reason, most of the details about the \const{FRSH}
+implementation will be described separately in Chapter
+\ref{cha:frsh}. To avoid repetitions of informations, all the
+primitives which have a similar behavior (for example,
+\reffun{ActivateTask}) will be reported only once below.
 
 
 
@@ -94,6 +112,9 @@ for writing applications.
   \begin{constantdescription}
     This constant represent an invalid task ID.
   \end{constantdescription}
+  \begin{funconformance}
+    FP, EDF, FRSH
+  \end{funconformance}
 \end{constant2}
 
 \begin{constant2}{EE\_MAX\_NACT}{EE_MAX_NACT}
@@ -103,6 +124,9 @@ for writing applications.
     maximum value for an unsigned integer on the particular
     architecture.
   \end{constantdescription}
+  \begin{funconformance}
+    FP, EDF
+  \end{funconformance}
 \end{constant2}
 
 \begin{constant2}{RES\_SCHEDULER}{RES_SCHEDULER}
@@ -115,6 +139,9 @@ for writing applications.
     the system, and it is computed when \rtd\ generates the \ee\ 
     configuration code.
   \end{constantdescription}
+  \begin{funconformance}
+    FP, EDF
+  \end{funconformance}
 \end{constant2}
 
 \begin{constant}{Task States}
@@ -141,7 +168,13 @@ for writing applications.
     a ready task which has been woken up from a synchronization but
     which is still in the ready queue waiting to execute.
   \end{constantdescription}
+  \begin{funconformance}
+    FP, EDF
+  \end{funconformance}
 \end{constant}
+
+
+
 
 %% Nota: questa parte non è ancora generata da RT-Druid!
 
@@ -212,7 +245,7 @@ size of the CPU general purpose register.
     of a register.
   \end{typedescription}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{type}
 
@@ -222,7 +255,7 @@ size of the CPU general purpose register.
     of a register.
   \end{typedescription}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{type}
 
@@ -232,7 +265,7 @@ size of the CPU general purpose register.
     has the size of a register.
   \end{typedescription}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{type}
 
@@ -261,7 +294,7 @@ size of the CPU general purpose register.
     of a register.
   \end{typedescription}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{type}
 
@@ -271,7 +304,7 @@ size of the CPU general purpose register.
     the size of a register.
   \end{typedescription}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{type}
 
@@ -280,7 +313,7 @@ size of the CPU general purpose register.
     This is a pointer to \reftype{TickType}.
   \end{typedescription}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{type}
 
@@ -290,7 +323,7 @@ size of the CPU general purpose register.
     method (see Section \ref{sec:circulartimer}.
   \end{typedescription}
   \begin{funconformance}
-    EDF
+    EDF, FRSH
   \end{funconformance}
 \end{type}
 
@@ -300,7 +333,7 @@ size of the CPU general purpose register.
     method (see Section \ref{sec:circulartimer}.
   \end{typedescription}
   \begin{funconformance}
-    EDF
+    EDF, FRSH
   \end{funconformance}
 \end{type}
 
@@ -314,7 +347,6 @@ size of the CPU general purpose register.
 The following macro have to be used when defining a Task.
 
 \begin{function_nopb}{TASK}
-  %PJ: da ricontrollare come è scritta
   \synopsis{TASK(Funcname) \{...\}}
   
   \begin{fundescription}
@@ -322,7 +354,7 @@ The following macro have to be used when defining a Task.
   \end{fundescription}
   
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function_nopb}
 
@@ -353,12 +385,14 @@ the developer to implement stack sharing between different
 tasks. Sharing the stack helps the developer to reduce the overall RAM
 used for the stack.
 
-Support for blocking primitives like counting semaphores is also
-available if the kernel is configured as multistack, for those tasks
-which has assigned a private stack. Tasks using blocking primitives
-are typically implemented as a never ending task in which each
-instance ends with a synchronization implemented for example as a
-semaphore wait.
+Support for blocking primitives like counting semaphores or FRSH
+synchronization objects is also available. In these cases, the kernel
+has to be configured as multistack, and the tasks using these
+primitives will need a private stack assigned to them (note that the
+multistack configuration is mandatory for the FRSH kernel
+implementation). Tasks using blocking primitives are typically
+implemented as a never ending task in which each instance ends with a
+synchronization implemented for example as a semaphore wait.
 
 In the conformance class FP, the scheduling policy is a Fixed Priority
 Scheduling with Immediate Priority Ceiling and Preemption
@@ -401,6 +435,18 @@ implemented:
   allowing consistent savings in the RAM space used for stacks.
 \end{description}
 
+In the conformance class FRSH, the scheduling policy is an Earliest
+Deadline First implementation with Stack Resource Policy (SRP), and
+with deadlines implemented using the IRIS scheduling algorithm
+\cite{iris}. In this case, each task is assigned a ``Virtual
+Resource'', which is used as a means to control the task execution
+time. The VRES parameters which can be specified are a ``budget'',
+which is an amount of time that the task can spend every
+``period''. The scheduling algorithm basically guarantees that at
+least the budget time will be guaranteed to the task every period,
+providing a so called ``resource reservation''.
+
+
 Tasks are activated using the primitive
 \reffun{ActivateTask}. Activating a task means that the activated task
 may be selected for scheduling and may execute one Task Instance. A
@@ -434,7 +480,7 @@ are the main differences:
     task may become the running task if it is the highest priority
     ready task (if using the FP kernel) or if it is the task with the
     earliest deadline and with preemption level greater than the
-    system ceiling (using the EDF kernel)..
+    system ceiling (using the EDF and FRSH kernel)..
 
     Once activated, the task will run for an instance, starting from
     its first instruction. If the task is activated while being the
@@ -442,8 +488,8 @@ are the main differences:
     as a pending activation, which will be handled afterwards. There
     is a maximum number of pending activations. If the maximum number
     of pending activations is exceeded, the activation is
-    ignored. Note that EDF deadlines for a pending activation are
-    computed when the previous instance ends.
+    ignored. Note that for the EDF kernel, the deadline for a pending
+    activation is computed when the previous instance ends.
 
     The function can be called from the Background task (typically,
     the \fn{main()} function).
@@ -459,7 +505,7 @@ are the main differences:
   \end{funreturn}
   
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -485,7 +531,7 @@ are the main differences:
     \fret{void}{The function never returns an error.}  
   \end{funreturn}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -502,7 +548,8 @@ Resources refer to binary semaphores used to implement shared critical
 sections.
 
 Resources are implemented using the Immediate Priority Ceiling
-protocol (FP kernel), or using the Stack Resource Policy (EDF kernel).
+protocol (FP kernel), or using the Stack Resource Policy (EDF and FRSH
+kernel).
 %
 %
 % \nb{mettere link alla sezione di Peppe}
@@ -511,13 +558,28 @@ protocol (FP kernel), or using the Stack Resource Policy (EDF kernel).
 A resource is locked using the primitive \reffun{GetResource}, and
 unlocked using \reffun{ReleaseResource}.
 
-A special resource named \refconst{RES_SCHEDULER} is also
-supported. The \refconst{RES_SCHEDULER} resource has a ceiling equal
-to the highest priority (FP or highest preemption level in the case of
-EDF) in the system. As a result, a task locking
+A special resource named \refconst{RES_SCHEDULER} is also supported
+for kernels FP and EDF. The \refconst{RES_SCHEDULER} resource has a
+ceiling equal to the highest priority (FP or highest preemption level
+in the case of EDF) in the system. As a result, a task locking
 \refconst{RES_SCHEDULER} becomes non-preemptive. If needed, the
 \refconst{RES_SCHEDULER} resource have to be configured in the OIL
 configuration file.
+
+In the FRSH Kernel implementation, preemption due to VRES budget
+exaustion during critical sections is disabled. This approach has also
+been analyzed in the literature as ``overrun and payback'' mechanism
+by \ref{ghazalie95} and \ref{davis06} w.r.t. a task continuing to
+execute when its budget runs out but it is holding a resource. In that
+case, the task budget becomes negative and the time consumed in excess
+will be borrowed from the next task instances (in pathological cases a
+task may be forced not to schedule for a few instances due to that, as
+shown in \cite{frescor_ep7v2}). The rationale behind this choice is
+that it is too costly on a microcontroller to implement some control
+over the time a task owns a resource. Being the application
+environment somehow controlled, there is hope that the designer will
+not abuse of the timing spent in a critical resource. Please note that
+also binding and unbinding is disabled when a task owns a resource
 
 \pagebreak
 
@@ -544,7 +606,7 @@ configuration file.
     \fret{void} {The function does not return an error.} 
   \end{funreturn}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -567,7 +629,7 @@ configuration file.
     \fret{void} {The function does not return an error.}
   \end{funreturn}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -648,7 +710,6 @@ the OIL Configuration file, and the programmer have to call
 \pagebreak
 
 \begin{function}{CounterTick}
-  %PJ: vedere il commento
   \synopsis{void CounterTick(CounterType c)}
   \begin{fundescription}
     This function receives a counter identifier as parameter, and it
@@ -677,7 +738,7 @@ the OIL Configuration file, and the programmer have to call
     \fret{void}{The function does not return an error.}
   \end{funreturn}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -698,7 +759,7 @@ the OIL Configuration file, and the programmer have to call
     \fret{void}{The function does not return an error.}
   \end{funreturn}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -733,7 +794,7 @@ the OIL Configuration file, and the programmer have to call
     \fret{void}{The function does not return an error.}
   \end{funreturn}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -776,7 +837,7 @@ the OIL Configuration file, and the programmer have to call
     \fret{void}{The function does not return an error.}
   \end{funreturn}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -795,7 +856,7 @@ the OIL Configuration file, and the programmer have to call
     \fret{void}{the function does not return an error.}
   \end{funreturn}
   \begin{funconformance}
-    FP, EDF
+    FP, EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -844,6 +905,10 @@ descriptor.
 Counting semaphores {\em do not} avoid Priority Inversion
 problems. Please use Resources instead (see Section
 \ref{sec:resource-primitives}).
+\end{warning}
+
+\begin{warning}
+Counting semaphores are not implementef in the FRSH kernel.
 \end{warning}
 
 \pagebreak
@@ -978,21 +1043,21 @@ problems. Please use Resources instead (see Section
 \section{Time handling}
 \label{sec:circulartimer}
 
-The implementation of the EDF scheduler done in the minimal API is based on a
-timing reference which is made to be efficiently implemented in small
-microcontrollers.
+The implementation of the EDF and FRSH scheduler done in the minimal
+API is based on a timing reference which is made to be efficiently
+implemented in small microcontrollers.
 
 The traditional way of implementing a timing representation which can
 be used to compute and store timing references used as example for
 deadlines is based on the POSIX {\tt struct timespec} data
-structure. Unfortunattely, the {\tt struct timespec} data structure is
+structure. Unfortunately, the {\tt struct timespec} data structure is
 not suited to be implemented on small mirocontrollers. The structure
 in fact is composed by two 32-bit integer representing seconds and
 nanoseconds, which require a substantial code amount to implement the
 most common operations.
 
-For that reason, the EDF implementation proposed by \ee\ uses a
-relative notion of time. That is, the system proposes a timing
+For that reason, the EDF and FRSH implementation proposed by \ee\ uses
+a relative notion of time. That is, the system proposes a timing
 reference which has the same size of a hardware timer register. All
 the timings are then considered relative to the current timing, and
 the timings are ordered by using the sign of their difference.
@@ -1034,7 +1099,7 @@ precision.
     \fret{TimeAbsType}{The current timer value.}
   \end{funreturn}
   \begin{funconformance}
-    EDF
+    EDF, FRSH
   \end{funconformance}
 \end{function}
 
@@ -1044,12 +1109,671 @@ precision.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{System Startup}
-When using the minimal API, there is no need a specific startup
+When using the FP or EDF kernel, there is no need a specific startup
 procedure. In particular, the kernel is already active after the first
-instruction of the \fn{main} function.
+instruction of the \fn{main} function. When using the FRSH kernel, the
+function \reffun{frsh_init} must be used to initialize the resource
+reservation and deadline checking features.
 
 A typical application will be structured with application dependent
 initialization routines inside the \fn{main} function. Then, tasks
 will be activated with calls to \reffun{ActivateTask}, and finally the
 \fn{main} task will end with a forever loop, implementing in this way
 the background task.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{FRSH Kernel details}
+\label{cha:frsh}
+
+This brief Section is dedicated to the implementation of the FRESCOR
+IST FP6 Project \cite{frescor} inside \ee. The Section start with an introduction of the FRESCOR Project, continuing with the description of the implemented FRSH API.
+
+\section{Introduction to FRESCOR}
+
+The FRESCOR project \cite{frescor} is aimed at developing a framework
+that integrates advanced flexible scheduling techniques directly into
+an embedded systems design methodology, covering all the levels
+involved in the implementation, from the OS primitives, through the
+middleware, up to the application level. This will be centred on a new
+contract model that will specify which are the application
+requirements with respect to the flexible use of the schedulable
+resources in the system, and also what are the resources that must be
+guaranteed if an application component is to be installed into the
+system, and how the system can distribute any spare capacity that it
+has, to achieve the highest usage of the available resources or to
+optimise their usage while addressing energy constraints. The project
+will build on the results of two previous EU projects: FIRST (Flexible
+Integrated Real-Time Systems Technology) and OCERA (Open Components
+for Embedded Real-time Applications).
+
+The main objective of the project is to develop the enabling
+technology and infrastructure required to effectively use the most
+advanced techniques developed for real-time flexible scheduling in
+embedded systems design methodologies and tools, providing the
+necessary elements to target reconfigurable processing modules and
+reconfigurable distributed architectures.
+
+In the area of development methods for embedded applications with
+complex timing requirements we have identified a large gap between the
+research state of the art and the applicability. The project will be
+addressed at closing this gap, and providing embedded systems
+developers the engineering solutions to manage timing requirements at
+a high level of abstraction, thus lowering the design and development
+costs, and speeding up the time to market.  The project will address
+the OS primitives needed to support the contract-based scheduling, the
+development of middleware to support the contracts themselves and
+adaptively manage the quality of service, the integration of this
+infrastructure into a container framework for component-based
+development methodologies, the development of simulation and analysis
+tools, and the evaluation and exploitation of the results.
+
+
+FRESCOR produced a framework capable of giving a system's view of the
+timing requirements and the schedulable resources. The framework
+enables the developer of an application component to focus on its own
+timing requirements without having to focus on system-level issues,
+which is essential in the dynamic scenario of reconfigurable
+architectures. In addition, the framework will provide for a
+transparent management of the quality of service at the system's
+level, by providing an end-to-end distributed transaction manager,
+adaptive system-level quality of service management middleware, and
+system-level design and optimization methods.  The technologies
+developed in the project will increase competitiveness of EU industry
+by providing the proper abstractions that make it possible to handle
+complex timing requirements in embedded applications, explicitly
+supporting the integrated scheduling of reconfigurable resources,
+including processors, reconfigurable hardware modules, memory, energy,
+and networks.  
+
+The implementation presented in this Section is the result of the
+effort of Evidence in porting the FRESCOR scheduling API (named FRSH,
+pronounced as ``fresh'') to \ee. The FRSH kernel basically adapt the
+FRSH API as defined in the FRESCOR Project to a minimal environment
+such as the one available on a microcontroller. The result is a kernel
+configuration without support for dynamic reconfiguration with a ROM
+footprint of around 10k for the complete system (more details on
+\cite{frescor_ep7v2}).
+ 
+Please note that the API implemented in the FRSH kernel is the merge
+of two different APIs, one similar to the OSEK/VDX API, and one as a
+subset of the FRSH API considering only the parts related to binding,
+unbinding, and synchronization. This merge is still visible in the
+primitive names, since the FRSH API derivative functions still have
+the \const{frsh_} prefix\footnote{the naming of these functions will
+be probably uniformed in the near future.}.
+
+It is out of the scope of this document to explain in detail all the
+caveats of the FRSH API. Instead, we will concentarte on the functions
+implemented into \ee. The interested reader can find more information
+on the following references: \cite{frescor}, \cite{frescor_ep7v2},
+\cite{iris}.
+
+\section{What is currently implemented of the FRSH API}
+
+The implementation we presented on \ee\ is not a complete
+implementation of the FRSH API. In particular, the implementation is a
+tradeoff between functionality and performance, made in a way to
+obtain a reasonable implementation on small microcontrollers.
+
+The features which have been implemented are the following:
+\begin{itemize}
+\item Task activation, resources and alarms with API similar to the
+  \const{FP} and \const{EDF} kernel;
+\item Task binding and unbinding following the FRSH API specification;
+\item Synchronization objects following the FRSH API specification.
+\item IRIS \cite{iris} scheduling algorithm for resource reservations.
+\item Support for the configuration using OIL and \rtd.
+\item FRSH types implemented in a similar ways to the FRSH API.
+\end{itemize}
+
+For more information on the FRSH extensions on the OIL language
+implemented by RT-Druid, you can refer to the \rtd\ reference manual.
+
+
+
+\section{FRSH API - Task and VRES Statuses}
+
+The following paragraphs describe Task and VRES statuses. Please note
+that the status of a task is orthogonal to the status of a VRES. In
+particular, the Task status controls the possibility for a task to
+execute given its activations and suspensions on synchronizations. The
+VRES status control the possibility for a task to be scheduled, which
+is controlled by the budget and period assigned to the VRES in the
+CONTRACT section of the OIL file.
+
+\begin{constant}{Task States}
+  \begin{constantdescription}
+    This is the list of the task states a task can have during its life:
+    \begin {lstlisting}
+#define EE_TASK_SUSPENDED  0
+#define EE_TASK_READY      1
+#define EE_TASK_STACKED    2
+#define EE_TASK_BLOCKED    4
+#define EE_TASK_EXEC       8
+#define EE_TASK_WASSTACKED 128
+    \end{lstlisting}
+    Task States in \ee\ are typically not visible to the application,
+    because they are highly dependent on the particular \ee\ kernel
+    implementation. In the \const{FRSH} kernel, the states have the
+    following meaning: \const{EE_TASK_SUSPENDED} is used when a task
+    is not requiring execution. \const{EE_TASK_READY} when a task is
+    ready to execute and it is waiting that its VRES is active with
+    the earliest deadline in the system to pass to the
+    \const{EE_TASK_EXEC} status. \const{EE_TASK_STACKED} is used to
+    track preempted tasks which are owning a
+    Resource. \const{EE_TASK_BLOCKED} are used to track tasks which
+    are blocked on synchronization objects. \const{EE_TASK_WASSTACKED}
+    is used to track the fact that a task has been preempted or has
+    been blocked still retaining its status on the stack.
+  \end{constantdescription}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{constant}
+
+
+\begin{constant}{VRES States}
+  \begin{constantdescription}
+    This is the list of the VRES states a task can have during its life:
+    \begin {lstlisting}
+#define EE_VRES_FREEZED    0
+#define EE_VRES_INACTIVE   1
+#define EE_VRES_ACTIVE     2
+#define EE_VRES_RECHARGING 4
+    \end{lstlisting}
+    VRES states are not visible to the application, although they
+    control the possibility for a task to be scheduled.  The possible
+    states of a VRES are the following: \const{EE_VRES_INACTIVE} means
+    that the VRES is linked to a task which has not been activated or
+    which is blocked. When the task is activated, or when it wokes up
+    from a synchronization, then the VRES is put in the
+    \const{EE_VRES_ACTIVE} state, as specified by the IRIS \cite{iris}
+    scheduling algorithm. When the task uses all its budget, the VRES
+    is put in the state \const{EE_VRES_RECHARGING}. In this state, the
+    task linked to the VRES cannot be executed, until the VRES
+    recharging time happens. The VRES recharging time depends on the
+    VRES budget, as well as on the idle times which may have the
+    effect to anticipate the recharging instant. Due to the
+    implementation of the circular timer, similar to what is done in
+    the EDF kernel (see Section \ref{sec:circulartimer}), an inactive
+    VRES may be put in the \const{EE_VRES_FREEZED} status when the
+    deadline of an inactive VRES arrives in the past.
+  \end{constantdescription}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{constant}
+
+
+
+
+
+\subsection{FRSH API - Init and general functions}
+
+\begin{function2}{frsh\_init}{frsh_init}
+  \synopsis{int frsh_init(void);}
+  \begin{fundescription}
+    We cannot call any frsh functions before frsh\_init. After calling
+    frsh\_init, the FRSH Kernel will be initialized.  The second time
+    this function is called it fails.
+  \end{fundescription}
+%%   \begin{funparameters}
+%%     \fpar{}{}
+%%   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_SYSTEM_ALREADY_INITIALIZED}{FRSH Kernel already initialized.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_strerror}{frsh_strerror}
+  \synopsis{int frsh_strerror(int error, char *message, size_t size);}
+  \begin{fundescription}
+    Converts a FRSH error code to a string.
+  \end{fundescription}
+   \begin{funparameters}
+     \fpar{error}{The error code for which we want the description.}
+     \fpar{message}{The error message.}
+     \fpar{size}{The size of the buffer.}
+   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{The error value is wrong.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_vres\_get\_contract}{frsh_vres_get_contract}
+  \synopsis{int frsh_vres_get_contract (const frsh_vres_id_t vres, frsh_contract_t *contract)}
+  \begin{fundescription}
+    This operation stores the contract parameters currently associated
+    with the specified vres in the variable pointed to by contract. It
+    returns an error if the vres\_id is not recognised.
+  \end{fundescription}
+   \begin{funparameters}
+     \fpar{vres}{the VRES}
+     \fpar{contract}{the pointer to the contract object}
+   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors} 
+    \fret{FRSH_ERR_BAD_ARGUMENT}{If the contract argument is NULL or the value of the vres argument is not in range.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+
+\begin{function2}{frsh\_contract\_get\_basic\_params}{frsh_contract_get_basic_params}
+  \synopsis{int frsh_contract_get_basic_params (const frsh_contract_t *contract,}\\
+  \lstinline!                                        frsh_rel_time_t *budget_min,!\\
+  \lstinline!                                        frsh_rel_time_t *period_max,!\\
+  \lstinline!                                        frsh_workload_t *workload,!\\
+  \lstinline!                                        frsh_contract_type_t *contract_type);!\\
+  \begin{fundescription}
+    This operation obtains from the specified contract object its
+    budget, period, and workload, and copies them to the places
+    pointed to by the corresponding output parameters.
+  \end{fundescription}
+   \begin{funparameters}
+     \fpar{contract}{the pointer to the contract object}
+     \fpar{budget_min}{pointer to preallocated space}
+     \fpar{period_max}{pointer to preallocated space}
+     \fpar{workload}{pointer to preallocated space}
+     \fpar{contract_type}{pointer to preallocated space}
+   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{Some of the parameters are NULL.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_contract\_get\_timing\_reqs}{frsh_contract_get_timing_reqs}
+  \synopsis{int frsh_contract_get_timing_reqs(const frsh_contract_t *contract, }\\
+\lstinline!				      int *d_equals_t,!\\
+\lstinline!				      frsh_rel_time_t *deadline, !\\
+\lstinline!				      frsh_signal_t *budget_overrun_signal, !\\
+\lstinline!				      frsh_signal_info_t *budget_overrun_siginfo, !\\
+\lstinline!				      frsh_signal_t *deadline_miss_signal, !\\
+\lstinline!				      frsh_signal_info_t *deadline_miss_siginfo);!\\
+  \begin{fundescription}
+    The operation obtains the corresponding input parameters from the
+    specified contract object. This function has been implemented only
+    for compatibility with the FRSH API. It returns that Deadline is
+    equal to the period, and there are no signals defined.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{If the contract is NULL.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_thread\_get\_vres\_id}{frsh_thread_get_vres_id}
+  \synopsis{int frsh_thread_get_vres_id(const frsh_thread_id_t thread, frsh_vres_id_t *vres_id);}
+  \begin{fundescription}
+    This operation stores the Id of the vres associated with the
+    specified thread in the variable pointed to by vres. It returns an
+    error if the thread does not exist, it is not under the control of
+    the scheduling framework, or is not bound.
+  \end{fundescription}
+%%   \begin{funparameters}
+%%     \fpar{}{}
+%%   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_NOT_BOUND}{If the given thread does not have a valid vres bound to it.}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{If the given thread does not exist or the vres argument is NULL.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_contract\_get\_basic\_params}{frsh_contract_get_basic_params}
+  \synopsis{int frsh_contract_get_basic_params (const frsh_contract_t *contract, }\\
+\lstinline!				        frsh_rel_time_t *budget_min,!\\
+\lstinline!				        frsh_rel_time_t *period_max,!\\
+\lstinline!				        frsh_workload_t *workload,!\\
+\lstinline!				        frsh_contract_type_t *contract_type);!\\
+  \begin{fundescription}
+    This operation obtains from the specified contract object its
+    budget, period, and workload, and copies them to the places
+    pointed to by the corresponding output parameters
+  \end{fundescription}
+  \begin{funparameters}
+     \fpar{contract}{the pointer to the contract object}
+     \fpar{budget_min}{pointer to preallocated space}
+     \fpar{period_max}{pointer to preallocated space}
+     \fpar{workload}{pointer to preallocated space}
+     \fpar{contract_type}{pointer to preallocated space}
+   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{if one of the contract or pointers is NULL.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_config\_is\_admission\_test\_enabled}{frsh_config_is_admission_test_enabled}
+  \synopsis{bool frsh_config_is_admission_test_enabled(void)}
+  \begin{fundescription}
+    Always returns 0.
+  \end{fundescription}
+%%   \begin{funparameters}
+%%     \fpar{}{}
+%%   \end{funparameters}
+%%  \begin{funreturn}
+%%    \fret{int}{The current timer value.}
+%%  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_vres\_get\_remaining\_budget}{frsh_vres_get_remaining_budget}
+  \synopsis{int frsh_vres_get_remaining_budget (const frsh_vres_id_t vres, frsh_rel_time_t *budget);}
+  \begin{fundescription}
+    This function stores in the variable pointed to by budget the
+    remaining execution-time budget associated with the specified
+    vres.
+  \end{fundescription}
+%%   \begin{funparameters}
+%%     \fpar{}{}
+%%   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{If the value of the vres argument is not in range or budget is NULL.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_vres\_get\_usage}{frsh_vres_get_usage}
+  \synopsis{int frsh_vres_get_usage (const frsh_vres_id_t vres, frsh_rel_time_t *spent)}
+  \begin{fundescription}
+    This function stores the current execution time spent by the
+    threads bound to the specified vres in the variable pointed to by
+    cpu\_time.
+  \end{fundescription}
+%%   \begin{funparameters}
+%%     \fpar{}{}
+%%   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{if the value of the vres argument is not in range or spent is NULL.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_vres\_get\_budget\_and\_period}{frsh_vres_get_budget_and_period}
+  \synopsis{int frsh_vres_get_budget_and_period (const frsh_vres_id_t vres, }\\
+\lstinline!				         frsh_rel_time_t *budget,!\\
+\lstinline!				         frsh_rel_time_t *period);!\\
+  \begin{fundescription}
+    This function stores in the variables pointed to by budget and
+    period, the execution-time budget and the period respectively
+    associated with the specified vres. If any of these pointers is
+    NULL, the corresponding information is not stored.
+  \end{fundescription}
+%%   \begin{funparameters}
+%%     \fpar{}{}
+%%   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{if the value of the vres argument is
+      not in range, or budget and period are both NULL.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+
+\section{FRSH API - Binding and unbinding}
+
+
+\begin{function2}{frsh\_thread\_bind}{frsh_thread_bind}
+  \synopsis{int frsh_thread_bind(const frsh_vres_id_t vres, const frsh_thread_id_t thread)}
+  \begin{fundescription}
+    This operation associates a thread with a vres, which means that
+    it starts consuming the vres's budget and is executed according to
+    the contract established for that vres. If the thread is already
+    bound to another vres, it is effectively unbound from it and bound
+    to the specified one.
+
+    It fails if there is already a thread bound to this vres.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{vres}{the vres to bind to the task}
+    \fpar{thread}{the thread to which we have to bind the vres}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{if the vres value does not complain
+      with the expected format or valid range or the given thread does
+      not exist.}
+    \fret{FRSH_ERR_NOT_CONTRACTED_VRES}{if the referenced vres is not valid}
+    \fret{FRSH_ERR_ALREADY_BOUND}{if the given vres has a thread already bound}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_thread\_unbind}{frsh_thread_unbind}
+  \synopsis{int frsh_thread_unbind(const frsh_thread_id_t thread);}
+  \begin{fundescription}
+    This operation unbinds a thread from a vres. Since threads with no
+    vres associated are not allowed to execute, they remain in a
+    dormant state until they are either eliminated or bound again.
+
+    If the thread is inside a critical section the effects of this
+    call are deferred until the critical section is ended
+  \end{fundescription}
+   \begin{funparameters}
+     \fpar{thread}{The thread to be unbinded}
+   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{if the given thread does not exist.}
+    \fret{FRSH_ERR_NOT_BOUND}{if the given thread does not have a valid vres bound to it}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+
+\section{FRSH API - Synchronization objects}
+
+\begin{function2}{frsh\_synchobj\_signal}{frsh_synchobj_signal}
+  \synopsis{int frsh_synchobj_signal(const frsh_synchobj_handle_t synch_handle);}
+  \begin{fundescription}
+    This function sends a notification event to the synchronization
+    object specified as parameter. If there is at least one vres
+    waiting on the synchronization object, it is awaken. If more than
+    one vres are waiting, just one of them is awaken. If no vres is
+    waiting on the synchronization object, the notification event is
+    queued.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{synch_handle}{The synchronisation object.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{if synch\_handle is 0.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+
+\begin{function2}{frsh\_synchobj\_wait}{frsh_synchobj_wait}
+  \synopsis{int frsh_synchobj_wait (const frsh_synchobj_handle_t synch_handle,}\\
+\lstinline!                           frsh_rel_time_t *next_budget,!\\
+\lstinline!                           frsh_rel_time_t *next_period,!\\
+\lstinline!                           bool *was_deadline_missed, !\\
+\lstinline!                           bool *was_budget_overran);!\\
+  \begin{fundescription}
+    This operation is invoked by threads to indicate that a job has
+    been completed (and that the scheduler may reassign the unused
+    capacity of the current job to other vres). This implementation de
+    facto does not void the budget, but simply blocks the the task. In
+    fact, the IRIS \cite{iris} scheduler automatically reclaims unused
+    bandwidth.
+
+    As a difference with \reffun{frsh_timed_wait}, here the vres
+    specifies to be awakened by the arrival of a signal operation
+    instead of at a precise point of time.
+
+    The vres' budget will be made zero for the remainder of the vres'
+    period, and FRSH will not replenish it until an event has been
+    notified to the synchronisation object by another vres.  It can
+    happen that the synchronisation object has notification events
+    queued from the past, in this case one of the events is dequeued
+    immediately and the vres won't have to wait for another one.
+
+    At the time of reception of a notification event (wether in the
+    future or in the past), all pending budget replenishments (if any)
+    are made effective. Once the vres has a positive budget and the
+    scheduler schedules the calling thread again, the call returns and
+    the vres continues executing.  Except for those parameters equal
+    to NULL pointers, the system reports the current period and budget
+    for the current job, it informs if the deadline of the previous
+    job was missed or not, and whether the budget of the previous job
+    was overrun or not. Note: this implementation using the IRIS
+    scheduler returns the VRES period and budget (which may not be in
+    sync with budget and periods of the task). For the same reason,
+    since there is not a direct link of the budget/period of a vres
+    with the task deadline, the deadline miss and budget overrun
+    information are not provided (in other words, they are meaningless
+    in this implementation).
+  \end{fundescription}
+   \begin{funparameters}
+     \fpar{synch_handle}{Synchronisation object upon which the vres will be waiting.}
+     \fpar{next_budget}{Upon return of this function, the variable pointed
+                     by this function will be equal to the current vres
+                     budget. If this parameter is set to NULL, no action is
+                     taken}
+     \fpar{next_period}{The vres period upon return (ignored if NULL).}
+     \fpar{was_deadline_missed}{NOT IMPLEMENTED}
+     \fpar{was_budget_overran}{NOT IMPLEMENTED}
+   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{if synch\_handle is 0.}
+    \fret{FRSH_ERR_INTERNAL_ERROR}{if the task still uses a resource.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+\begin{function2}{frsh\_synchobj\_wait\_with\_timeout}{frsh_synchobj_wait_with_timeout}
+  \synopsis{int frsh_synchobj_wait_with_timeout (const frsh_synchobj_handle_t synch_handle, }\\
+\lstinline!			 		 const frsh_abs_time_t *abs_timeout,!\\
+\lstinline!				 	 bool *timed_out,!\\
+\lstinline!					 frsh_rel_time_t *next_budget,!\\
+\lstinline!					 frsh_rel_time_t *next_period,!\\
+\lstinline!					 bool *was_deadline_missed,!\\
+\lstinline!					 bool *was_budget_overran);!\\
+  \begin{fundescription}
+    This call is the same as \reffun{frsh_synchobj_wait} but with an
+    extra absolute timeout. The timed\_out argument, indicates whether
+    the function returned because of the expiration of the timeout or
+    not.
+  \end{fundescription}
+%%   \begin{funparameters}
+%%     \fpar{}{}
+%%   \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{if synch\_handle is 0 or the abs\_timeout argument is NULL or its value is in the past.}
+    \fret{FRSH_ERR_INTERNAL_ERROR}{if the task still uses a resource.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+
+\begin{function2}{frsh\_timed\_wait}{frsh_timed_wait}
+  \synopsis{int frsh_timed_wait (const frsh_abs_time_t *abs_time, }\\
+\lstinline!                        frsh_rel_time_t *next_budget, !\\
+\lstinline!                        frsh_rel_time_t *next_period, !\\
+\lstinline!                        bool *was_deadline_missed, !\\
+\lstinline!                        bool *was_budget_overran);!\\
+  \begin{fundescription}
+    This operation is invoked by threads associated with bounded
+    workload vres to indicate that a job has been completed (and that
+    the scheduler may reassign the unused capacity of the current job
+    to other vres). It is also invoked when the first job of such
+    threads has to be scheduled.
+
+    As an effect, the system will make the current vres's budget zero
+    for the remainder of the vres's period, and will not replenish the
+    budget until the specified absolute time. At that time, all
+    pending budget replenishments (if any) are made effective. Once
+    the vres has a positive budget and the scheduler schedules the
+    calling thread again, the call returns and at that time, except
+    for those parameters equal to NULL pointers, the system reports
+    the current period and budget for the current job, whether the
+    deadline of the previous job was missed or not, and whether the
+    budget of the previous job was overrun or not.
+
+    Note about this implementation: The same exceptions to this
+    description made for the \reffun{frsh_synchobj_wait} applies.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{abs_time}{absolute time at which the budget will be replenished}
+
+    \fpar{next_budget}{upon return of this function, the variable
+      pointed by this function will be equal to the current vres
+      budget. If this parameter is set to NULL, no action is taken.}
+
+    \fpar{next_period}{upon return of this function, the variable
+      pointed by this function will be equal to the current vres
+      period. If this parameter is set to NULL, no action is taken.}
+
+    \fpar{was_deadline_missed}{upon return of this function, the
+      variable pointed by this function will be equal to true if the
+      previous vres deadline was missed, to false otherwise. If this
+      parameter is set to NULL, no action is taken.}
+
+    \fpar{was_budget_overrun}{upon return of this function, the
+      variable pointed by this function will be equal to true if the
+      previous vres budget was overrun, to false otherwise. If this
+      parameter is set to NULL, no action is taken.}
+
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{FRSH_NO_ERROR}{No errors}
+    \fret{FRSH_ERR_BAD_ARGUMENT}{if abs\_time is NULL.}
+  \end{funreturn}
+  \begin{funconformance}
+    FRSH
+  \end{funconformance}
+\end{function2}
+
+

@@ -8,14 +8,15 @@ and which supports stack sharing.
 
 The \ee\ kernel has been developed with the idea of providing the
 minimal set of primitives which can be used to implement a
-multithreading environment. The \ee\ API is available as a reduced OSEK/VDX API,
-providing support for thread activation, mutual exclusion, alarms, and 
-counting semaphores.
+multithreading environment. The \ee\ API is available as a reduced
+OSEK/VDX API, providing support for thread activation, mutual
+exclusion, alarms, and counting semaphores.
 
-Moreover, the \ee\ kernel offers support for both Fixed Priority (FP)
-and Earliest Deadline First (EDF) scheduling algorithms, to offer a
-choice between the tradiction and innovative efficient ways of
-scheduling concurrent threads.
+Moreover, the \ee\ kernel offers support for Fixed Priority (FP),
+Earliest Deadline First (EDF), and Contract-based scheduling (FRSH)
+\cite{frescor} scheduling algorithms, to offer a choice between the
+tradiction and innovative efficient ways of scheduling concurrent
+threads.
 
 The OSEK/VDX consortium provides the OIL language (OSEK Implementation 
 Language) as a standard configuration language, which is used for the 
@@ -49,6 +50,8 @@ The features provided by \ee\ to developers are the following:
     model to reduce the overall stack usage;
   \item Support for EDF scheduling by using a circular timer approach
     \cite{Carlini03}.
+  \item Support for contract-based resource reservations using the
+    IRIS scheduling algorithm \cite{iris}
 \end{itemize}
 
 The purpose of this document is to describe in detail the minimal API
