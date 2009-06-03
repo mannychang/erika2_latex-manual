@@ -1,4 +1,4 @@
-MAN_BASE_DIR = ../..
+MAN_BASE_DIR = ..
 DOCUMENT_NAME = FLEX_REFMAN_ITA
 include $(MAN_BASE_DIR)/common/ver_defs.mk
 
