@@ -1,28 +1,32 @@
 \documentclass[12pt,a4paper,normalheadings,titlepage]{scrreprt}
 
-\usepackage{../../common/evman-ITA}
+\usepackage{../common/evman}
 \usepackage{graphicx}
 
 \pagestyle{headings}
 
-\def\title{ERIKA Enterprise Tutorial}
-\def\subtitle{per la piattaforma Microchip \dspic}
+\def\title{ERIKA Enterprise Basic Manual}
+\def\subtitle{...multithreading in un click!}
 \include{dynamic_version}
 
 \begin{document}
 
 \maketitle
 
+%\thispagestyle{plain}
+
 \pagebreak
 
 \tableofcontents
 
-\include{tutorial_pic30_contents}
+\include{preface}
+
+\include{api}
 
 \include{history}
 
-\bibliographystyle{plain}
-\bibliography{../../common/biblio}
+%\bibliographystyle{plain}
+%\bibliography{../common/biblio}
 
 \printindex
 

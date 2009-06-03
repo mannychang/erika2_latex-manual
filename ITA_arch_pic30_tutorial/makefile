@@ -1,5 +1,5 @@
-MAN_BASE_DIR = ../..
-DOCUMENT_NAME = EE_BASIC_REFMAN_ITA
+MAN_BASE_DIR = ..
+DOCUMENT_NAME = ARCH_PIC30_TUTORIAL_ITA
 include $(MAN_BASE_DIR)/common/ver_defs.mk
 
 #tullio, queste tre variabili potrebbero essere buttate nel makefile...

@@ -4,7 +4,7 @@ NIOS2 = arch_nios2 arch_nios2_api_tutorial arch_nios2_fifo_tutorial arch_nios2_l
 INTERNAL = eedoc_internal
 CORE = ee_basic_refman ee_porting ee_refman rtdruid_refman
 FLEX = flex_refman flex_scicos
-ITA = ITA/arch_pic30_tutorial ITA/ee_basic_refman ITA/flex_refman
+ITA = ITA_arch_pic30_tutorial ITA_ee_basic_refman ITA_flex_refman
 
 
 help:
@@ -30,7 +30,7 @@ clean:
 	for x in $(PIC30) $(AVR5) $(NIOS2) $(INTERNAL) $(CORE) $(FLEX) $(ITA); do make -C $${x} clean; done;
 	rm -fr *.pdf *.tgz
 	rm -fr *.php
-	
+
 avr5:
 	for x in $(AVR5); do make -C $${x}; done;
 pic30:
