@@ -55,7 +55,7 @@ eeb_gpl: pic30 core
 	tar czf eeb_manuals.tgz *.pdf
 
 #web-manuals: pic30 nios2 flex common eeb_gpl italian
-web-manuals: pic30 nios2 flex common eeb_gpl
+web-manuals: pic30 nios2 flex common eeb_gpl avr5
 
 # this options execute the FTP script to upload everything
 # into the Evidence website

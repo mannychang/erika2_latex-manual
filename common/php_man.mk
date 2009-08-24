@@ -22,7 +22,7 @@ dynamic-man.php: version.mk
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(EE_REFMAN__MAIN_NAME)_$(EE_REFMAN__VER).pdf\" target=\"_blank\">Erika Enterprise Reference Manual v. " >> dynamic-man.php
 	@echo -n $(EE_REFMAN__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-	
+
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(EE_BASIC_REFMAN__MAIN_NAME)_$(EE_BASIC_REFMAN__VER).pdf\" target=\"_blank\">Erika Enterprise Minimal API Reference Manual v. " >> dynamic-man.php
 	@echo -n $(EE_BASIC_REFMAN__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
@@ -79,7 +79,7 @@ dynamic-man.php: version.mk
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(FLEX_REFMAN__MAIN_NAME)_$(FLEX_REFMAN__VER).pdf\" target=\"_blank\">FLEX Reference Manual v. " >> dynamic-man.php
 	@echo -n $(FLEX_REFMAN__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-	
+
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(FLEX_SCICOS__MAIN_NAME)_$(FLEX_SCICOS__VER).pdf\" target=\"_blank\">Scicos for FLEX Reference Manual v. " >> dynamic-man.php
 	@echo -n $(FLEX_SCICOS__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
@@ -112,14 +112,33 @@ dynamic-man.php: version.mk
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_NIOS2_LWIP_TUTORIAL__MAIN_NAME)_$(ARCH_NIOS2_LWIP_TUTORIAL__VER).pdf\" target=\"_blank\">Erika Enterprise LWIP Tutorial for Altera Nios II v. " >> dynamic-man.php
 	@echo -n $(ARCH_NIOS2_LWIP_TUTORIAL__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-	
+
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_NIOS2_FIFO_TUTORIAL__MAIN_NAME)_$(ARCH_NIOS2_FIFO_TUTORIAL__VER).pdf\" target=\"_blank\">Erika Enterprise FIFO message passing Tutorial for Altera Nios II v. " >> dynamic-man.php
 	@echo -n $(ARCH_NIOS2_FIFO_TUTORIAL__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-	
+
+
 #-------------------------------------------------------------------
-	
+
+	@echo >> dynamic-man.php
+	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
+
+	@echo >> dynamic-man.php
+	@echo "<tr><td style=\"color: #003366; background-color: #dae1e7; word-spacing: 2px; letter-spacing: 2px\">&nbsp;<strong>Erika Enterprise for the AVR5 Platform</strong></td></tr>" >> dynamic-man.php
+
+	@echo >> dynamic-man.php
+	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_AVR5__MAIN_NAME)_$(ARCH_AVR5__VER).pdf\" target=\"_blank\">Erika Enterprise Manual for AVR5 v. " >> dynamic-man.php
+	@echo -n $(ARCH_AVR5__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
+	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
+
+	@echo >> dynamic-man.php
+	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_AVR5_TUTORIAL__MAIN_NAME)_$(ARCH_AVR5_TUTORIAL__VER).pdf\" target=\"_blank\">Erika Enterprise API Tutorial for Altera Nios II v. " >> dynamic-man.php
+	@echo -n $(ARCH_AVR5_TUTORIAL__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
+	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
+
+#-------------------------------------------------------------------
+
 	@echo >> dynamic-man.php
 	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
 
@@ -130,7 +149,7 @@ dynamic-man.php: version.mk
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(EE_BASIC_REFMAN_ITA__MAIN_NAME)_$(EE_BASIC_REFMAN_ITA__VER).pdf\" target=\"_blank\">[ITA] Erika Enterprise Minimal API Reference Manual v. " >> dynamic-man.php
 	@echo -n $(EE_BASIC_REFMAN_ITA__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-	
+
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_PIC30_TUTORIAL_ITA__MAIN_NAME)_$(ARCH_PIC30_TUTORIAL_ITA__VER).pdf\" target=\"_blank\">[ITA] Erika Enterprise Tutorial for dsPIC (R) DSC 30 family v. " >> dynamic-man.php
 	@echo -n $(ARCH_PIC30_TUTORIAL_ITA__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
@@ -140,9 +159,9 @@ dynamic-man.php: version.mk
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(FLEX_REFMAN_ITA__MAIN_NAME)_$(FLEX_REFMAN_ITA__VER).pdf\" target=\"_blank\">[ITA] FLEX Reference Manual v. " >> dynamic-man.php
 	@echo -n $(FLEX_REFMAN_ITA__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-	
+
 #-------------------------------------------------------------------
-	
+
 	@echo >> dynamic-man.php
 	@echo "</tbody>" >> dynamic-man.php
 	@echo "</table>" >> dynamic-man.php
