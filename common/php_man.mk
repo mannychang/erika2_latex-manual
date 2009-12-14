@@ -16,7 +16,7 @@ dynamic-man.php: version.mk
 #-------------------------------------------------------------------
 
 	@echo >> dynamic-man.php
-	@echo "<tr><td style=\"color: #003366; background-color: #dae1e7; word-spacing: 2px; letter-spacing: 2px\">&nbsp;<strong>Erika Enterprise</strong></td></tr>" >> dynamic-man.php
+	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>Erika Enterprise</strong></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(EE_REFMAN__MAIN_NAME)_$(EE_REFMAN__VER).pdf\" target=\"_blank\">Erika Enterprise Reference Manual v. " >> dynamic-man.php
@@ -37,7 +37,7 @@ dynamic-man.php: version.mk
 	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
-	@echo "<tr><td style=\"color: #003366; background-color: #dae1e7; word-spacing: 2px; letter-spacing: 2px\">&nbsp;<strong>RT-Druid Code Generator</strong></td></tr>" >> dynamic-man.php
+	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>RT-Druid Code Generator</strong></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(RTDRUID_REFMAN__MAIN_NAME)_$(RTDRUID_REFMAN__VER).pdf\" target=\"_blank\">RT-Druid Reference Manual v. " >> dynamic-man.php
@@ -50,7 +50,7 @@ dynamic-man.php: version.mk
 	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
-	@echo "<tr><td style=\"color: #003366; background-color: #dae1e7; word-spacing: 2px; letter-spacing: 2px\">&nbsp;<strong>Erika Enterprise for dsPIC (R) DSC</strong></td></tr>" >> dynamic-man.php
+	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>Erika Enterprise for dsPIC (R) DSC</strong></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_PIC30__MAIN_NAME)_$(ARCH_PIC30__VER).pdf\" target=\"_blank\">Erika Enterprise Manual for dsPIC (R) DSC 30 family v. " >> dynamic-man.php
@@ -73,7 +73,7 @@ dynamic-man.php: version.mk
 	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
-	@echo "<tr><td style=\"color: #003366; background-color: #dae1e7; word-spacing: 2px; letter-spacing: 2px\">&nbsp;<strong>FLEX Embedded Platform</strong></td></tr>" >> dynamic-man.php
+	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>FLEX Embedded Platform</strong></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(FLEX_REFMAN__MAIN_NAME)_$(FLEX_REFMAN__VER).pdf\" target=\"_blank\">FLEX Reference Manual v. " >> dynamic-man.php
@@ -91,7 +91,7 @@ dynamic-man.php: version.mk
 	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
-	@echo "<tr><td style=\"color: #003366; background-color: #dae1e7; word-spacing: 2px; letter-spacing: 2px\">&nbsp;<strong>Erika Enterprise for the Altera Nios II Platform</strong></td></tr>" >> dynamic-man.php
+	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>Erika Enterprise for the Altera Nios II Platform</strong></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_NIOS2__MAIN_NAME)_$(ARCH_NIOS2__VER).pdf\" target=\"_blank\">Erika Enterprise Manual for Altera Nios II v. " >> dynamic-man.php
@@ -125,7 +125,7 @@ dynamic-man.php: version.mk
 	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
-	@echo "<tr><td style=\"color: #003366; background-color: #dae1e7; word-spacing: 2px; letter-spacing: 2px\">&nbsp;<strong>Erika Enterprise for the AVR5 Platform</strong></td></tr>" >> dynamic-man.php
+	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>Erika Enterprise for the AVR5 Platform</strong></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_AVR5__MAIN_NAME)_$(ARCH_AVR5__VER).pdf\" target=\"_blank\">Erika Enterprise Manual for AVR5 v. " >> dynamic-man.php
@@ -143,7 +143,7 @@ dynamic-man.php: version.mk
 	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
-	@echo "<tr><td style=\"color: #003366; background-color: #dae1e7; word-spacing: 2px; letter-spacing: 2px\">&nbsp;<strong>Misc Reference Manuals in ITALIAN language (OUTDATED!)</strong></td></tr>" >> dynamic-man.php
+	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>Misc Reference Manuals in ITALIAN language (OUTDATED!)</strong></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
 	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(EE_BASIC_REFMAN_ITA__MAIN_NAME)_$(EE_BASIC_REFMAN_ITA__VER).pdf\" target=\"_blank\">[ITA] Erika Enterprise Minimal API Reference Manual v. " >> dynamic-man.php
