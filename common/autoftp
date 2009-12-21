@@ -1,7 +1,7 @@
 open ftp.tuxfamily.org 
 user erikaadm
-cd webdownload/manuals/download/manuals/include
+cd ~/htdocs/download/manuals/include
 mput *.php
-cd ../pdf
+cd ~/webdownload/manuals_pdf
 mput *.pdf
 bye
