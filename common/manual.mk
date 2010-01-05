@@ -103,7 +103,7 @@ $(MAN_BASE_DIR)/$(MAIN_NAME).pdf: $(MAIN).pdf
 # so that AA_BB_CC is good, while AA_BB_CC_DD is not
 # ... it may be done better ;-)
 dynamic_version.tex: version.mk
-	echo -n "\\def\\version{" > dynamic_version.tex
+	echo -n '\\def\\version{' > dynamic_version.tex
 	echo -n $(VERSION) | sed "s/_/./" | sed "s/_/./" >> dynamic_version.tex
 	echo -n "}" >> dynamic_version.tex
 
