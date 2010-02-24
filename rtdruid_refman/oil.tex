@@ -24,7 +24,7 @@ system, including placement of threads and resources.
 
 In \ee\ all the RTOS objects like tasks, alarms, resources, are static
 and predefined at application compile time. To specify which objects
-exists in a particular application, \ee\ uses the OIL Language, which
+exist in a particular application, \ee\ uses the OIL Language, which
 is a simple text description language.
 
 Here is an example of the OIL File for the \dspic\ device:
@@ -488,7 +488,7 @@ linker to load the library you specified.
 \subsubsection{Building and using libraries which are integrated in the \ee\ build system}
 
 In this case, the target is to use the library code which is provided
-in the \ee\ build tree. Basicaly, the OIL file can specify a set of
+in the \ee\ build tree. Basically, the OIL file can specify a set of
 libraries which are distributed with or are supported by \ee\ and that
 have to be linked together with the application. The specification is
 done by using the \oil{LIB} attribute.
@@ -523,7 +523,7 @@ The \const{LIB} attribute can be used in one of the following ways:
 \end{lstlisting}
 
 \begin{note}
-To compile {\em all} the libraries which are supported by a particular
+To compile {\em all} the libraries that are supported by a particular
 architecture with a single OIL file, the following OIL file
 configuration can be used:
 
@@ -643,8 +643,8 @@ the \oil{KERNEL_TYPE} definition. The definition is shown below:
 \end{lstlisting}
 
 For the \const{EDF} and \const{FRSH} kernels, it is possible to
-specify the tick length. given the tick length for the circular timer,
-which is then used to compute the vaues to put on the relative
+specify the tick length. Given the tick length for the circular timer,
+which is then used to compute the values to put in the relative
 deadline task parameter. The tick time can be specified in various
 unit measures, such as seconds (``s''), milliseconds (``ms''),
 microseconds (``us''), and nanoseconds (``ns''). Please check the
@@ -662,7 +662,8 @@ ticks or using unit measures as for the tick time described above),
 and the \const{CPU_ID} (which must only be specified on multicore
 applications).
 
-For more details on the \const{FRSH} kernel, pelase see
+For more details on the \const{FRSH} kernel, please see
+% *** broken sentence
 
 Some examples of use within the declaration part are the following:
 
@@ -930,8 +931,8 @@ divided by the \const{TICK_TIME} attribute specified inside the OS
 attribute \const{KERNEL_TYPE} to obtain the final tick value which is
 then programmed inside the microcontroller.
 
-If a number is specified whithout any time unit (e.g. ``1234'' and not
-``1234ms''), then the number is taken ``as is'' and then programmed to
+If a number is specified without any time unit (e.g., ``1234'' and not
+``1234ms''), then the number is taken ``as is'' and programmed to
 the target device.
 
 Please remember that, to be complete, the OIL
@@ -986,7 +987,8 @@ CPU test_application {
 \end{lstlisting}
 
 \subsection{Schedule attribute}
-The \oil{SCHEDULE} attribute specifies if a task is full preemptive or non preemptive.
+The \oil{SCHEDULE} attribute specifies if a task is full preemptive
+(\const{FULL}) or non preemptive (\const{NON}).  The default is \const{NON}.
 
 Example:
 
@@ -1006,7 +1008,7 @@ CPU test_application {
 \end{lstlisting}
 
 \subsection{Event attribute}
-The \oil{EVENT} attribute is used to list the Events which belongs to
+The \oil{EVENT} attribute is used to list the Events which belong to
 a task. It is used in conformance classes \const{ECC1} and
 \const{ECC2}.
 
