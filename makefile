@@ -1,10 +1,9 @@
 AVR5  = arch_avr5  arch_avr5_tutorial
-PIC30 = arch_pic30 arch_pic30_tutorial arch_pic30_mplab
+PIC30 = arch_pic30 arch_pic30_tutorial
 NIOS2 = arch_nios2 arch_nios2_api_tutorial arch_nios2_fifo_tutorial arch_nios2_lwip_tutorial arch_nios2_multicore_tutorial 
 INTERNAL = eedoc_internal
 CORE = ee_basic_refman ee_porting ee_refman rtdruid_refman
 FLEX = flex_refman flex_scicos
-ITA = ITA_arch_pic30_tutorial ITA_ee_basic_refman ITA_flex_refman
 
 
 help:
@@ -19,7 +18,6 @@ help:
 	@echo make core 
 	@echo make eeb_gpl
 	@echo make flex
-	@echo make italian
 	@echo
 	@echo make web-manuals
 	@echo
@@ -27,7 +25,7 @@ help:
 	@echo make install
 
 clean:
-	for x in $(PIC30) $(AVR5) $(NIOS2) $(INTERNAL) $(CORE) $(FLEX) $(ITA); do make -C $${x} clean; done;
+	for x in $(PIC30) $(AVR5) $(NIOS2) $(INTERNAL) $(CORE) $(FLEX); do make -C $${x} clean; done;
 	rm -fr *.pdf *.tgz
 	rm -fr *.php
 
@@ -48,13 +46,10 @@ internal:
 core:
 	for x in $(CORE); do make -C $${x}; done;
 
-italian:
-	for x in $(ITA); do make -C $${x}; done;
-
 eeb_gpl: pic30 core
 	tar czf eeb_manuals.tgz *.pdf
 
-#web-manuals: pic30 nios2 flex common eeb_gpl italian
+#web-manuals: pic30 nios2 flex common eeb_gpl
 web-manuals: pic30 nios2 flex common eeb_gpl avr5
 
 # this options execute the FTP script to upload everything

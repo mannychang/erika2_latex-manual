@@ -58,13 +58,7 @@ dynamic-man.php: version.mk
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_PIC30_TUTORIAL__MAIN_NAME)_$(ARCH_PIC30_TUTORIAL__VER).pdf\" target=\"_blank\">Erika Enterprise Tutorial for dsPIC (R) DSC 30 family v. " >> dynamic-man.php
-	@echo -n $(ARCH_PIC30_TUTORIAL__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
-	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-
-	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_PIC30_MPLAB__MAIN_NAME)_$(ARCH_PIC30_MPLAB__VER).pdf\" target=\"_blank\">Erika Enterprise Integration with MPLAB IDE v. " >> dynamic-man.php
-	@echo -n $(ARCH_PIC30_MPLAB__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
+	@echo -n "<tr><td><a href=\"http://erika.tuxfamily.org/wiki/index.php?title=Tutorial:_Installing_ERIKA_and_RT-Druid,_and_compile_your_first_application\" target=\"_blank\">Erika Enterprise Tutorial for dsPIC (R) DSC 30 family (Wiki version)" >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
 
 #-------------------------------------------------------------------
@@ -133,31 +127,8 @@ dynamic-man.php: version.mk
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_AVR5_TUTORIAL__MAIN_NAME)_$(ARCH_AVR5_TUTORIAL__VER).pdf\" target=\"_blank\">Erika Enterprise API Tutorial for Altera Nios II v. " >> dynamic-man.php
+	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_AVR5_TUTORIAL__MAIN_NAME)_$(ARCH_AVR5_TUTORIAL__VER).pdf\" target=\"_blank\">Erika Enterprise API Tutorial for AVR5 v. " >> dynamic-man.php
 	@echo -n $(ARCH_AVR5_TUTORIAL__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
-	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-
-#-------------------------------------------------------------------
-
-	@echo >> dynamic-man.php
-	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
-
-	@echo >> dynamic-man.php
-	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>Misc Reference Manuals in ITALIAN language (OUTDATED!)</strong></td></tr>" >> dynamic-man.php
-
-	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(EE_BASIC_REFMAN_ITA__MAIN_NAME)_$(EE_BASIC_REFMAN_ITA__VER).pdf\" target=\"_blank\">[ITA] Erika Enterprise Minimal API Reference Manual v. " >> dynamic-man.php
-	@echo -n $(EE_BASIC_REFMAN_ITA__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
-	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-
-	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_PIC30_TUTORIAL_ITA__MAIN_NAME)_$(ARCH_PIC30_TUTORIAL_ITA__VER).pdf\" target=\"_blank\">[ITA] Erika Enterprise Tutorial for dsPIC (R) DSC 30 family v. " >> dynamic-man.php
-	@echo -n $(ARCH_PIC30_TUTORIAL_ITA__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
-	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-
-	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(FLEX_REFMAN_ITA__MAIN_NAME)_$(FLEX_REFMAN_ITA__VER).pdf\" target=\"_blank\">[ITA] FLEX Reference Manual v. " >> dynamic-man.php
-	@echo -n $(FLEX_REFMAN_ITA__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
 
 #-------------------------------------------------------------------
