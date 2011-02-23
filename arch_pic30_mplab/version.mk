@@ -1,4 +1,0 @@
-ARCH_PIC30_MPLAB__DIR = arch_pic30_mplab
-ARCH_PIC30_MPLAB__MAIN_NAME = tutorial_pic30_mplab
-ARCH_PIC30_MPLAB__MAIN = tutorial_pic30_mplab
-ARCH_PIC30_MPLAB__VER = 1_0_0

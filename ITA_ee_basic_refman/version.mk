@@ -1,4 +1,0 @@
-EE_BASIC_REFMAN_ITA__DIR = ITA_ee_basic_refman
-EE_BASIC_REFMAN_ITA__MAIN_NAME = ee_minimal_refman_ITA
-EE_BASIC_REFMAN_ITA__MAIN = reference
-EE_BASIC_REFMAN_ITA__VER = 1_1_0
