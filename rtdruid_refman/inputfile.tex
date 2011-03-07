@@ -1,0 +1,2004 @@
+\chapter{Format of the Input File}
+\label{cha:DTD-Input-file}
+
+
+\section{Introduction}
+
+This chapter describes the structure and the syntax of the RTD XML
+format, which is used to describe the main component of a system. The
+RTD format has been used since the first versions of \rtd\ as the
+source of the information for the schedulability analysis plugin.
+
+The DTD of the RTD specification is contained in the file
+\file{templates/evidence.DTD} of the \rtd\ documentation.
+% FIXME: check if the file position is still correct.
+
+The structure of this chapter is the following: first, it describes
+the development process of an embedded real-time system with \rtd, and
+how the different steps of this process are reflected in the sections
+of the \rtd\ input file. Then, it details the structure of the DTD,
+describing each of its sections with examples. Finally, it describes
+other miscellaneous, like common elements and conventions.
+
+
+\section{Development process with \rtd}
+
+The objective of the \rtd\ schedulability plugins is to help the
+system designer in all phases of the design and development of a
+complex embedded application. For this reason, the input file is
+divided into different sections, each one containing information on a
+single phase of the design and development process. In particular, we
+envision the following steps:
+\begin{itemize}
+\item Modeling the functional behavior of the application. In this
+  phase, the designer models the behavior of the system and of the
+  application without any regard to the implementation of the system
+  on a specific platform. This phase is typically done with tools like
+  Matlab/Simulink, or similar. The description of the functional model
+  of the system is done in the \const{FUNCTIONAL} section of the input
+  file (see Section \ref{sec:Functional-section} for details).
+\item Modeling the software and hardware architecture of the
+  system. In this phase, the designer models the characteristics of
+  the platform on which the application will be implemented. This
+  involves the definition of the number of computational nodes, the
+  number and types of processors for each node, the RTOS used on each
+  node, the number of real-time tasks, etc. The architectural model is
+  specified in the \const{ARCHITECTURAL} part of the \rtd\ input file
+  (see Section \ref{sec:Architectural-section} for more details).
+\item Mapping the functional model to the architectural model. In this
+  phase, the functional elements defined in the \const{FUNCTIONAL}
+  section are ``mapped'' on to the appropriate architectural
+  elements. For example, it is important to decide which task will
+  perform a specific operation of the applications, and on which
+  node/RTOS such task is allocated. Of course, many different mapping
+  choices are possible, and the choice of the mapping can influence
+  the performance of the system. In the \rtd\ input file, the mapping
+  is specified in the \const{MAPPING} section (see Section
+  \ref{sec:Mapping-section} for more details).
+\item Back-annotation of performance measurement. In this phase, the
+  system is run under specific testing conditions, and the performance
+  of each element is measured and back-annotated. For example, in this
+  phase each task is run under different conditions and the execution
+  time is measured and recorded. At the end of the test, the
+  average-case and worst case execution time of the task can be
+  obtained. These information will be useful for the next phase, the
+  schedulability analysis. The back-annotation information is
+  contained in the \const{ANNOTATION} section of the \rtd\ input file
+  (see Section \ref{sec:Annotation-section} for more details).
+\item Schedulability analysis. In this phase, a systematic off-line
+  analysis of the system is performed. The analysis will tell the
+  designer if the system is schedulable (i.e. if all tasks will
+  complete in time) under all conditions. Moreover, the analysis gives
+  back additional sensitivity information about the system. For
+  example, if the system is not schedulable, the analysis tells us
+  which task will miss its deadline and how it is possible to modify
+  the system the avoid this.  In case the system is schedulable, it
+  tells us how much ``free space'' is left before a deadline is
+  missed. The results of the analysis are provided by the tool in the
+  \const{SCHEDULABILITY} section (see
+  Section\ref{sec:Schedulability-section} for more details).
+\end{itemize}
+
+Not all sections are mandatory. In most cases, it is possible to
+specify only some section and still be able to analyze the system. For
+example, under certain conditions, the \const{FUNCTIONAL} section need
+not to be specified. This is useful, for example, when analyzing
+systems that are already implemented.
+
+
+\section{RTD and ERTD files}
+
+The \rtd\ schedulability plugin stores the input files in two
+different formats, each one having a different file extension, as
+shown in Table \ref{tab:file-formats}.
+
+%
+\begin{table}
+\begin{centering}
+\begin{tabular}{|c|p{7cm}|}
+\hline 
+File extension & Description
+\tabularnewline
+\hline
+\hline 
+.RTD & XML file format that has been created for ease human processing.
+\tabularnewline
+\hline 
+.ERTD & XML file format automatically generated by EMF. That format is not
+suited for readability. 
+\tabularnewline
+\hline
+\end{tabular}
+\par\end{centering}
+
+\caption{XML file formats used by the \rtd\ Tool set.}
+\label{tab:file-formats}
+\end{table}
+
+
+The two formats express the system semantic in a different form: the
+.ERTD form is suited for automatic processing by the EMF automatically
+generated loader, whereas the .RTD form is more easily readable, and
+hence it is more suited for manual editing. This chapter only
+describes the .RTD style XML file structure. The .ERTD file structure
+is an internal XML representationand and it is not described in this
+manual.
+
+\textbf{Note:} \rtd\ uses the file extension to discriminate which
+file format should be expected as content. Files in .RTD form are
+parsed by an XSLT sheet, converted in .ERTD form, and then loaded.
+When saving the file from the GUI it is possible to save in both formats.
+
+
+\section{.RTD XML file structure}
+
+The purpose of the file format presented in this section is to describe
+all the aspects of a complex system. As its root, a system is composed
+by a single \const{system} element, that contains a \const{Name}
+attribute used to discriminate between different instances of systems.
+The following is an example of a system definition:
+
+\begin{lstlisting}
+<?xml version="1.0" encoding="UTF-8"?>
+<SYSTEM Name="mySystem">
+[...]
+</SYSTEM>
+\end{lstlisting}
+
+Each system is described using sections. Each section is used to
+describe a particular phase of the design methodology that
+\rtd\ proposes.  Here is a quick list of the various sections that
+compose a system description:
+
+\begin{description}
+\item [{modes}] The modes section is used to list different working
+  modes of a system. See section \ref{sec:Mode-section}.
+\item [{functional}] The functional section contains all the elements
+  that describe the functional part of the system. The functional part
+  of a system is in general composed by different elements, named
+  \const{PROC}, \const{VAR}, \const{SUBSYSTEM}, and \const{TRIGGER}
+  (external events).  Moreover, the functional part contains the
+  \emph{use} relationships between the different elements in the
+  system, the \emph{partial ordering} between different events
+  (start/end of a method, proc activation, trigger arrival). For each
+  element it is possible to specify some temporal characterization,
+  such as periodicity, deadline, minimum interarrival time, jitter and
+  offset (see sections \ref{sub:Logical-level-design} 
+  % FIXME reference not found
+  and \ref{sec:Functional-section}).
+\item [{architectural}] The architectural section contains the
+  specification of different parts of the system that are of interest
+  for the purpose of mapping. This section contains, for example,
+  elements such as \const{ECU}, \const{CPU}, \const{TASK},
+  \const{SEMAPHORE}s, \const{BUS} and related \const{FRAME}s. This
+  section does not contain the relation between tasks and CPUs, that
+  is instead contained in the mapping section.  If a system includes
+  only the architectural but not the functional section, all the
+  references to \const{VAR}s are substituted with resources that
+  otherwise are ignored (see Sections
+  \ref{sub:Software-architecture-design} 
+  % FIXME reference not found
+  and
+  \ref{sec:Architectural-section}).
+
+\item [{mapping}] The mapping section is used to describe the
+  assignment of \const{PROC}s to \const{TASK}s, to specify which RTOS
+  a task is assigned to, and to specify if a \const{VAR} element
+  should be implemented as a mutex or through a bus frame. These
+  information depend on the system application modes (see sections
+  \ref{sub:Mapping} 
+  % FIXME ref not found
+  and \ref{sec:Mapping-section}).
+\item [{annotation}] The annotation section includes the temporal
+  information related to the execution times of each task and of each
+  method related to proc, var and resources. This information depends
+  on the system application modes (see section
+  \ref{sec:Annotation-section}).
+\item [{schedulability}] The schedulability section contains the
+  result of the schedulability test that is made for each CPU and for
+  each task. This information depends on the system application modes
+  (see sections \ref{sub:Schedulability-Analysis} and
+  \ref{sec:Schedulability-section}).
+  % FIXME ref not found
+\end{description}
+
+It is not possible to describe more than one system inside a single
+input file. Not all the sections just described are mandatory in an
+instance of an input file, however it must be clear that some features
+may be disabled in case of missing informations. For example,
+schedulability tests cannot be performed if computation times are
+missing.
+
+All the identifiers in an input file are \emph{case insensitive},
+except for the references that must contain the exact name of an
+object (that usually has a one-to-one relation with some identifier
+used in the source code).
+
+
+\paragraph{Example}
+
+Here is an example of a typical XML file structure.
+
+\begin{lstlisting}
+<?xml version="1.0" encoding="UTF-8"?>
+<SYSTEM Name="...">
+  <MODES>
+    [...]
+  </MODES>
+  <FUNCTIONAL>
+    [...]
+  </FUNCTIONAL>
+  <ARCHITECTURAL>
+    [...]
+  </ARCHITECTURAL>
+  <MAPPING>
+    [...]
+  </MAPPING>
+  <ANNOTATION>
+    [...]
+  </ANNOTATION>
+  <SCHEDULABILITY>
+    [...]
+  </SCHEDULABILITY>
+</SYSTEM>
+\end{lstlisting}
+
+The following sections present in detail the content of each section
+in the XML file, detailing all the elements that characterize each
+part.
+
+
+\section{Mode section}
+\label{sec:Mode-section}
+
+Modes are abstractions that can be used to specify a configuration of
+the system that is used only under particular working conditions.  For
+example, an airplane controller probably has different control
+algorithms when the airplane is taking off, flying and landing, and
+these algorithms have requirements expressed by a different set of
+tasks, resources, and so on. For this reason, the specification of
+modes in the system is useful for describing the behavior and the
+composition of the system in all its aspects and in an unified way.
+
+Modes typically influence the mapping phase, because it is in that
+phase that the designer decides:
+
+\begin{itemize}
+\item which is the task that contains each PROC;
+\item which is the RTOS that contains each Task;
+\item how each variable is handled (private, protected using some kind
+  of mutual exclusion, or bus variables);
+\end{itemize}
+
+As a consequence, the mapping phase influences the computation time
+and the blocking time of each task, and the schedulability of each
+single task and CPU in the system.
+
+The Mode section is simply composed by a sequence of \const{MODE}
+elements, as described below. \rtd\ defines implicitly a \emph{default
+  Mode} that is always used for all the elements that do not
+explicitly specify one.
+
+Please note that, although the name is similar, \const{MODE}s are not
+equivalent to OSEK/VDX Application Modes. OSEK/VDX Application Modes
+are used to identify a boot configuration which cannot be changed
+after the system starts (for example, normal operation, testing,
+...). The \const{MODE} section is instead used to specify runtime
+aspects of an application (for example, engine stop, engine running at
+minimum RPM, engine running at 1000~rpm, engine running at 2000~rpm,
+...). The idea is that each \const{MODE} may define a different
+application setup and a different schedulability analysis (for
+example, some tasks may have a frequency which is directly linked to
+the rotation speed of the engine).
+
+\subsection{\const{MODE}}
+
+\const{MODE} elements simply describe mode names. A \const{MODE}
+element contains only one attribute:
+\begin{description}
+\item [{attribute~Name}] is the symbolic name of a mode.
+\end{description}
+
+\paragraph{Example}
+
+In the following example, four modes (\const{Init}, \const{Running,
+Fault} and \const{default mode}) are defined:
+
+\begin{lstlisting}
+[...]
+<MODES>
+  <MODE Name="Init"/>
+  <MODE Name="Running"/>
+  <MODE Name="Fault"/>
+</MODES>
+[...]
+\end{lstlisting}
+
+% FIXME: we should link to an existing example
+
+\section{Functional section}
+\label{sec:Functional-section}
+
+The functional section contains a set of elements that describe the
+\emph{functional behavior} of the system. These entities will be
+mapped onto the architectural elements during the mapping phase. Each
+entity is represented by an XML element inside the main
+\const{FUNCTIONAL} element. The functional section may contain one or
+more instances of the following elements: \const{PROC},
+\const{TRIGGER}, \const{VAR}, \const{EVENT}, \const{PARTIALORDER},
+\const{TIMECONST}, \const{SUBSYSTEM}.
+
+Element names are grouped in namespaces. Two elements inside the same
+namespace must have different names. \rtd\ defines the following
+namespaces for the \const{FUNCTIONAL} element:
+\begin{itemize}
+\item One namespace that contains \const{TRIGGER} names,
+  \const{SUBSYSTEM} names, \const{PROC} and \const{VAR} external to
+  subsystems.
+\item One namespace for each \const{SUBSYSTEM}. This namespace
+  contains its internal \const{SUBSYSTEM}s, \const{PROC} and
+  \const{VAR};
+\item One namespace for each \const{PROC}, \const{VAR},
+  \const{REQUIRED\_INTERFACE} and \const{PROVIDED\_INTERFACE.} This
+  namespace contains the names of the \const{METHOD} specified inside
+  any of the elements listed before.
+\item One namespace for each \const{PROC}, \const{VAR},
+  \const{TRIGGER}, and \const{REQUIRED\_INTERFACE.} This namespace
+  contains the names of the \const{METHODREF} specified inside any of
+  the elements listed before.
+\item One namespace that contains \const{EVENT} names
+  \footnote{In all the functional section, even if they are related to different
+    subsystems}.
+\end{itemize}
+
+% FIXME: to be changed in the next version. EVENT names should stay in
+% the namespaces of the subsystems where they are specified
+
+
+
+\subsection{\const{PROC}}
+\label{sub:PROC}
+
+A \const{PROC} element allows the description of the minimal
+computational entity, that \emph{provides} one or more methods and
+\emph{uses} one or more methods exported by other \const{PROC}s.
+
+A \const{PROC} element may be internal or external to a subsystem:
+
+\begin{itemize}
+\item if a \const{PROC} element is internal to a subsystem, it can use
+  only the \const{METHOD}s provided by the \const{PROC}, and the
+  \const{VAR}iables internal to the same subsystem, or by the
+  \const{REQUIRED\_INTERFACE} of its own subsystem;
+\item if a \const{PROC} element is external to a subsystem, it can use
+  the \const{METHOD}s provided by \const{PROC}s and \const{VAR}iables
+  external to the subsystems, or the \const{PROVIDED\_INTERFACE} of
+  the other subsystems.
+\end{itemize}
+
+A \const{PROC} element has only one attribute:
+
+\begin{description}
+\item [{attribute~Name}] this attribute specifies the \const{PROC}
+  name inside the current namespace.
+\end{description}
+
+A \const{PROC} element must contain at least one
+\const{METHOD}\footnote{The next versions of \rtd\ will provide a
+  default method if no method is specified}. A \const{PROC} can
+contain zero or more \texttt{METHODREF} elements.
+
+
+\subsubsection{\const{METHOD}}
+
+This element represents a method provided by a \const{PROC}. For more
+information about methods, see Section \ref{sub:METHOD}.
+
+
+\subsubsection{\const{METHODREF}}
+
+This element specifies the coordinates that identify a method provided
+by some other element that will be called by the \const{PROC}'s
+methods (see Section \ref{sub:METHODREF}).
+
+
+\paragraph{Example}
+
+The following example shows the definition of two \const{PROC} elements
+named \const{filter1} and \const{filter2}. \const{filter1} provides
+a method \const{method1}, that is required by \const{filter2}.
+
+\begin{lstlisting}
+[...]
+<FUNCTIONAL>
+  <PROC Name="filter1">
+    <METHOD Name="method1"/>
+    [...]
+  </PROC>
+  <PROC Name="filter2">
+    <METHODREF
+      Name="internal_name_for_method1"
+      MethodName="filter1/method1"
+    />
+    [...]
+  </PROC>
+  [...]
+</FUNCTIONAL>
+[...]
+\end{lstlisting}
+
+
+
+\subsection{\const{VAR}}
+\label{sub:VAR}
+
+The \const{VAR} element inside the XML representation is used to model
+an abstract data type. An abstract data type is typically composed by
+some data structures, and by a set of methods that are used to access
+and modify the them.
+
+The \const{VAR} element has the following attributes:
+\begin{description}
+\item [{attribute~Name}] this attribute specifies the \const{VAR} name
+  inside the current namespace.
+\item [{attribute~Type}] this attribute specifies the type of the VAR
+  element.
+\end{description}
+
+A \const{VAR} can only contain a set of \const{METHOD} elements.
+
+\subsubsection{\const{METHOD}}
+
+This element represents a method provided by the abstract data type
+implemented inside the \const{VAR}. See Section \ref{sub:METHOD} for
+details.
+
+
+\subsubsection{Example}
+
+The following example describes two VAR elements, the first named
+\const{image} is implemented as an C integer matrix (\const{int[][]}),
+that provides two elements \const{read} and \const{write}; the second
+named \const{size} is implemented as an C integer (\const{int}), that
+provides two implicit methods \const{read} and \const{write}.
+
+\begin{lstlisting}
+[...]
+<FUNCTIONAL>
+  <VAR Name="image" Type="int[][]">
+    <METHOD Name="read"/>
+    <METHOD Name="write"/>
+  </VAR>
+  <VAR Name="size" Type="int"/>
+  [...]
+</FUNCTIONAL>
+[...]
+\end{lstlisting}
+
+\subsection{\const{TRIGGER}}
+
+A \const{TRIGGER} element describes an external event that can
+activate and use one or more methods provided by other elements in the
+functional specification.
+
+A trigger is characterized by a single attribute:
+
+\begin{description}
+\item [{attribute~Name}] this attribute specifies the \const{TRIGGER}
+  name inside the \const{FUNCTIONAL} specification.
+\end{description}
+
+A \const{TRIGGER} can only contain a set of \const{METHODREF}
+elements.
+
+
+\subsubsection{\const{METHODREF}}
+
+This element represent a method invoked by a TRIGGER. For details see
+Section \ref{sub:METHODREF}.
+
+
+\paragraph{Example}
+
+The following example, extracted from the example contained in the
+directory \file{examples/001}, describes a trigger named \const{imageArrival}
+that requires three methods: \const{write}, \const{decodeX} and
+\const{derX}, provided respectively by objects \const{image}, \const{filter1}
+and \const{der1}.
+%FIXME: check the file name
+
+These reference have been renamed inside the trigger as \const{image.write,}
+\const{filter1.decodeX} and \const{der1.derX}.
+
+\begin{lstlisting}
+[...]
+<FUNCTIONAL>
+  <TRIGGER Name="imageArrival" >
+    <METHODREF
+      Name="image.write"
+      MethodName="image/write"
+    />
+    <METHODREF
+      Name="filter1.decodeX"
+      MethodName="filter1/decodeX"
+    />
+    <METHODREF
+      Name="der1.derX"
+      MethodName="der1/derX"
+    />
+    [...]
+  </TRIGGER>
+  [...]
+</FUNCTIONAL>
+[...]
+\end{lstlisting}
+
+Please note the difference between, for example, \const{der1.derX} and
+\const{der1/derX}: the former is the name of the \const{METHODREF}
+(the ``\const{.}'' is part of the name), whereas the latter is the
+path to the \const{METHOD} element (as specified in Section
+\ref{sub:Paths-to-elements}, the ``\const{/}'' is used as separator).
+
+
+\subsection{\const{EVENT}}
+\label{sub:EVENT}
+
+An \const{EVENT} element is used to tag the execution of a
+\const{METHOD}.  \const{EVENT}s are then used when representing order
+between events, or timing constraints between different method
+executions. An \const{EVENT} can describe the action of activating a
+method (\const{activation}), and the fact that a method has started
+(\const{begin}) or ended (\const{end}) its execution on the final
+architecture.
+
+Subsystems do not have {}``internal'' \const{EVENT}s. In any case,
+\const{EVENT}s can tag internal subsystem methods. An \const{EVENT}
+has the following three attributes:
+\begin{description}
+\item [{attribute~Name}] this attribute specifies the \const{EVENT}
+  name inside the functional section. \const{EVENT} names are unique
+  in the entire functional section.
+\item [{attribute~Type}] specifies the action that the \const{EVENT}
+  is tagging:
+
+  \begin{description}
+  \item [{activation}] specifies that the \const{EVENT} tags the activation
+    of a method. Activating a method means that the method is ready to
+    execute, without specifying when the task will be really executed
+    on the architecture.
+  \item [{begin}] specifies that the \const{EVENT} tags the beginning of
+    execution of a method. The \const{begin} of a method always follows
+    its \const{activation}.
+  \item [{end}] specifies that the \const{EVENT} tags the end of the execution
+    of a method. The \const{end} of the execution of a method always
+    follows its \const{begin}.
+  \end{description}
+
+\item [{attribute~MethodRefName}] specifies the name of the \const{METHODREF}
+  that the \const{EVENT} is tagging.
+\end{description}
+
+\paragraph{Example}
+
+The following example shows how to represent the activation event
+of a method.
+
+\begin{lstlisting}
+[...]
+<FUNCTIONAL>
+  <EVENT 
+    Name="my_activation_event"
+    Type="activation"
+    MethodRefName="imageArrival/der1.derX"
+  /> 
+  [...]
+</FUNCTIONAL>
+[...]
+\end{lstlisting}
+
+\subsection{\const{PARTIALORDER}}
+
+A \const{PARTIALORDER} element is a container of \const{ORDER} elements.
+An \const{ORDER} element can be used to describe a precedence relationship
+between two events. A \const{PARTIALORDER} is related to a particular
+system mode.
+
+\const{PARTIALORDER} has only one attribute:
+
+\begin{description}
+\item [{attribute~ModeRef}] this attribute specifies the Mode to which
+  the \const{ORDER} elements contained inside the \const{PARTIALORDER}
+  element are related to. If ModeRef is not specified, the default mode
+  is used.
+\end{description}
+
+The \const{PARTIALORDER} element can contain zero or more \const{ORDER}
+elements.
+
+
+\subsubsection{\const{ORDER}}
+
+An \const{ORDER} element only contains a pair of \const{EVENTREF}
+elements. The first \const{EVENTREF} is the predecessor, the second is
+the successor. For information about \const{EVENTREF} elements, see
+Section \ref{sub:EVENTREF}.
+
+
+\paragraph{Example}
+
+The following \const{PARTIALORDER} example shows four events with
+precedence relationship as shown in Figure
+\ref{fig:PARTIALORDER-Example}.
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=6.3cm]{images/partialorder.eps}
+  \end{center}
+  \caption{The \const{PARTIALORDER} Example.}
+  \label{fig:PARTIALORDER-Example}
+\end{figure}
+
+\begin{lstlisting}
+[...]
+<FUNCTIONAL>
+  <PARTIALORDER>
+    <ORDER>
+      <EVENTREF Name="one"/>
+      <EVENTREF Name="three"/>
+    </ORDER>
+    <ORDER>
+      <EVENTREF Name="two"/>
+      <EVENTREF Name="three"/>
+    </ORDER>
+    <ORDER>
+      <EVENTREF Name="three"/>
+      <EVENTREF Name="four"/>
+    </ORDER>
+  </PARTIALORDER>
+  [...]
+</FUNCTIONAL>
+[...]
+\end{lstlisting}
+
+\subsection{\const{TIMECONST}}
+
+A \const{TIMECONST} element is a container of one or two
+\const{EVENTREF} followed by a \const{BOUND} element. A
+\const{TIMECONST} is used to represent a constraint on events.
+
+When the constraint describes a property of an event (such as an event
+periodicity), only one \const{EVENTREF} is needed.
+
+When the constraint describes a property related to two events (such
+as an end-to-end deadline), two \const{EVENTREF}s are needed.
+
+A \const{TIMECONST} has only one attribute:
+\begin{description}
+\item [{attribute~ModeRef}] this attribute specifies the Mode to which
+  the \const{TIMECONST} elements is related to. If ModeRef is not
+  specified, the default mode is used.
+\end{description}
+
+
+\subsubsection{\const{EVENTREF}}
+
+For information about \const{EVENTREF} elements, see Section
+\ref{sub:EVENTREF}.
+
+
+\subsubsection{\const{BOUND}}
+
+The \const{BOUND} element is used to characterize the type of
+constraints represented by a \const{TIMECONST} element.
+
+The available constraints are the following:
+
+\begin{description}
+\item [{deadline}] specifies a constraint that the distance between
+  two events must not exceed the deadline.
+\item [{period}] specifies the period of an event;
+\item [{mit}] specifies the Minimum Interarrival Time (MIT) of an
+  event.  That is, if an event appeared at time $t$, then the same
+  event will not appear again before time $t+mit$.
+\item [{jitter}] specifies the maximum jitter between two events;
+\item [{offset}] specifies the constant time distance between two
+  events;
+\end{description}
+
+The \const{BOUND} object has two attributes:
+
+\begin{description}
+\item [{attribute~Type}] The type of the constraint; Should be either
+  ``deadline'', ``period'', ``mit'', ``jitter'', or ``offset''.
+\item [{attribute~Value}] The temporal value related to the
+  constraint.
+\end{description}
+
+\underbar{The current version of \rtd\ only supports deadline, period
+  and offsets.}
+% FIXME: is this still true?
+
+\paragraph{Example}
+
+The following example describes how to model the periodicity of an
+event and a deadline between two events.
+
+\begin{lstlisting}
+[...]
+<FUNCTIONAL>
+  <TIMECONST>
+    <EVENTREF Name="my_periodic_event"/>
+    <BOUND Type="period" Value="40ms"/>
+  </TIMECONST>
+  <TIMECONST> 
+    <EVENTREF Name="start_event"/>
+    <EVENTREF Name="end_event"/>
+    <BOUND Type="deadline" Value="35ms"/>
+  </TIMECONST> 
+  [..]
+</FUNCTIONAL>
+[...]
+\end{lstlisting}
+
+\subsection{\const{SUBSYSTEM}}
+\label{sub:SUBSYSTEM}
+
+This element is a container that can be used to group a set of
+\const{SUBSYSTEM}s, \const{PROC}s and \const{VAR}s. It has been
+introduced since \rtd\ 0.2 to permit a modular specification of the
+functional part of a system. It mimics the concept of subsystem
+defined in component-based languages.
+
+A \const{SUBSYSTEM} consists of three sub-elements:
+
+\begin{itemize}
+\item an \const{IMPLEMENTATION} element that groups internal
+  \const{SUBSYSTEMs, PROC}s and \const{VAR}s; it represents the
+  internal implementation of a module or component.
+\item a \const{PROVIDED\_INTERFACE} element; it represents the
+  interface that this subsystem provides to other subsystems or
+  external elements.
+\item a \const{REQUIRED\_INTERFACE} element; it represents the
+  interface that this subsystem requires from external subsystems or
+  elements in order to work correctly.
+\end{itemize}
+
+The implementation of a subsystem is hidden to the rest of the system.
+In this way, it is possible to change the implementation without
+affecting the implementation of the rest of the system. For this
+reason, \const{SUBSYSTEM, PROC} and \const{VAR} elements specified in
+the \const{IMPLEMENTATION} of a \const{SUBSYSTEM} cannot be referred
+directly from external entities. An external entity can only refer to
+the \const{METHOD} elements specified in the
+\const{PROVIDED\_INTERFACE} section. On the other hand, a \const{PROC}
+or a \const{VAR} inside the \const{IMPLEMENTATION} can only refer to
+the \const{METHOD} elements specified in its
+\const{REQUIRED\_INTERFACE}.
+
+% check the following image before putting it in production
+%(see Figure \ref{fig:subsystem}).
+%% %
+%% \begin{figure}
+%% \includegraphics[width=1\columnwidth,keepaspectratio]{subsystem.eps}
+%% \caption{\label{fig:subsystem}A subsystem. The figure highlights the purpose
+%% of the \emph{provided} and the \emph{required} interface. Please note
+%% that \const{EVENT\_PROC\_2} points to the link (the \const{METHODREF})
+%% between \const{PROC\_1} and \const{PROC\_2}, not directly to \const{PROC\_2}'s
+%% \const{METHOD}.}
+%% \end{figure}
+
+
+A subsystem does not contain \const{EVENT}s. However, \const{EVENTS}
+can tag internal subsystem methods (see Section \ref{sub:EVENT}).
+
+Note: subsystems can be nested. That is, a subsystem can contain
+another subsystem.
+
+A subsystem has the following attribute:
+
+\begin{description}
+\item [{attribute~Name}] This attribute is the name of the subsystem.
+\end{description}
+
+A subsystem contains three kinds of elements:
+
+\begin{itemize}
+\item \const{IMPLEMENTATION}
+\item \const{PROVIDED\_INTERFACE}
+\item \const{REQUIRED\_INTERFACE}
+\end{itemize}
+
+\subsubsection{\const{IMPLEMENTATION}}
+
+This element contains one or more \const{SUBSYTEM} elements (see
+Section \ref{sub:SUBSYSTEM}), one or more \const{PROC} elements (see
+Section \ref{sub:PROC}) and one or more \const{VAR} elements (see
+Section \ref{sub:VAR}) internal to a subsystem.
+
+
+\subsubsection{\const{REQUIRED\_INTERFACE}}
+
+This element contains a list of methods that are required by the
+subsystem because some \const{PROC} element inside the subsystem needs
+that \const{METHOD}. Each one of these methods must be mapped on the
+external \const{PROC}, \const{VAR}, \const{SUBSYSTEM} that provides
+it, using a \const{METHODREF}. Therefore, the
+\const{REQUIRED\_INTERFACE} is composed by a sequence of pairs each
+one composed by a \const{METHOD} and its \const{METHODREF}. The
+\const{METHODREF} can be missing if the binding of the
+\const{SUBSYSTEM} has not been completed (see the example below).
+
+
+\subsubsection{\const{PROVIDED\_INTERFACE}}
+
+This element contains the list of methods exported by the subsystem.
+These exported \const{METHOD}s are mapped to the methods of the
+objects inside the subsystem using elements of type
+\const{EXPORTED\_METHOD}.  For that reason, the
+\const{PROVIDED\_INTERFACE} is composed by a sequence of pairs each
+one composed by a \const{METHOD} and its \const{EXPORTED\_METHOD}.
+The \const{EXPORTED\_METHOD} can be missing if the binding of the
+\const{SUBSYSTEM} has not been completed (see the example below).
+
+
+\subsubsection{\const{EXPORTED\_METHOD}}
+
+This XML element is used to specify the internal method that is binded
+to the provided method exported by the subsystem. This element has the
+following attributes:
+
+\begin{description}
+\item [{attribute~ObjRef}] is the name of the object that contains the
+  method (a \const{PROVIDED\_INTERFACE} of a \const{SUBSYTEM} internal
+  to the current subsystem, or a \const{PROC} or a \const{VAR}
+  internal to the subsystem);
+\item [{attribute~MethodName}] is the method name.
+\end{description}
+
+\paragraph{Example}
+
+The following example describes a subsystem named \const{mySub}, which
+exports four methods \const{read,} \const{write, start} and
+\const{stop} and which requires two methods \const{input} and
+\const{output}.  The subsystem contains a \const{PROC} named
+\const{subProc} and a var named \const{subData}. The provided methods
+are linked to the internal methods. The subsystem requires two
+external methods, \const{input} and \const{output}. The first one has
+been mapped on method \const{getData} of subsystem \const{yourSum},
+whereas the output method has not been mapped yet.\textcolor{red}{}%
+
+%FIXME: for an example with nested subsystems check ``testcase 003''
+
+\begin{lstlisting}
+[...]
+<FUNCTIONAL>
+  <SUBSYSTEM Name="mySub">
+    <IMPLEMENTATION>
+      <PROC Name="subProc">
+        <METHOD Name="start"/>
+        <METHOD Name="stop"/>
+        <METHODREF
+          Name="subProc.read"
+          MethodName="mySub/input"
+        />
+        <METHODREF
+          Name="subProc.write"
+          MethodName="mySub/output"
+        />
+        <METHODREF
+          Name="subProc.data.read"
+          MethodName="subData/read"
+        />
+        <METHODREF
+          Name="subProc.data.write"
+          MethodName="subData/write"
+        />
+      </PROC>
+
+      <!-- implicit read and write methods -->
+      <VAR Name="subData" Type="int"/>
+    </IMPLEMENTATION>
+
+    <PROVIDED_INTERFACE>
+       <METHOD Name="read"/>
+       <EXPORTED_METHOD
+          ObjRef="subData"
+          MethodRef="read"
+       />
+       <METHOD Name="write"/>
+       <EXPORTED_METHOD
+          ObjRef="subData"
+          MethodRef="write"
+       />
+      <METHOD Name="start"/>
+      <EXPORTED_METHOD
+          ObjRef="subProc"
+          MethodRef="start"
+       />
+      <METHOD Name="stop"/>
+      <EXPORTED_METHOD
+          ObjRef="subProc"
+          MethodRef="stop"
+       />
+     </PROVIDED_INTERFACE>
+     <REQUIRED_INTERFACE>
+       <METHOD Name="input"/>
+       <METHODREF 
+          Name="inputMapping"
+          MethodName="yourSub/getData"
+       />
+       <METHOD Name="output"/>
+     </REQUIRED_INTERFACE>
+  </SUBSYSTEM>
+  [...]
+</FUNCTIONAL>
+[...]
+\end{lstlisting}
+
+
+\section{Architectural section}
+\label{sec:Architectural-section}
+
+The architectural section contains a set of elements that describes
+the \emph{hw/sw architecture} of the system. These entities will be
+mapped together with methods of the functional section during the
+mapping phase.
+
+Each architectural entity is represented by an XML element inside the
+main \const{ARCHITECTURAL} element. The architectural section may
+contain the following elements: \const{ECU}, \const{TASK},
+\const{RESOURCE}, \const{BUS}, \const{FRAME}, \const{SIGNAL},
+\const{MUTEX}. Element names are grouped in namespaces. Every element
+inside a namespace must have a different name. The \rtd\ Toolset
+defines the following namespaces for the \const{ARCHITECTURAL}
+section:
+
+\begin{itemize}
+\item a namespace that contains \const{ECU} names;
+\item a namespace that contains \const{RTOS} names;
+\item a namespace that contains \const{TASK} names;
+\item a namespace that contains \const{RESOURCE} names;
+\item a namespace that contains \const{BUS} names;
+\item a namespace that contains \const{FRAME} names;
+\item a namespace that contains \const{SIGNAL} names;
+\item a namespace that contains \const{MUTEX} names.
+\end{itemize}
+
+
+\subsection{\const{ECU}}
+
+The \const{ECU} (Embedded Control Unit) element represents a
+computational node composed by one or more \const{CPU} elements;
+\const{CPU} elements belonging to the same ECU may be etherogeneous
+(e.g., an \const{ECU} can have an ARM7TDMI and an Hitachi H8). The
+various \const{CPU} elements mapped to the same \const{ECU} can
+communicate using a shared bus (message passing paradigm) and/or
+shared variables (shared memory).
+
+Note: the current version of the schedulability analysis of the \rtd\
+Toolset does not consider shared resources between tasks allocated
+to different \const{CPU} elements. Moreover, there is currently no
+check to prevent such situation. A mutex shared between tasks allocated
+to different CPUs is treated as a local mutex on both CPUs; no warning
+message is printed if this condition appears.
+
+The \const{ECU} element has only one attribute:
+
+\begin{description}
+\item [{attribute~Name}] is the name assigned to the \const{ECU}.
+\end{description}
+
+The \const{ECU} element contains one or more \const{CPU}s.
+
+
+\subsubsection{\const{CPU}}
+
+The \const{CPU} element models a computation unit (that in general can
+be a generic commercial micro-controller) that is controlled by a
+Real-Time Operating System (RTOS).
+
+The current version of the \rtd\ Tool set only allows the existence of
+one \const{RTOS} for each \const{CPU}. This constraint will be relaxed
+in the following versions.
+
+The \const{CPU} element has the following attributes:
+
+\begin{description}
+\item [{attribute~Name}] is the the name of the \const{CPU} inside the
+  \const{ECU};
+\item [{attribute~Model}] is the CPU model (e.g., ARM7TDMI, PPC z7,
+  ...). This information is optional.
+\end{description}
+
+A \const{CPU} can contain one or more \const{RTOS}.
+
+
+\subsubsection{\const{RTOS}}
+
+The \const{RTOS} element is used to model the operating system that
+will be installed on the CPU, and it is identified by a name that is
+used during the mapping phase to specify the relation between task and
+CPU.
+
+The \const{RTOS} element has the following attribute:
+
+\begin{description}
+\item [{attribute~Name}] is the the name of the \const{RTOS} element;
+\end{description}
+
+The RTOS element contains two elements named \const{OSMODEL} and
+\const{OILVAR}, that in future releases of the \rtd\ Toolset will
+specify the peculiarities of the Operating System. In the current
+version of the \rtd\ Tool set these elements are empty.
+
+
+\paragraph{Example}
+
+This example shows a single \const{ECU} node, that has two ARM7TDMI
+CPUs each one handled by a different operating system.
+
+\begin{lstlisting}
+[...]
+<ARCHITECTURAL>
+[...]
+  <ECU Name="ECU0">
+    <CPU Name="CPU0" Model="ARM7TDMI">
+      <RTOS Name="CPU0.erikaEnterprise"/> </RTOS>
+    </CPU>
+    <CPU Name="CPU1" Model="ARM7TDMI">
+      <RTOS Name="CPU1.erikaEnterprise"/> </RTOS>
+    </CPU>
+  </ECU>
+[...]
+</ARCHITECTURAL>
+[...]
+\end{lstlisting}
+
+\subsection{\const{TASK}}
+
+The \const{TASK} element can be used to represent both an RTOS task or
+and RTOS ISR.\footnote{When running the schedulability analysis, the
+  \rtd\ Tool set handles task and ISRs in the same way.  When
+  generating RTOS configuration files, tasks and ISRs are considered
+  in a different way.}
+
+Each \const{TASK} element is characterized by a set of parameters
+(e.g., its priority, period or deadline), that in general depends on
+the Application Modes.
+
+Moreover, a \const{TASK} contains some information useful for the OIL
+standard. These informations are not used in the current version of
+the \rtd\ Tool set.
+
+The \const{TASK} element has the following attributes:
+
+\begin{description}
+\item [{attribute~Name}] is the name of the \const{TASK} element;
+\item [{attribute~Type}] specifies whether the \const{TASK} element
+  represents a task or an ISR in the final implementation.
+\end{description}
+
+The \const{TASK} element may contain the following elements:
+
+
+\subsubsection{\const{SCHEDULING}}
+
+The \const{SCHEDULING} element is used to specify the scheduling
+parameters of a task.
+
+The \const{SCHEDULING} element has the following attributes:
+
+\begin{description}
+\item [{attribute~Priority}] is used to store informations about the
+  Task priority. Lower values are considered to be lower priority in
+  the system; bigger numbers refer to higher priorities
+  \footnote{Please note that this priority assignment extends the OSEK
+    Priority assignment used in OIL, where 0 is considered the lowest
+    priority and bigger number correspond to higher priorities.};
+\item [{attribute~Threshold}] is used to store informations about Task
+  Threshold (supposing that the Kernel specifies a Preemption
+  Threshold scheduling algorithm).
+  %FIXME - bug 146 on the old Evidence bugzilla
+\item [{attribute~PreemptionGroupName}] is used to store the
+  Non-Preemption Group of a Task. 
+\item [{attribute~ModeRef}] is used to specify to which Mode these scheduling
+  parameters are related.
+\end{description}
+
+
+\subsubsection{\const{ACTIVATION}}
+
+This element is used to specify the activation parameters of a task.
+For example, this element specifies if the task is activated
+periodically or not, if it can have pending activations, and moreover
+it specifies other activation parameters.
+
+The \const{ACTIVATION} element has the following attributes:
+\begin{description}
+\item [{attribute~Type}] is the type of the Task/ISR. Can be
+  {}``\const{sporadic}'', {}``\const{periodic}'',
+  {}``\const{aperiodic}''.
+% FIXMEE ISRs should have the same types
+\item [{attribute~ActNumber}] is the number of pending activations for
+  a task. This value is used for example in RTOS like those compliant
+  with OSEK BCC2/ECC2 conformance classes, that can admit more than
+  one pending activation for tasks. Typically this value is set to 1.
+\item [{attribute~Class}] is the class of the task/ISR. %
+% FIXME: is the class attribute used?
+\item [{attribute~Period}] is a time value that can be used to specify
+  a typical period of a Task/ISR. In the case of periodic tasks, the
+  value is the period of the task. In the case of sporadic tasks or
+  ISRs, this value represents the Minimum Interarrival Time.%
+% FIXME note for an ISR only the mit makes sense, not the period!
+\item [{attribute~Offset}] is a time value that specifies the
+  activation offset of the task. It is currently used \emph{only} for
+  the purpose of scheduling analysis, and does not influence the code
+  generated by the \rtd\ Toolset.%
+%FIXME - this is not for ISRs
+\item [{attribute~Deadline}] is a time value that represents the
+  relative deadline of a task. %
+\item [{attribute~ModeRef}] is used to specify to which Mode these activation
+  parameters are related.%
+% FIXME check what happens if nothing is specified. The default mode should be used
+\end{description}
+
+\subsubsection{\const{RESOURCEREF}}
+
+A \const{RESOURCEREF} element is used to group the methods of the
+resources used by tasks (depending on the mode of
+operation). \const{RESOURCEREF} elements are mainly used for
+schedulability analysis when a partial system is specified (e.g., a
+system with incomplete mapping or incomplete functional
+specification). In this sense, \const{RESOURCEREF} elements are not
+the main way a user should follow to specify the relationship between
+tasks, methods, and mutexes. See Section \ref{sub:RESOURCE} for
+details.
+
+A \const{RESOURCEREF} element has the following attribute:
+\begin{description}
+\item [{attribute~ModeRef}] is used to specify to which Mode these
+  \const{RESOURCEREF} element is related to.
+\end{description}
+
+A \const{RESOURCEREF} should contain one or more \const{METHODREF}
+element (see Section \ref{sub:METHODREF}), that specifies the methods
+used by a task that have to be protected by mutexes.
+
+
+\subsubsection{\const{OILVAR}}
+
+The \const{OILVAR} element is used to store in an RTD file the
+corresponding content of an \ee\ OIL File. The idea is the following:
+the OIL file contains all the information needed to generate the
+configuration code of the \ee\ kernel. Most of these information are
+often linked to a specific microcontroller or boards, and it is not
+worth to model them in detail into an RTD or ERTD file. For this
+reason, when RT-Druid imports an OIL file inside an RTD file, all the
+elements which cannot be directly mapped to an RTD element are put
+inside the OILVAR container.
+
+
+\paragraph{Example}
+
+This example describes a periodic TASK, with a 45~ms period, named
+Writer. The task has a priority equal to 3, and it uses three
+resources, Res8, Res12 and Res6, to do write operations on the first
+two resources, and read operations on the latter.
+
+\begin{lstlisting}
+[...]
+<ARCHITECTURAL>
+[...]
+  <TASK Name="Writer" Type="task">
+     <SCHEDULING Priority="3" />
+     <ACTIVATION Type="periodic" Period="45ms" />
+     <RESOURCEREF>
+        <METHODREF Name="Res8.write"  MethodName="Res8/write" />
+        <METHODREF Name="Res12.write" MethodName="Res12/write" />
+        <METHODREF Name="Res6.read"   MethodName="Res6/read" />
+    </RESOURCEREF>
+  </TASK>
+[...]
+</ARCHITECTURAL>
+[...]
+\end{lstlisting}
+
+
+\subsection{\const{RESOURCE}}
+\label{sub:RESOURCE}
+
+A \const{RESOURCE} element is used to specify methods of the resources
+used by tasks (depending on the mode of operation). \const{RESOURCE}
+elements are mainly used for schedulability analysis when a partial
+system is specified (e.g., a system with incomplete mapping).
+
+Typically a user specifies (using the elements in the \const{MAPPING}
+section) the mapping between \const{TASK} and \const{PROC} elements,
+and between \const{VAR} and \const{MUTEX} elements (see Figure
+\ref{fig:RESOURCE}).  Then, in the \const{FUNCTIONAL} section the
+\const{PROC} elements specifies which \const{VAR} elements they
+use. Using these informations the schedulability analyzer can know
+which are the resources used by \const{PROC} elements (that
+information is useful when doing a schedulability analysis).
+
+\begin{figure}
+  \includegraphics[width=1\columnwidth]{images/resource}
+  \caption{Use of \const{RESOURCE} elements to enable schedulability
+    analysis without complete mapping specified.}
+  \label{fig:RESOURCE}
+\end{figure}
+
+
+Suppose now that the user do not have a complete system, because for
+example the mapping has not been completed yet. In such a situation,
+the user could not perform schedulability analysis, because there is
+no way for the system to know which mutexes each task is using.
+
+Unfortunately such a situation happens often, for example when the
+user tries to import an OSEK OIL architectural specification (OIL
+contains the architectural specification of a system, but not the
+functional part). \const{RESOURCEREF} elements is a temporary way the
+user can use to link resources to tasks directly inside the
+architectural specification making schedulability analysis possible
+also with a incomplete mapped system.
+
+If both methods (mapping and \const{RESOURCE} elements) are specified
+for an object (e.g. a task) in the a system, the schedulability
+analyzer will always use the mapping informations regardless of what
+specified in the \const{RESOURCE} elements.
+
+The presence of the mapping relationship between \const{TASK} and
+\const{PROC} elements are the discriminant part that is used by the
+\rtd\ Toolset for choosing the right path to follow. That is, if the
+mapping is present and a \const{VAR} has links with any mutex, it is
+supposed that the \const{VAR} is a private data structure that does
+not need to be protected with mutexes. That because the Toolset
+subsumes that the mapping part can be either not or completely
+present.
+
+A \const{RESOURCE} element has the following attribute:
+
+\begin{description}
+\item [{attribute~Name}] is the name of the \const{RESOURCE} element.
+\end{description}
+
+The \const{RESOURCE} element can contain zero or more \const{METHOD}
+elements (same as in Section \ref{sub:METHOD}) and one or more
+\const{MUTEXREF} elements (see Section \ref{sub:MUTEXREF}).
+
+A \const{RESOURCE} always has two \emph{predefined} methods named
+\const{read} and \const{write}.
+
+
+\paragraph{Example}
+
+This example shows a resource \const{Res2} that is protected by mutex
+\const{Mutex2}.
+
+\begin{lstlisting}
+[...]
+<ARCHITECTURAL>
+[...]
+  <RESOURCE Name="Res2">
+     <MUTEXREF MutexName="Mutex2"/>
+  </RESOURCE> 
+[...]
+</ARCHITECTURAL>
+[...]
+\end{lstlisting}
+
+
+\subsection{\const{BUS}}
+
+The \const{BUS} element is used to represent the bus of the
+\const{ECU}.
+
+The \const{BUS} element is currently not used.
+
+A \const{BUS} element has the following attributes:
+\begin{description}
+\item [{attribute~Name}] is the name of the bus.
+\item [{attribute~Type}] is the type of the bus.
+\item [{attribute~Speed}] is the speed of the bus.
+\end{description}
+
+\paragraph{Example}
+
+No example available for the \const{BUS} element.
+
+
+\subsection{\const{FRAME}}
+
+The \const{FRAME} element is used to represent a set of messages sent
+on the network, such as an OSEK COM IPDU.
+
+The \const{FRAME} element is currently not used.
+
+A \const{FRAME} has the following attributes:
+\begin{description}
+\item [{attribute~Name}] is the name of the frame.
+\item [{attribute~ID}] is the identifier of the frame.
+\item [{attribute~ActivationType}] is the activation type of the frame.
+\item [{attribute~ActivationClass}] is the activation class of the frame.
+\item [{attribute~ActivationRate}] is the activation rate of the FRAME.
+\item [{attribute~Length}] is the length of the frame.
+\end{description}
+
+\paragraph{Example}
+
+No example available for the \const{FRAME} element.
+
+
+\subsection{\const{SIGNAL}}
+
+The \const{SIGNAL} element is used to represent the behavior of OSEK
+alarms, counters and events.
+
+The \const{SIGNAL} element is currently not used.
+
+A \const{SIGNAL} element has the following attributes:
+\begin{description}
+\item [{attribute~Name}] is the name of the signal.
+\item [{attribute~Type}] is the type of the signal.
+\end{description}
+
+\paragraph{Example}
+
+No example available for the \const{SIGNAL} element.
+
+
+\subsection{\const{MUTEX}}
+
+The \const{MUTEX} element is used to represent a RTOS mutex. A mutex
+can be thought as a binary semaphore used to ensure mutual exclusion
+between tasks (and on OSEK OS, also between ISRs). \const{MUTEX}
+elements are currently used during the schedulability analysis to
+compute blocking times of tasks. A \const{MUTEX} element has the
+following attributes:
+
+\begin{description}
+\item [{attribute~Name}] is the name of the mutex.
+\item [{attribute~Policy}] is the policy that must be used for the
+  mutex.  The attribute is optional. Policy identifiers have not been
+  specified yet. Currently, the behavior of the Tool set is to ignore
+  the Policy attribute, considering that all the mutexes will use the
+  Immediate Priority Ceiling Protocol.
+\end{description}
+
+\paragraph{Example}
+
+This example shows how to declare a mutex named \const{Mutex2}.
+
+\begin{lstlisting}
+[...]
+<ARCHITECTURAL>
+[...]
+  <MUTEX Name="Mutex2"/>
+[...]
+</ARCHITECTURAL>
+[...]
+\end{lstlisting}
+
+
+\section{Mapping section}
+\label{sec:Mapping-section}
+
+The mapping section contains a set of elements that describes the
+\emph{mapping} of the system. The mapping of the system is the result
+of the mapping phase, which links the functional aspects (that is,
+\const{PROC} elements, \const{VAR} elements, and so on) to the
+architectural aspects of a system (that is, \const{TASK},
+\const{MUTEX}es, and so on). Each architectural entity is represented
+by an XML element inside the main \const{MAPPING} element. The mapping
+section may contain the following elements: \const{PROCMAP},
+\const{TASKMAP}, \const{VARMAP}.
+
+
+\subsection{\const{PROCMAP}}
+
+The \const{PROCMAP} element is used to represent the mapping
+relationship between \const{PROC} and \const{TASK} elements: that is,
+the fact that a \const{PROC} is executed by a particular
+\const{TASK}. In general, different \const{PROC} elements will be
+mapped to a single Task. The ordering between different \const{PROC}
+elements can be also specified passing an integer number as
+attribute. The \const{PROCMAP} element has the following attributes:
+
+\begin{description}
+\item [{attribute~TaskRef}] is the name (path) of the \const{TASK}. If
+  the \const{TASK} name contains special characters, they must be
+  protected using {}``\textbackslash{}''.
+\item [{attribute~ProcRef}] is the full name (path) of the
+  \const{PROC}.  If the \const{PROC} name contains special characters,
+  they must be protected using {}``\textbackslash{}''.
+\item [{attribute~ModeRef}] is the name of the mode to which this
+  mapping is related. If not specified, the default mode is used.
+\item [{attribute~Order}] is the mapping order (an integer
+  number). This attribute is currently not used.
+\end{description}
+
+Please note that the \const{PROCMAP} elements do not have {}``names''.
+
+
+\paragraph{Example}
+
+The \const{Guide} task is composed by three \const{PROC} contained
+inside the \const{Guide} subsystem. These \const{PROC} elements have
+the following names: \const{decode}, \const{feedBack} and
+\const{pwmRef}.  This example shows how to specify that the
+\const{Guide} task is composed by the sequence of the three
+\const{PROC} elements in that particular order.
+
+\begin{lstlisting}
+[...]
+<MAPPING>
+[...]
+  <PROCMAP ProcRef="Guide/decode"   TaskRef="Guide" Order="0"/>
+  <PROCMAP ProcRef="Guide/feedBack" TaskRef="Guide" Order="1"/>
+  <PROCMAP ProcRef="Guide/pwmRef"   TaskRef="Guide" Order="2"/>
+[...]
+</MAPPING>
+[...]
+\end{lstlisting}
+
+
+\subsection{\const{TASKMAP}}
+
+The \const{TASKMAP} element is used to represent the mapping
+relationship between \const{TASK} and \const{RTOS} elements: that is,
+the fact that a \const{TASK} is executed by a particular \const{RTOS}
+on a given \const{CPU}. The \const{TASKMAP} element has the following
+attributes:
+
+\begin{description}
+\item [{attribute~TaskRef}] is the name (path) of the \const{TASK}. If
+  the \const{TASK} name contains special characters, they must be
+  protected using {}``\textbackslash{}''.
+\item [{attribute~RtosRef}] is the name of the \const{RTOS}. The name
+  of the RTOS is NOT a pathname.
+\item [{attribute~ModeRef}] is the name of the mode to which this
+  mapping is related. If not specified, the default mode is used.
+\end{description}
+
+Please note that the \const{TASKMAP} elements does not have {}``names''.
+
+
+\paragraph{Example}
+
+This example shows how the \const{Guide} task is mapped to the
+\const{RTOS} identified by the name \const{CPU0.erika}.
+
+\begin{lstlisting}
+[...]
+<MAPPING>
+[...]
+  <TASKMAP rtosRef ="CPU0.erika" TaskRef="Guide"/>
+[...]
+</MAPPING>
+[...]
+\end{lstlisting}
+
+
+\subsection{\const{VARMAP}}
+
+The \const{VARMAP} element is used to represent the mapping
+relationship between \const{VAR} and \const{MUTEX} elements, or
+between a \const{VAR} element and \const{FRAME}/\const{BUS} elements.
+
+The idea is that a data structure needs some kind of mutual exclusion
+protection that is provided by a \const{RTOS} by means of some sort of
+binary semaphore (in case of a shared memory paradigm) or by means of
+some message that needs to be transmitted on a bus (in case of a
+message passing paradigm).
+
+The \const{TASKMAP} element has the following attributes:
+\begin{description}
+\item [{attribute~VarRef}] is the name (path) of the \const{VAR}
+  element.  This attribute is mandatory. If the \const{VAR} name
+  contains special characters, they must be protected using
+  {}``\textbackslash{}''.
+\item [{attribute~FrameRef}] is the name of the \const{FRAME} element
+  to which the \const{VAR} is mapped. This attribute is optional. If
+  specified, also the \const{BUS} element must be specified.
+\item [{attribute~BusRef}] is the name of the \const{BUS} element to
+  which the \const{VAR} is mapped. This attribute is optional. If
+  specified, also the \const{FRAME} element must be specified.
+\item [{attribute~MutexRef}] is the name (path) of the \const{MUTEX}
+  element to which the \const{VAR} is mapped. This attribute is
+  optional.  If the \const{MUTEX} name contains special characters,
+  they must be protected using {}``\textbackslash{}''.
+\item [{attribute~ModeRef}] is the name of the mode to which this
+  mapping is related. If not specified, the default mode is used.
+\end{description}
+
+\paragraph{Example}
+
+This example shows 2 global variables named \const{OmegaRef1} and
+\const{OmegaRef2}, and two variables local to the \const{Guide}
+subsystem, named \const{img1} and \const{img2}. These variables are
+protected by two distinct mutexes: \const{InputMutex} that protects
+\const{img1} and \const{img2}, and \const{SpeedMutex} that protects
+\const{omegaRef1} and \const{omegaRef2}.
+
+\begin{lstlisting}
+[...]
+<MAPPING>
+[...]
+  <VARMAP VarRef="Guide/img1" MutexRef="InputMutex"/>
+  <VARMAP VarRef="Guide/img2" MutexRef="InputMutex"/>
+
+  <VARMAP VarRef="omegaRef1" MutexRef="SpeedMutex"/>
+  <VARMAP VarRef="omegaRef2" MutexRef="SpeedMutex"/> 
+[...]
+</MAPPING>
+[...]
+\end{lstlisting}
+
+
+
+\section{Annotation section}
+\label{sec:Annotation-section}
+
+The annotation section contains a set of elements that describes
+information about the actual performance of the system being modeled.
+
+The idea is that the system is modeled, mapped, and then tested on the
+final target. Once a test application have been run, some performance
+results (such ad example the task execution times) are back-annotated
+inside the model using the \const{ANNOTATION} section. Back-annotated
+informations are then used for other purposes, such as schedulability
+analysis or scheduling simulation.
+
+The current version of the \rtd\ Tool set needs back-annotated
+informations for the purpose of scheduling analysis.
+
+The \const{ANNOTATION} section may contain only the element
+\const{EXECTIME}.
+
+
+\subsection{\const{EXECTIME}}
+
+The exectime element is used to describe the execution time of an
+entity in the system. Supported entities for \const{EXECTIME} are
+\const{TASK} elements, \const{PROC} elements, \const{METHOD} elements
+and \const{RESOURCE} \const{METHOD} elements.
+
+The \const{EXECTIME} element has the following attributes:
+\begin{description}
+\item [{attribute~Ref}] is the identifier (path) of the element which
+  the \const{EXECTIME} is referred to. Please note that when
+  specifying the path you must not specify the section name (e.g.,
+  ARCHITECTURAL), because it is implicit in the Type attribute.
+\item [{attribute~Type}] is the type of element to which the
+  \const{EXECTIME} element is referred to. Available types are:
+
+  \begin{description}
+  \item [{task}] The Ref attribute refers to a \const{TASK} name. The
+    back annotation gives information about an entire \const{TASK}
+    instance.
+  \item [{proc}] The Ref attribute refers to a \const{PROC} name. The
+    back annotation gives information about a \const{PROC} execution
+    time.
+    % FIXME: to be better specified which is the method to which the
+    % annotation is referring
+  \item [{method}] The Ref attribute refers to a specific
+    \const{METHOD} of a \const{VAR} or of a \const{PROC}.
+  \item [{resource\_method}] The Ref attribute refers to a
+    \const{METHOD} of an architectural element \const{RESOURCE}.
+  \end{description}
+  
+\item [{attribute~ModeRef}] is the name of the mode to which this
+  mapping is related. If not specified, the default mode is used.
+\end{description}
+
+The current version of the schedulability analyzer use the Task exec
+times as informations for the execution time of tasks. Then, it uses
+the execution time of methods linked to \const{VAR} and
+\const{RESOURCE} elements as the information from where the blocking
+times are computed.
+
+The \const{EXECTIME} element can contain the following elements:
+\const{WORST}, \const{BEST}, \const{DISTRIBUTION}.
+
+The current version of the \rtd\ Toolset uses only the \const{WORST}
+element.
+
+
+\subsubsection{\const{WORST}}
+
+This element can be used to specify the worst case execution time of
+the element being measured by the \const{EXECTIME}.
+
+The \const{WORST} element has only one attribute:
+\begin{description}
+\item [{attribute~Value}] is the worst case execution time.
+\end{description}
+
+\subsubsection{\const{BEST}}
+
+This element can be used to measure the best case execution time of
+the element being measured by the \const{EXECTIME}.
+
+The current version of the \rtd\ Tool set does not use this element.
+
+The \const{BEST} element has only one attribute:
+\begin{description}
+\item [{attribute~Value}] is the minimum measured execution time.
+\end{description}
+
+\subsubsection{\const{DISTRIBUTION}}
+
+This element can be used to represent the probabilistic distribution
+of the execution time of the element being measured by the
+\const{EXECTIME}.  The current version of the \rtd\ schedulability
+analysis does not use this element. The \const{DISTRIBUTION} element
+has only one attribute:
+
+\begin{description}
+\item [{attribute~Type}] is used to specify the kind of distribution
+  (e.g., Gaussian, Poisson, ...).
+\end{description}
+
+The \const{DISTRIBUTION} element can contain the following elements:
+\const{AVG}, \const{VARIANCE}, \const{SAMPLE}.
+
+
+\paragraph{\const{AVG}}
+
+The \const{AVG} element is used to contain an average execution time.
+It only has an attribute \textbf{Value} that contains that
+information.  Only zero or one element of this kind can appear inside
+a \const{DISTRIBUTION} element.
+
+
+\paragraph{\const{VARIANCE}}
+
+The \const{VARIANCE} element is used to contain the variance of the
+execution time. It only has an attribute \textbf{Value} that contains
+that information. Only zero or one element of this kind can appear
+inside a \const{DISTRIBUTION} element.
+
+
+\paragraph{\const{SAMPLE}}
+
+The \const{SAMPLE} element is used to represent a discrete probability
+distribution of the execution times. Each \const{SAMPLE} element
+represents a sample of the probability distribution. For that reason,
+the element has two attributes, \textbf{Value} and
+\textbf{Probability}, that are used to describe the value of the
+sample and its probability.
+
+Of course, zero or more \const{SAMPLE} elements can appear inside a
+\const{DISTRIBUTION} element.
+
+
+\paragraph{Example}
+
+The following example shows how to annotate the execution time of the
+\const{read} and \const{write} methods provided by variable
+\const{img1} internal to the \const{Guide} subsystem. The annotation
+also shows the amount of time the \const{Guide} task has executed on
+the CPU.
+
+\begin{lstlisting}
+[...]
+<ANNOTATION>
+[...]
+  <EXECTIME Ref="Guide/img1/read" Type="METHOD">
+     <WORST Value="8us" />
+  </EXECTIME>
+  <EXECTIME Ref="Guide/img1/write" Type="METHOD">
+     <WORST Value="10us" />
+  </EXECTIME> 
+
+  <EXECTIME Ref="Guide" Type="TASK">
+     <WORST Value="0.5ms" />
+  </EXECTIME> 
+[...]
+</ANNOTATION>
+[...]
+\end{lstlisting}
+
+
+\section{Schedulability section}
+\label{sec:Schedulability-section}
+
+The schedulability section contains a set of elements that store the
+result of the schedulability analysis. The idea is that the \rtd\ Tool
+set (once the user has provided all the necessary informations about
+tasks, methods, resources, ...) is able to compute some
+schedulability analysis (see Chapter
+\ref{cha:Schedulability-analysis}) that returns two kind of
+informations:
+% FIXME - ref not existing
+
+\begin{itemize}
+\item a textual report;
+\item a detailed (for each \const{RTOS}, for each \const{TASK}) schedulability
+information.
+\end{itemize}
+
+The schedulability section reports, for each application mode, a
+scheduling \emph{scenario}, that is, the schedulability information
+for the system.  The system retains the last detailed schedulability
+informations and all the reports which have been generated. The
+schedulability section is composed by a sequence of
+\const{SCHEDULINGSCENARIO} elements.
+
+
+\subsection{\const{SCHEDULINGSCENARIO}}
+
+A scheduling scenario represents the system schedulability
+information.  A scheduling scenario is explicitly referred to a single
+application mode. Only a scheduling scenario may exist for a given
+application mode.
+
+The \const{SCHEDULINGSCENARIO} element has only one attribute:
+
+\begin{description}
+\item [{attribute~ModeRef}] is the application Mode to which the
+  scenario refers to.
+\end{description}
+
+The \const{SCHEDULINGSCENARIO} element can contain one ore more of the
+following elements: \const{REPORT}, \const{CPUSCHED},
+\const{TASKSCHED}.
+
+
+\subsubsection{\const{REPORT}}
+
+The \const{REPORT} element is an unformatted text container that
+contains the schedulability report produced by the schedulability
+tool. More than one report can be present for the same application
+mode.
+
+
+\subsubsection{\const{CPUSCHED}}
+
+The \const{CPUSCHED} element gives some overall scheduling
+informations about an \const{RTOS} mapped to a \const{CPU}. The
+\const{CPUSCHED} element contains the following attributes:
+
+\begin{description}
+\item [{attribute~CpuRef}] is the \const{CPU} name which this element
+  refers to. \const{CpuRef} is not a pathname, because there is only a
+  namespace for \const{CPU}s.
+\item [{attribute~Utilization}] is the utilization factor of the
+  taskset allocated to the \const{CPU}.
+\item [{attribute~SpeedFactor}] is the speed factor of the taskset
+  allocated to the \const{CPU}.
+\item [{attribute~Boundary}] is the theoretical $U_{lub}$boundary for
+  the taskset.
+\item [{attribute~Schedulable}] is the answer of the schedulability
+  test.  Possible values are {}``\emph{yes}'' and {}``\emph{no}''.
+\end{description}
+
+\subsubsection{\const{TASKSCHED}}
+
+The \const{TASKSCHED} element gives some overall scheduling
+informations about a task.
+
+The \const{TASKSCHED} element contains the following attributes:
+
+\begin{description}
+\item [{attribute~TaskRef}] is the task (path) name which this element
+  refers to. If the \const{TASKREF} name contains special characters,
+  they must be protected using {}``\textbackslash{}''.
+\item [{attribute~Utilization}] is the utilization of the task.
+\item [{attribute~CDelta}] is the amount of computation time the task
+  should decrease to let the task set being schedulable.
+\item [{attribute~TDelta}] is the amount of time the period of a task
+  should increase to let the task set being schedulable.
+\item [{attribute~Schedulable}] is the answer of the schedulability
+  test.  Possible values are {}``\emph{yes}'' and {}``\emph{no}''.
+\item [{attribute~ResponseTime}] is the worst case response time of a
+  task.
+\end{description}
+
+\paragraph{Example}
+
+A detailed explanation of the report and on the results can be
+obtained running the examples provided with the \rtd\ Toolset. The
+meaning of each field is described in detail in Chapter
+\ref{cha:Schedulability-analysis}.
+% FIXME ref
+
+
+\section{Conventions and references}
+
+The XML file structure defined in this chapter is written using a set
+of conventions that specifies how things should be written inside some
+attribute or element descriptions. Moreover, some elements (e.g.,
+\const{METHOD} elements) are common to different element
+specifications (e.g., a \const{VAR} and a \const{PROC} can have a
+\const{METHOD} element). Finally, some elements often need to refer
+other elements (for example, to express that {}``a \const{PROC} is
+using a \const{METHOD} provided by a \const{VAR}''). For that reason,
+specific XML elements have to be used (e.g., a \const{METHODREF}), and
+the meaning of these elements is simply to refer other elements.
+
+This section lists all these reference elements, conventions, and
+shared elements.
+
+
+\subsection{Name convention}
+
+The current implementation of the \rtd\ Toolset maps the different
+entities in the system under analysis (e.g., Tasks, CPUs, execution
+times, ...) to XML elements. Each XML element will typically
+refer to a different system entity. Entities have a name specified in
+the \const{name} attribute. Two XML elements of the same kind $\alpha$
+and $\beta$ with the same \const{name} attribute value refer to the
+same system entity. In case two (or more) declarations exist, the tool
+will try to merge the parameter definitions in the declarations.  If
+the same parameter is assigned different values in different
+declarations (in case of conflicts), the last one that appears in the
+input file will prevail, but \underbar{no error message will be
+  provided}.
+
+Future versions of the tool set will provide error messages to inform
+the user about the overwriting of different system parameters.
+
+
+\subsection{Time references}
+
+Throughout this document, whenever a timing reference is needed, the
+user can specify a timing unit chosen from the following list:
+
+\begin{description}
+\item [{h}] hours
+\item [{m}] minutes
+\item [{s}] seconds
+\item [{ms}] milliseconds
+\item [{us}] microseconds
+\item [{ns}] nanoseconds
+\end{description}
+
+If not specified, milliseconds (\textbf{ms}) are used as default
+timing unit.
+
+
+\subsubsection{Example}
+
+Example of time units are:
+\begin{description}
+\item [1ms] one millisecond;
+\item [1m] one minute;
+\item [60001ms] one minute plus one millisecond.
+\end{description}
+
+\subsection{Paths to elements}
+\label{sub:Paths-to-elements}
+
+The XML structure used by the \rtd\ Tool set describe a tree of XML
+elements representing the various elements in a given system.
+Throughout this document, whenever a reference to an existing element
+is needed, the entire path to that element should be used.
+
+The path should contain the values of the \const{Name} attribute
+separated by the \emph{slash} \emph{character} {}``/''. As an example,
+a valid path is {}``\const{mysubsystem/myproc/write}''. If the
+\emph{slash character} {}``\const{/}'' is protected by \emph{backslash
+  character} {}``\const{\\}'', then in this case it is
+considered part of a name in the hierarchy. As an example, the path
+{}``\const{mysubsystem\\/name/myproc/write}'' has three
+elements: {}``\const{mysubsystem/name}'', {}``\const{myproc}'' and
+{}``\const{write}''.
+
+The \emph{backslash character} {}``\textbackslash{}'' can be protected
+with another \emph{backslash character} {}``\textbackslash{}''.  As an
+example, the path
+{}``\const{mysub\\\\/name/myproc/write}''
+has four elements: {}``\const{mysub\\}'',
+{}``\const{name}'', {}``\const{myproc}'' and {}``\const{write}''.
+
+All others characters are considered part of a path name. A local path
+refers to a local object, in the form
+{}``\const{objectname/methodname}''.  A global path refers to an
+object in any place of the hierarchy, in the form
+{}``\const{name/.../name}''.
+
+% FIXME: see bug 149 in the old Evidence bugzilla
+
+
+\subsection{\const{METHOD}}
+\label{sub:METHOD}
+
+A method in general can be thought as a function that implement some
+part of the behavior of an object. For example, a \const{PROC}
+implementing a control algorithm may have different methods each one
+implementing a different version of the same control rule. A
+\const{VAR} can export different methods that allow to access a shared
+data structure in different ways.
+
+A \const{METHOD} element has only one attribute:
+\begin{description}
+\item [{attribute~Name}] this attribute specifies the \const{METHOD}
+  name. Method names are \emph{unique} names for each object (as
+  \const{PROC} and \const{VAR}).
+\end{description}
+
+\subsection{\const{METHODREF}}
+\label{sub:METHODREF}
+
+A \const{METHODREF} is used to explicitly model the fact that a PROC
+$\alpha$ has some relationship with another \const{PROC} $\beta$
+because $\alpha$ is calling a \const{METHOD} exported by $\beta$.  A
+\const{METHODREF} requires the following attributes:
+\begin{description}
+\item [{attribute~Name}] this attribute specifies a method inside the
+  functional section. Please remind that method names are unique in
+  all the functional section.
+\item [{attribute~MethodName}] this attribute contains a path to a
+  \const{METHOD}.  Paths inside a \const{METHODREF} are local
+  pathnames in the form {}``objectname/methodname'' in the case of
+  \const{PROC} and \const{REQUIRED\_INTERFACE}; are global pathnames
+  in the case of \const{TRIGGER}, and \const{RESOURCEREF}.
+% FIXME: is this 100% correct?
+\end{description}
+The \const{METHODREF} does not give any kind of information about how
+many times the method pointed by the \const{METHODREF} is called.
+
+
+\subsection{\const{EVENTREF}}
+\label{sub:EVENTREF}
+
+\const{EVENTREF} is an element used to reference an \const{EVENT}.  An
+\const{EVENTREF} has only one attribute:
+\begin{description}
+\item [{attribute~Name}] the Name attribute is the name of the
+  \const{EVENT} which the \const{EVENTREF} is referred to.
+\end{description}
+
+\subsection{\const{MUTEXREF}}
+\label{sub:MUTEXREF}
+
+\const{MUTEXREF} is an element used to reference a \const{MUTEX}.  It
+is mainly used inside \const{RESOURCES} (see Section
+\ref{sub:RESOURCE} and Figure \ref{fig:RESOURCE}). A \const{MUTEXREF}
+has two attributes:
+\begin{description}
+\item [{attribute~MutexName}] the \const{MUTEX} name to which this
+  element refers. MutexName is not a pathname, because all the
+  references to mutexes can be done only in the same namespace of the
+  entity that requires it.
+\item [{attribute~ModeRef}] is used to specify to which Mode the
+  \const{MUTEXREF} object is related.
+\end{description}
+
+\section{A complete example}
+
+As a complete example, consider the example number 5 (under the
+directory \file{examples/005} of the \rtd\ directory tree). The
+example describes a model of a small toy composed by a little car with
+two motors directly connected to the wheels. The toy can read a shaded
+path using a light sensor, following the reference position in the
+path using a differential control algorithm. The toy example is
+composed by 2 subsystems:
+
+\begin{description}
+\item [Guida] reads the data from an optical sensor, computing the
+  optimal reference speed of the two motors following a control rule.
+\item [ControlloMotore] tries to change the power set to the motors to
+  minimize the difference between the optimal values computed by the
+  \const{Guida} subsystem and the values read by the rotational
+  sensors on the wheels.
+\end{description}
+
+All the \const{PROC} elements of the two subsystems are then mapped on
+three different \const{TASK}s:
+
+\begin{description}
+\item [irq\_sensori] this \const{TASK} element is an ISR
+  that reads the light sensors with a period of 1 ms.
+\item [Guida] this \const{TASK} element is a task that
+  computes the optimal motor speed values with a period of 1 ms.
+\item [ControlloMotore] this \const{TASK} element reads the
+  rotational sensors on the wheels and controls the motor speed trying
+  to reach the value of the optimal speed. The Period is set to 0.05
+  ms.
+\end{description}
+
+Finally, two mutexes, \const{MutexIngressi} and \const{MutexVel} are
+defined to allow data exchange between the various \const{TASK}
+elements.
