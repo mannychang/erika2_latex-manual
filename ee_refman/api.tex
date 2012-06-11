@@ -2,12 +2,12 @@
 \label{sec:api_reference}
 
 \section{Introduction}
-The \ee\ Operating System provides a basic interface for the execution
-of concurrent applications on a single processor and on multiprocessor
-systems.
+The \ee\ Operating System provides a interface according to OSEK/VDX
+specification, version 2.2.3. In addition, extended that specification
+allowing the development of multicore applications.
 
 The interface proposed is suited for small 8 to 32 bit
-microcontrollers, and proposes an architecture where tasks can execute
+architectures, and proposes an environment where tasks can execute
 concurrently exchanging data with a shared memory paradigm. Support
 for limited synchronization primitives is also provided. 
 
@@ -80,6 +80,15 @@ Resources, Alarms, and Application modes are codified as integers, so
 there can be up to $2^n-1$ different entities, where $n$ is the number
 of bits of the CPU register width (e.g., 32 for a 32 bit CPU).
 
+Figure \ref{tab:minimum-requirements} shows the current limits with
+respect to the number of OS objects allowed in the system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% INIZIO PARTE IMPORTATA DA minimumrequirements.lyx - NON MODIFICARE
+% MODIFICATE IL LYX, ESPORTATE e commentate all'inizio ed alla fine!!!
+\input{minimumrequirements.tex}
+% FINE PARTE IMPORTATA DA TABELLAOSEK.LYX - NON MODIFICARE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Available primitives}
 \ee\ provides a set of primitives that can be called in different
@@ -87,8 +96,12 @@ situations. The complete list of primitives is listed in Table
 \ref{tab:api-restrictions}, together with the locations where it is
 legal to call these functions.
 
+The Background Task is the context where the application \fn{main()}
+function is executed, after the call to \reffun{StartOS}. Please note that by default the current implementation of the \reffun{StartOS} primitive never returns. To make it return, tou need to add the following option to the OIL file:
 
-
+\begin{lstlisting}
+  EE_OPT = __OO_STARTOS_OLD__
+\end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INIZIO PARTE IMPORTATA DA TabellaOSEK.lyx - NON MODIFICARE
@@ -160,28 +173,31 @@ for writing applications.
     This is the list of Service IDs values that can be returned by
     \reffun{OSErrorGetServiceId}:
     \begin {lstlisting}
-#define OSServiceId_ActivateTask     1
-#define OSServiceId_TerminateTask    2
-#define OSServiceId_ChainTask        3
-#define OSServiceId_Schedule         4
-#define OSServiceId_GetTaskState     5
-#define OSServiceId_GetResource      6
-#define OSServiceId_ReleaseResource  7
-#define OSServiceId_SetEvent         8
-#define OSServiceId_ClearEvent       9
-#define OSServiceId_GetEvent        10
-#define OSServiceId_WaitEvent       11
-#define OSServiceId_GetAlarmBase    12
-#define OSServiceId_GetAlarm        13
-#define OSServiceId_SetRelAlarm     14
-#define OSServiceId_SetAbsAlarm     14
-#define OSServiceId_CancelAlarm     16
-#define OSServiceId_AlarmTick       17
-#define OSServiceId_ForceSchedule   18
+#define OSServiceId_ActivateTask      1U
+#define OSServiceId_TerminateTask     2U
+#define OSServiceId_ChainTask         3U
+#define OSServiceId_Schedule          4U
+#define OSServiceId_GetTaskID         5U
+#define OSServiceId_GetTaskState      6U
+#define OSServiceId_GetResource       7U
+#define OSServiceId_ReleaseResource   8U
+#define OSServiceId_SetEvent          9U
+#define OSServiceId_ClearEvent        10U
+#define OSServiceId_GetEvent          11U
+#define OSServiceId_WaitEvent         12U
+#define OSServiceId_GetAlarmBase      13U
+#define OSServiceId_GetAlarm          14U
+#define OSServiceId_SetRelAlarm       15U
+#define OSServiceId_SetAbsAlarm       16U
+#define OSServiceId_CancelAlarm       17U
+#define OSServiceId_IncrementCounter  18U
+#define OSServiceId_GetCounterValue   19U
+#define OSServiceId_GetElapsedValue   20U
+#define OSServiceId_StartOS           21U
+#define OSServiceId_ForceSchedule     22U
     \end{lstlisting}
     Please note that the primitives:
     \begin{itemize}                              \vspace{-2mm}
-      \item \reffun{GetTaskID}                   \vspace{-2mm}
       \item \reffun{DisableAllInterrupts}        \vspace{-2mm}
       \item \reffun{EnableAllInterrupts}         \vspace{-2mm}
       \item \reffun{SuspendAllInterrupts}        \vspace{-2mm}
@@ -189,7 +205,6 @@ for writing applications.
       \item \reffun{SuspendOSInterrupts}         \vspace{-2mm}
       \item \reffun{ResumeOSInterrupts}          \vspace{-2mm}
       \item \reffun{GetActiveApplicationMode}    \vspace{-2mm}
-      \item \reffun{StartOS}                     \vspace{-2mm}
       \item \reffun{ShutdownOS}                  \vspace{-2mm}
     \end{itemize}
     never return an error, and for that reason they are not listed
@@ -222,6 +237,8 @@ for writing applications.
     the conformance classes ECC1 and ECC2.
   \end{constantdescription}
 \end{constant}
+
+%% EG: Finalmente aggiungere le informazioni relative alle macro dei contatori?
 
 %% Nota: questa parte non è ancora generata da RT-Druid!
 
@@ -635,6 +652,9 @@ may be implemented:
   Resource, and interrupts, can preempt it.
 \end{description}
 
+Independently of the task type all kernel primitives that may cause
+rescheduling may be called in any Tasks' sub-functions.
+
 Tasks are activated using the primitives \reffun{ActivateTask} or
 \reffun{ChainTask}. Activating a task means that the activated task,
 may be selected for scheduling, and may execute one Task Instance. A
@@ -819,12 +839,9 @@ OIL configuration file.
     context is saved and the higher-priority task is
     executed. Otherwise the calling task is continued.
 
-    This function does not release the internal resource that the
-    current task may have locked. This function is typically used
-    after a call to \reffun{CounterTick} within a task, to force a
-    reschedule of the system after a task activation that may have
-    been issued within an alarm notification executed by the
-    \reffun{CounterTick} primitive.
+    The difference of this primitive with respect to \reffun{Schedule}
+    is that Internal Resources are not released.
+
   \end{fundescription}
   \begin{funreturn}
     \fret{void}{The function is redefined as returning \const{void} when
@@ -1135,6 +1152,14 @@ The primitives \reffun{GetResource} and \reffun{ReleaseResource}
 automatically internally uses a spin-lock mechanism when called on a
 Global Resource.
 
+\ee\ support resource management at ISR level for a selected number of
+architectures. Please check on the \ee\ wiki whether the architecture
+you are currently using supports this feature. The implementation of
+this feature is implemented extending the OIL configuration to accept
+ISR priority as extra field in ISR Object definition. The ISR Priority
+field contains architecture independent values which are then mapped
+by \rtd\ to real interrupt priority register values.
+
 \pagebreak
 
 
@@ -1382,7 +1407,7 @@ also the fact that the multistack kernel have to be used.
 Alarm}s.
 
 A Counter is basically an integer value that can be incremented by $1$
-``Tick'' using the primitive \reffun{CounterTick}. 
+``Tick'' using the primitive \reffun{IncrementCounter}. 
 
 An Alarm is a notification that is attached to a specific Counter (the
 link between a Counter and an Alarm is specified at compile time in
@@ -1404,7 +1429,7 @@ to be one of the following actions:
   \reffun{ALARMCALLBACK}) is called.
 \end{description} 
 
-The notifications are executed inside the \reffun{CounterTick}
+The notifications are executed inside the \reffun{IncrementCounter}
 function. It is up to the developer placing the counter in meaningful
 places (e.g., a timer interrupt).
 
@@ -1417,25 +1442,20 @@ CPU. Alarms are local to the CPU that hosts the counter they are
 linked to.
 
 \begin{warning}
-Currently there is no support for automatically generated system
-counters\index{System counters} (e.g., counters that are automatically
-linked to hardware timers). All the counters have to be defined inside
-the OIL Configuration file, and the user have to call
-\reffun{CounterTick} to increment them. 
-
-Also, there is limited support for the \reftype{AlarmBaseType} type
-and \reffun{GetAlarmBase} primitive. In fact, although the primitive
-returns the values that are set for the alarm in the OIL file, these
-values are not taken into consideration by \reffun{CounterTick},
-\reffun{SetRelAlarm}, and \reffun{SetAbsAlarm}. Support for this
-feature will be provided in the next versions of \ee.
+The OSEK/VDX standard provides support for \index{System Counter}s
+(e.g., counters that are automatically linked to hardware
+timers). Please check on the \ee\ wiki whether the architecture you
+are using supports this feature. If the architecture does not support
+the feature, then all the counters have to be defined inside the OIL
+Configuration file, and the user have to call
+\reffun{IncrementCounter} to increment them.
 \end{warning}
 
 \pagebreak
 
-\begin{function}{CounterTick}
+\begin{function}{IncrementCounter}
   %PJ: vedere il commento
-  \synopsis{void CounterTick(CounterType c)}
+  \synopsis{void IncrementCounter(CounterType c)}
   \begin{fundescription}
     This function receives a counter identifier as parameter, and it
     increments it by 1. This function is typically called inside an
@@ -1450,12 +1470,9 @@ feature will be provided in the next versions of \ee.
       \item an event mask set on an extended task.
     \end{itemize}
 
-    The function is atomic, and no rescheduling will take place after
-    the execution of this function. When called from the task level,
-    to implement the rescheduling the application should call
-    \reffun{Schedule} or \reffun{ForceSchedule} after the call to this
-    function. When called from the ISR type 2 level, the rescheduling
-    will automatically take place at the end of the interrupt routines.
+    The function is atomic, and a reschedule will happen at the end if
+    the primitive is called at task level. If called at ISR level, the
+    reschedule will happen at the end of the outermost nested IRQ.
   \end{fundescription}
   \begin{funparameters}
     \fpar{c}{The counter that needs to be incremented.}
@@ -1467,6 +1484,9 @@ feature will be provided in the next versions of \ee.
     BCC1, BCC2, ECC1, ECC2
   \end{funconformance}
 \end{function}
+
+% EG: Bisognerebbe aggiungere le due funzioni GetCounterValue e GetElapsedValue
+% Aggiunte per avvicinarsi alla conformance Autosar.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1541,6 +1561,7 @@ feature will be provided in the next versions of \ee.
     If the alarm is already in use, this call will be ignored and the
     error \const{E_OS_STATE} is returned.  Allowed on task level and
     in ISR, but not in hook routines.
+
   \end{fundescription}
   \begin{funparameters}
     \fpar{AlarmID}{Reference to alarm}
@@ -1555,7 +1576,7 @@ feature will be provided in the next versions of \ee.
     \fret{E_OK}{No error.}
     \fret{E_OS_STATE}{Alarm is already in use.}
     \fret{E_OS_ID}{(Extended) reference \vr{AlarmID} is invalid}
-    
+    \fret{E_OS_VALUE}{(Standard and Extended) Value of \vr{increment} equal to 0.}
     \fret{E_OS_VALUE}{(Extended) Value of \vr{increment} outside of
       the admissible limits, or value of \vr{cycle} unequal to 0 and
       outside of the admissible counter limits.}
@@ -1574,15 +1595,9 @@ feature will be provided in the next versions of \ee.
     \vr{start} ticks are reached, the \vr{AlarmID} notification is
     executed.
     
-    If the absolute value \vr{start} is very close to the current
-    counter value, the alarm may expire, and the task may become ready
-    or the alarm-callback may be called before the system service
-    returns to the user.
-    
-    If the absolute value \vr{start} was already reached before the
-    system call, the alarm shall only expire when the absolute value
-    \vr{start} is reached again, i.e. after the next overrun of the
-    counter.
+    If the absolute value \vr{start} is equal to the actual counter
+    value, the alarm not expire immediately but will expire the next
+    time the counter will reach the \vr{start} value..
     
     If \vr{cycle} is unequal zero, the alarm element is logged on
     again immediately after expiry with the relative value \vr{cycle}.
@@ -1642,6 +1657,14 @@ feature will be provided in the next versions of \ee.
 
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Internal Messages}
+
+\ee\ supports internal messaging following the OSEK COM specifiations,
+conformace classes CCCA and CCCB. Please refer to the \ee\ COM Manual
+for more information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1764,7 +1787,7 @@ problems. Please use Resources instead (see Section
 \begin{function}{TryWaitSem}
   \synopsis{int TryWaitSem(SemRefType s);}
   \begin{fundescription}
-    This is a non-blocking version of \reffun{SemWait}. If the
+    This is a non-blocking version of \reffun{WaitSem}. If the
     semaphore counter is greater than 0, then the counter is
     decremented by one, and the primitive returns 0. If the counter
     has a value of 0, then the counter is decremented, and the
@@ -1889,12 +1912,25 @@ hardware reset.
     alarms \const{AUTOSTART} set as \const{TRUE} inside the OIL
     configuration file. After that, the system is rescheduled and the
     highest priority ready task is executed.
-
-    The function returns to the caller after the first idle time is
-    reached. It is up to the caller to implement a meaningful
-    background activity. If unsure of a meaningful background
-    activity, just use the \fn{for(;;)} construct.
     
+    The \reffun{StartOS} primitive by default never returns to the caller.
+
+    Please note that old versions of \ee\ implemented the
+    \reffun{StartOS} primitive in a way that it was returning to the
+    user, to enable the possibility to do some meaningful background
+    activities. To re-enable this old behavior, please add the
+    following line to the OIL file:
+
+\begin{lstlisting}
+  EE_OPT = "__OO_STARTOS_OLD__"
+\end{lstlisting}
+
+    If the function is configured to return to the caller, then it
+    will return after the first idle time is reached. It is up to the
+    caller to implement a meaningful background activity.  If unsure
+    of a meaningful background activity, just use the \fn{for(;;)}
+    construct.
+
   \end{fundescription}
   \begin{funparameters}
     \fpar{Mode}{application mode}
@@ -2532,11 +2568,11 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{OSError\_CounterTick\_AlarmID}{OSError_CounterTick_AlarmID}
-  \synopsis{AlarmType OSError_CounterTick_AlarmID(void)}
+\begin{function_nopb2}{OSError\_IncrementCounter\_AlarmID}{OSError_IncrementCounter_AlarmID}
+  \synopsis{AlarmType OSError_IncrementCounter_AlarmID(void)}
   \begin{fundescription}
     The function returns the \const{AlarmID} of the Alarm notification
-    triggered by \reffun{CounterTick} that raised the error. The function must
+    triggered by \reffun{IncrementCounter} that raised the error. The function must
     be used inside \reffun{ErrorHook} after having discovered using
     \reffun{OSErrorGetServiceId} that the error was caused by that
     function.
@@ -2550,11 +2586,11 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{OSError\_CounterTick\_TaskID}{OSError_CounterTick_TaskID}
-  \synopsis{TaskType OSError_CounterTick_TaskID(void)}
+\begin{function_nopb2}{OSError\_IncrementCounter\_TaskID}{OSError_IncrementCounter_TaskID}
+  \synopsis{TaskType OSError_IncrementCounter_TaskID(void)}
   \begin{fundescription}
     The function returns the \const{TaskID} related to the Alarm
-    notification triggered by \reffun{CounterTick} that raised the
+    notification triggered by \reffun{IncrementCounter} that raised the
     error. The function must be used inside \reffun{ErrorHook} after
     having discovered using \reffun{OSErrorGetServiceId} that the
     error was caused by that function.
@@ -2568,11 +2604,11 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{OSError\_CounterTick\_Mask}{OSError_CounterTick_Mask}
-  \synopsis{EventMaskType OSError_CounterTick_Mask(void)}
+\begin{function_nopb2}{OSError\_IncrementCounter\_Mask}{OSError_IncrementCounter_Mask}
+  \synopsis{EventMaskType OSError_IncrementCounter_Mask(void)}
   \begin{fundescription}
     The function returns the Event \const{Mask} related to the Alarm
-    notification triggered by \reffun{CounterTick} that raised the
+    notification triggered by \reffun{IncrementCounter} that raised the
     error. The function must be used inside \reffun{ErrorHook} after
     having discovered using \reffun{OSErrorGetServiceId} that the
     error was caused by that function.
@@ -2586,11 +2622,11 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{OSError\_CounterTick\_action}{OSError_CounterTick_action}
-  \synopsis{EE_TYPENOTIFY OSError_CounterTick_action(void)}
+\begin{function_nopb2}{OSError\_IncrementCounter\_action}{OSError_IncrementCounter_action}
+  \synopsis{EE_TYPENOTIFY OSError_IncrementCounter_action(void)}
   \begin{fundescription}
     The function returns the \const{action} related to the Alarm
-    notification triggered by \reffun{CounterTick} that raised the
+    notification triggered by \reffun{IncrementCounter} that raised the
     error. The function must be used inside \reffun{ErrorHook} after
     having discovered using \reffun{OSErrorGetServiceId} that the
     error was caused by that function.

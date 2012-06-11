@@ -1,0 +1,33 @@
+\begin{table}
+\begin{centering}
+\begin{tabular}{|>{\centering}p{4cm}|>{\centering}p{1.4cm}|>{\centering}p{1.4cm}|>{\centering}p{1.4cm}|>{\centering}p{1.4cm}|}
+\hline 
+Feature & BCC1 & BCC2 & ECC1 & ECC2\tabularnewline
+\hline 
+Multiple requesting of task activation & no & yes & no & BT: yes; ET: no\tabularnewline
+\hline 
+Number of tasks which are not in the \emph{suspended} state & \multicolumn{2}{c|}{at least 255} & \multicolumn{2}{>{\centering}p{2.8cm}|}{at least 255 (any combination of BT/ET)}\tabularnewline
+\hline 
+More than one task per priority & yes & yes & yes & yes\tabularnewline
+\hline 
+Number of events per task & \multicolumn{2}{c|}{-} & \multicolumn{2}{c|}{\emph{nbits}}\tabularnewline
+\hline 
+Number of task priorities & \emph{nbits} & 16 & \emph{nbits} & 16\tabularnewline
+\hline 
+Resources & \multicolumn{4}{>{\centering}p{5.6cm}|}{$2^{nbits}-1$ (including RES\_SCHEDULER)}\tabularnewline
+\hline 
+Internal Resources & \multicolumn{4}{>{\centering}p{5.6cm}|}{no limit (they are automatically computed by the OIL Compiler)}\tabularnewline
+\hline 
+Alarms & \multicolumn{4}{c|}{$2^{nbits}-1$}\tabularnewline
+\hline 
+Application modes & \multicolumn{4}{c|}{$2^{nbits}-1$}\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\caption{\label{tab:minimum-requirements}This table lists the current limits
+with respect to the number of OS objects allowed in the system. \emph{nbits}
+means the number of bits stored in a microcontroller register (16
+on a 16 bit machine, 32 on a 32 bit machine, with a minimum value
+of 16).}
+\end{table}

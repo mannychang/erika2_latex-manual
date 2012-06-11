@@ -1,378 +1,88 @@
-%
 \begin{table}
-\begin{centering}\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\begin{centering}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
 \hline 
-Service&
-\begin{sideways}
-Background Task%
-\end{sideways}&
-\begin{sideways}
-Task%
-\end{sideways}&
-\begin{sideways}
-ISR1%
-\end{sideways}&
-\begin{sideways}
-ISR2%
-\end{sideways}&
-\begin{sideways}
-ErrorHook%
-\end{sideways}&
-\begin{sideways}
-PreTaskHook%
-\end{sideways}&
-\begin{sideways}
-PostTaskHook%
-\end{sideways}&
-\begin{sideways}
-StartupHook%
-\end{sideways}&
-\begin{sideways}
-ShutdownHook%
-\end{sideways}&
-\begin{sideways}
-Alarm Callback%
+Service & \begin{sideways}
+Background Task
+\end{sideways} & \begin{sideways}
+Task
+\end{sideways} & \begin{sideways}
+ISR1
+\end{sideways} & \begin{sideways}
+ISR2
+\end{sideways} & \begin{sideways}
+ErrorHook
+\end{sideways} & \begin{sideways}
+PreTaskHook
+\end{sideways} & \begin{sideways}
+PostTaskHook
+\end{sideways} & \begin{sideways}
+StartupHook
+\end{sideways} & \begin{sideways}
+ShutdownHook
+\end{sideways} & \begin{sideways}
+Alarm Callback
 \end{sideways}\tabularnewline
-\hline
 \hline 
-\reffun{ActivateTask}&
-$\surd^{*}$&
-$\surd$&
-&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
 \hline 
-\reffun{TerminateTask}&
-&
-$\surd$&
-&
-&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{ActivateTask} & $\surd^{*}$ & $\surd$ &  & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{ChainTask}&
-&
-$\surd$&
-&
-&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{TerminateTask} &  & $\surd$ &  &  &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{Schedule}&
-&
-$\surd$&
-&
-&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{ChainTask} &  & $\surd$ &  &  &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{ForceSchedule}&
-$\surd^{*}$&
-$\surd^{*}$&
-&
-&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{Schedule} &  & $\surd$ &  &  &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{GetTaskID}&
-&
-$\surd$&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-\tabularnewline
+\reffun{ForceSchedule} & $\surd^{*}$ & $\surd^{*}$ &  &  &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{GetTaskState}&
-&
-$\surd$&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-\tabularnewline
+\reffun{GetTaskID} &  & $\surd$ &  & $\surd$ & $\surd$ & $\surd$ & $\surd$ &  &  & \tabularnewline
 \hline 
-\reffun{DisableAllInterrupts}&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{GetTaskState} &  & $\surd$ &  & $\surd$ & $\surd$ & $\surd$ & $\surd$ &  &  & \tabularnewline
 \hline 
-\reffun{EnableAllInterrupts}&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{DisableAllInterrupts} & $\surd^{*}$ & $\surd$ & $\surd$ & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{SuspendAllInterrupts}&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-$\surd$\tabularnewline
+\reffun{EnableAllInterrupts} & $\surd^{*}$ & $\surd$ & $\surd$ & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{ResumeAllInterrupts}&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-$\surd$\tabularnewline
+\reffun{SuspendAllInterrupts} & $\surd^{*}$ & $\surd$ & $\surd$ & $\surd$ & $\surd$ & $\surd$ & $\surd$ &  &  & $\surd$\tabularnewline
 \hline 
-\reffun{SuspendOSInterrupts}&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{ResumeAllInterrupts} & $\surd^{*}$ & $\surd$ & $\surd$ & $\surd$ & $\surd$ & $\surd$ & $\surd$ &  &  & $\surd$\tabularnewline
 \hline 
-\reffun{ResumeOSInterrupts}&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{SuspendOSInterrupts} & $\surd^{*}$ & $\surd$ & $\surd$ & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{GetResource}&
-&
-$\surd$&
-&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{ResumeOSInterrupts} & $\surd^{*}$ & $\surd$ & $\surd$ & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{ReleaseResource}&
-&
-$\surd$&
-&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{GetResource} &  & $\surd$ &  & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{SetEvent}&
-$\surd^{*}$&
-$\surd$&
-&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{ReleaseResource} &  & $\surd$ &  & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{ClearEvent}&
-&
-$\surd$&
-&
-&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{SetEvent} & $\surd^{*}$ & $\surd$ &  & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{GetEvent}&
-&
-$\surd$&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-\tabularnewline
+\reffun{ClearEvent} &  & $\surd$ &  &  &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{WaitEvent}&
-&
-$\surd$&
-&
-&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{GetEvent} &  & $\surd$ &  & $\surd$ & $\surd$ & $\surd$ & $\surd$ &  &  & \tabularnewline
 \hline 
-\reffun{CounterTick}&
-$\surd^{*}$&
-$\surd^{*}$&
-&
-$\surd^{*}$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{WaitEvent} &  & $\surd$ &  &  &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{GetAlarmBase}&
-&
-$\surd$&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-\tabularnewline
+\reffun{IncrementCounter} & $\surd^{*}$ & $\surd^{*}$ &  & $\surd^{*}$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{GetAlarm}&
-&
-$\surd$&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-&
-&
-\tabularnewline
+\reffun{GetAlarmBase} &  & $\surd$ &  & $\surd$ & $\surd$ & $\surd$ & $\surd$ &  &  & \tabularnewline
 \hline 
-\reffun{SetRelAlarm}&
-&
-$\surd$&
-&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{GetAlarm} &  & $\surd$ &  & $\surd$ & $\surd$ & $\surd$ & $\surd$ &  &  & \tabularnewline
 \hline 
-\reffun{SetAbsAlarm}&
-&
-$\surd$&
-&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{SetRelAlarm} &  & $\surd$ &  & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{CancelAlarm}&
-&
-$\surd$&
-&
-$\surd$&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{SetAbsAlarm} &  & $\surd$ &  & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{GetActiveApplicationMode}&
-&
-$\surd$&
-&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-$\surd$&
-\tabularnewline
+\reffun{CancelAlarm} &  & $\surd$ &  & $\surd$ &  &  &  &  &  & \tabularnewline
 \hline 
-\reffun{StartOS}&
-&
-$\surd$&
-&
-&
-&
-&
-&
-&
-&
-\tabularnewline
+\reffun{GetActiveApplicationMode} &  & $\surd$ &  & $\surd$ & $\surd$ & $\surd$ & $\surd$ & $\surd$ & $\surd$ & \tabularnewline
 \hline 
-\reffun{ShutdownOS}&
-&
-$\surd$&
-&
-$\surd$&
-$\surd$&
-&
-&
-$\surd$&
-&
-\tabularnewline
-\hline
-\end{tabular}\par\end{centering}
-
+\reffun{StartOS} & $\surd$ & $\surd$ &  &  &  &  &  &  &  & \tabularnewline
+\hline 
+\reffun{ShutdownOS} &  & $\surd$ &  & $\surd$ & $\surd$ &  &  & $\surd$ &  & \tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
 
 \caption{\label{tab:api-restrictions}This table lists the environments where
 primitives can be called. $\surd^{*}$means that the feature is an

@@ -2,13 +2,9 @@
 
 \section{\ee\ and \rtd}
 
-Evidence presents the \ee\ RTOS, a multi-processor real-time operating 
-system kernel, which is available for several platforms from Altera's 
-NIOS II Softcores to the \dspic\ micro-controllers family. 
-
-The \ee\ kernel introduces innovative concepts, mechanisms and programming
-features to support the future generation of micro-controllers and multicore
-systems-on-a-chip.
+\ee\ is a free of charge, open-source RTOS implementation of the
+OSEK/VDX API, available for various microcontrollers on the web page
+\url{http://erika.tuxfamily.org}.
 
 \ee\ offers the availability of a real-time scheduler and resource 
 managers allowing the full exploitation of the power of new generation 
@@ -32,27 +28,26 @@ model to reduce the overall stack usage;
 switch;
 \end{itemize}
 
-The \ee\ kernel has been developed with the idea of providing the
-minimal set of primitives which can beq used to implement a
-multithreading environment. The \ee\ API as a reduced OSEK/VDX API,
-providing support for thread activation, mutual exclusion, alarms, and 
+The \ee\ kernel is a complete OSEK/VDX environment, which can be used
+to implement multithreading applications. The \ee\ API providing
+support for thread activation, mutual exclusion, alarms, events and
 counting semaphores.
 
-The OSEK/VDX consortium provides the OIL language (OSEK Implementation 
-Language) as a standard configuration language, which is used for the 
-static definition of the RTOS objects which are instantiated and used 
-by the application. \ee\ fully supports the OIL language for the 
+The OSEK/VDX consortium provides the OIL language (OSEK Implementation
+Language) as a standard configuration language, which is used for the
+static definition of the RTOS objects which are instantiated and used
+by the application. \ee\ fully supports the OIL language for the
 configuration of real-time applications.
 
-\ee\ is natively supported by \rtd, a tool suite for the automatic 
-configuration and deployment of embedded applications which enables to 
-easily exploit multi-processor architectures and achieve the desired 
+\ee\ is natively supported by \rtd, a tool suite for the automatic
+configuration and deployment of embedded applications which enables to
+easily exploit multi-processor architectures and achieve the desired
 performance without modifying the application source code. More details
 about \rtd\ are available in a dedicated reference manual.
 
 The purpose of this document is to describe in detail the \ee\
 API. Details about specific architecture can be found in dedicated manuals,
-available for download on the Evidence web site.
+available for download on the Erika web site.
 
 
 
