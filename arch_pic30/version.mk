@@ -1,4 +1,0 @@
-ARCH_PIC30__DIR = arch_pic30
-ARCH_PIC30__MAIN_NAME = arch_pic30
-ARCH_PIC30__MAIN = arch_pic30
-ARCH_PIC30__VER = 1_1_9

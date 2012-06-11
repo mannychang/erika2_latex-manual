@@ -1,9 +1,8 @@
 AVR5  = arch_avr5  arch_avr5_tutorial
-PIC30 = arch_pic30 arch_pic30_tutorial
 NIOS2 = arch_nios2 arch_nios2_api_tutorial arch_nios2_fifo_tutorial arch_nios2_lwip_tutorial arch_nios2_multicore_tutorial 
 INTERNAL = eedoc_internal
 CORE = ee_basic_refman ee_porting ee_refman rtdruid_refman
-FLEX = flex_refman flex_scicos
+FLEX = flex_refman
 
 
 help:
@@ -11,7 +10,6 @@ help:
 	@echo
 	@echo make clean
 	@echo
-	@echo make pic30
 	@echo make avr5
 	@echo make nios2
 	@echo make internal
@@ -25,14 +23,12 @@ help:
 	@echo make install
 
 clean:
-	for x in $(PIC30) $(AVR5) $(NIOS2) $(INTERNAL) $(CORE) $(FLEX); do make -C $${x} clean; done;
+	for x in $(AVR5) $(NIOS2) $(INTERNAL) $(CORE) $(FLEX); do make -C $${x} clean; done;
 	rm -fr *.pdf *.tgz
 	rm -fr *.php
 
 avr5:
 	for x in $(AVR5); do make -C $${x}; done;
-pic30:
-	for x in $(PIC30); do make -C $${x}; done;
 
 nios2:
 	for x in $(NIOS2); do make -C $${x}; done;
@@ -46,11 +42,10 @@ internal:
 core:
 	for x in $(CORE); do make -C $${x}; done;
 
-eeb_gpl: pic30 core
+eeb_gpl: core
 	tar czf eeb_manuals.tgz *.pdf
 
-#web-manuals: pic30 nios2 flex common eeb_gpl
-web-manuals: pic30 nios2 flex common eeb_gpl avr5
+web-manuals: nios2 flex common eeb_gpl avr5
 
 # this options execute the FTP script to upload everything
 # into the Evidence website

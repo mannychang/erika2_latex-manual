@@ -53,8 +53,7 @@ dynamic-man.php: version.mk
 	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>Erika Enterprise for dsPIC (R) DSC</strong></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_PIC30__MAIN_NAME)_$(ARCH_PIC30__VER).pdf\" target=\"_blank\">Erika Enterprise Manual for dsPIC (R) DSC 30 family v. " >> dynamic-man.php
-	@echo -n $(ARCH_PIC30__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
+	@echo -n "<tr><td><a href=\"http://erika.tuxfamily.org/wiki/index.php?title=Microchip_dsPIC\" target=\"_blank\">Erika Enterprise Manual for dsPIC (R) DSC 30 family (Wiki version) " >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
