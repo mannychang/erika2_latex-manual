@@ -1,0 +1,33 @@
+\documentclass[12pt,a4paper,normalheadings,titlepage]{scrreprt}
+
+\usepackage{../common/evman}
+\usepackage{graphicx}
+
+\pagestyle{headings}
+
+\def\title{ERIKA Enterprise OSEK COM Manual}
+\def\subtitle{Intertask communication now!}
+\include{dynamic_version}
+
+\begin{document}
+
+\maketitle
+
+%\thispagestyle{plain}
+
+\pagebreak
+
+\tableofcontents
+
+\include{preface}
+
+\include{api}
+
+\include{history}
+
+\bibliographystyle{plain}
+\bibliography{../common/biblio}
+
+\printindex
+
+\end{document}

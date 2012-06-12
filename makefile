@@ -1,7 +1,7 @@
 AVR5  = arch_avr5  arch_avr5_tutorial
 NIOS2 = arch_nios2 arch_nios2_api_tutorial arch_nios2_fifo_tutorial arch_nios2_lwip_tutorial arch_nios2_multicore_tutorial 
 INTERNAL = eedoc_internal
-CORE = ee_basic_refman ee_porting ee_refman rtdruid_refman
+CORE = ee_basic_refman ee_porting ee_refman ee_com_refman rtdruid_refman
 FLEX = flex_refman
 
 

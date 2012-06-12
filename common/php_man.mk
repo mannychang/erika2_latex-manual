@@ -34,6 +34,11 @@ dynamic-man.php: version.mk
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
+	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(EE_COM_REFMAN__MAIN_NAME)_$(EE_COM_REFMAN__VER).pdf\" target=\"_blank\">Erika Enterprise COM Stack reference manual v. " >> dynamic-man.php
+	@echo -n $(EE_COM_REFMAN__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
+	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
+
+	@echo >> dynamic-man.php
 	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
 
 	@echo >> dynamic-man.php
