@@ -97,7 +97,10 @@ situations. The complete list of primitives is listed in Table
 legal to call these functions.
 
 The Background Task is the context where the application \fn{main()}
-function is executed, after the call to \reffun{StartOS}. Please note that by default the current implementation of the \reffun{StartOS} primitive never returns. To make it return, tou need to add the following option to the OIL file:
+function is executed, after the call to \reffun{StartOS}. Please note that by
+default the current implementation of the \reffun{StartOS} primitive never
+returns. To make it return, tou need to add the following option to the OIL
+file:
 
 \begin{lstlisting}
   EE_OPT = __OO_STARTOS_OLD__
@@ -233,59 +236,36 @@ for writing applications.
 #define READY     2
 #define SUSPENDED 3
     \end{lstlisting}
-	Please note that the \const{WAITING} state is only available in
+    Please note that the \const{WAITING} state is only available in
     the conformance classes ECC1 and ECC2.
   \end{constantdescription}
 \end{constant}
 
-%% EG: Finalmente aggiungere le informazioni relative alle macro dei contatori?
+\begin{constant}{Counters Constants}
+  \begin{constantdescription}
+    For all configurated counters \rtd\ generate the return values of
+    \reffun{GetAlarmbase} as constants:
+    \begin{description}
+      \item[OSMAXALLOWEDVALUE\_x] Maximum possible allowed value of counter x in ticks
+      \item[OSTICKSPERBASE\_x]    Number of ticks required to reach a specific unit of counter x
+      \item[OSMINCYCLE\_x]        Minimum allowed number of ticks for a cyclic alarm of counter x
+    \end{description}
 
-%% Nota: questa parte non è ancora generata da RT-Druid!
+    Thus, if the counter name is known, it is not necessary to call \reffun{GetAlarmbase}.
+    When system counter is configured, the constants of this counter are
+    additionally accessible via the following constants:
+    \begin{description}
+      \item[OSMAXALLOWEDVALUE] Maximum possible allowed value of the system counter in ticks.
+      \item[OSTICKSPERBASE]    Number of ticks required to reach a specific unit of the system counter.
+      \item[OSMINCYCLE]        Minimum allowed number of ticks for a cyclic alarm of the system counter.
+    \end{description}
 
-%% \begin{constant}{xxxx}
-%% \nb{Nell'oil un 'counter' deve essere definito come segue
-
-%% COUNTER Counter1 {
-%%     MINCYCLE = 1;
-%%     MAXALLOWEDVALUE = 16;
-%%     TICKSPERBASE = 2;
-%% };
-
-%% quindi, con un MINCYCLE, MAXALLOWEDVALUE e TICKPERBASE, che sono anche i valori qui indicati;
-%% Pero' questi NON vengono dichiarati nel codice usando delle define, ma inserendone i valori nel vettore
-
-%%     const EE_oo_counter_ROM_type EE_counter_ROM[] = {
-%%         {16, 2, 1}         /*Counter1*/
-%%     };
-
-%% Mi sembra che torni con quanto indicato su ee/pkg/kernel/oo/inc/ee_common.h
-
-%% Mentre, di TICKDURATION ... NON so nulla : e' la prima volta che lo vedo (forse c'era qualcosa nella primissima versione con H8).
-
-%% Altra cosa: non mi sembra esista un 'counter di sistema'.
-%% }
-%% \begin {lstlisting}
-%% /* these #defines have to be defined by the user or by the HAL!!!
-%%    x is the counter */
-
-%% /* Maximum possible allowed value of counter x in ticks. */
-%% //#define OSMAXALLOWEDVALUE_x 
-
-%% /* Number of ticks required to reach a specific unit of counter x. */
-%% //#define OSTICKSPERBASE_x 
-%% /* Minimum allowed number of ticks for a cyclic alarm of counter x. */
-%% //#define OSMINCYCLE_x 
-%% /* Maximum possible allowed value of the system counter in ticks. */
-%% //#define OSMAXALLOWEDVALUE 
-%% /* Number of ticks required to reach a specific unit of the system counter. */
-%% //#define OSTICKSPERBASE 
-%% /* Minimum allowed number of ticks for a cyclic alarm of the system counter. */
-%% //#define OSMINCYCLE 
-
-%% /* Duration of a tick of the system counter in nanoseconds. */
-%% //#define OSTICKDURATION
-%% \end{lstlisting}
-%% \end{constant}
+    Additionally the following constant is supplied:
+    \begin{description}
+      \item [OSTICKDURATION]  Duration of a tick of the system counter in nanoseconds.
+    \end{description}
+  \end{constantdescription}
+\end{constant}
 
 \begin{constant}{OSDEFAULTAPPMODE}
   \begin{constantdescription}
@@ -1455,7 +1435,7 @@ Configuration file, and the user have to call
 
 \begin{function}{IncrementCounter}
   %PJ: vedere il commento
-  \synopsis{void IncrementCounter(CounterType c)}
+  \synopsis{StatusType IncrementCounter(CounterType c)}
   \begin{fundescription}
     This function receives a counter identifier as parameter, and it
     increments it by 1. This function is typically called inside an
@@ -1478,15 +1458,54 @@ Configuration file, and the user have to call
     \fpar{c}{The counter that needs to be incremented.}
   \end{funparameters}
   \begin{funreturn}
-    \fret{void}{The function does not return an error.}
+    \fret{E_OK}{No error.}
+    \fret{E_OS_ID}{(Extended) Reference \vr{CounterID} is invalid or counter
+    is implemented in hardware and can not be incremented by software.}
   \end{funreturn}
   \begin{funconformance}
     BCC1, BCC2, ECC1, ECC2
   \end{funconformance}
 \end{function}
 
-% EG: Bisognerebbe aggiungere le due funzioni GetCounterValue e GetElapsedValue
-% Aggiunte per avvicinarsi alla conformance Autosar.
+\begin{function}{GetCounterValue}
+  \synopsis{StatusType GetCounterValue(CounterType CounterID, TickRefType Value)}
+  \begin{fundescription}
+    This service reads the current count value of a counter returning or the software ticks.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{CounterID}{The Counter which tick value should be read.}
+    \fpar{Value}{Will contains the current tick value of the counter.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{E_OK}{No error.}
+    \fret{E_OS_ID}{(Extended) Reference \vr{CounterID} is invalid.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
+
+\begin{function}{GetElapsedValue}
+  \synopsis{StatusType GetElapsedValue(CounterType CounterID, TickRefType Value, TickRefType ElapsedValue)}
+  \begin{fundescription}
+    This service gets the number of ticks between the current tick value and a previously read tick value.
+    If the timer already passed the <Value> value a second (or multiple) time, the result returned is wrong.
+    The reason is that the service can not detect such a relative overflow.
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{CounterID}{The Counter which tick value should be read.}
+    \fpar{Value}{Contains the previously read tick value the counter.}
+    \fpar{ElapsedValue}{Will contains the difference to the previous read value.}
+  \end{funparameters}
+  \begin{funreturn}
+    \fret{E_OK}{No error.}
+    \fret{E_OS_ID}{(Extended) Reference \vr{CounterID} is invalid.}
+    \fret{E_OS_VALUE}{(Extended) The given Value is invalid.}
+  \end{funreturn}
+  \begin{funconformance}
+    BCC1, BCC2, ECC1, ECC2
+  \end{funconformance}
+\end{function}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
