@@ -2682,3 +2682,16 @@ of the primitive \const{XXX}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% EG: General ISR section
+\section{Interrupt service routines}
+
+\ee\ Set that all interrupts of category 1 have to have a higher or equal
+hardware priority compared with interrupts of category 2. This limitation has
+been introduced to avoid that any activities corresponding to the calls of the
+operating system performed in the context of an ISR2 interruting an ISR1 are
+unbounded delayed, until the next rescheduling, beacuse ISR1 are outside of
+\ee\ bounduaries, so any action can be done at the end of the one of them.
+This is the only limitation common to all \ee\ porting, so you should check
+specific architecture manuals and/or wiki pages if more limitation
+regarding ISR priority levels has been introduced.
