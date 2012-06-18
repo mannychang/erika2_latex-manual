@@ -2683,15 +2683,19 @@ of the primitive \const{XXX}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% EG: General ISR section
 \section{Interrupt service routines}
 
-\ee\ Set that all interrupts of category 1 have to have a higher or equal
-hardware priority compared with interrupts of category 2. This limitation has
-been introduced to avoid that any activities corresponding to the calls of the
-operating system performed in the context of an ISR2 interruting an ISR1 are
-unbounded delayed, until the next rescheduling, beacuse ISR1 are outside of
-\ee\ bounduaries, so any action can be done at the end of the one of them.
+\ee\ supports both ISR Category 1 (which are ISR not directly handled
+by the operating system) and ISR Category 2 (which are handled by the
+operating system, and that can call OS primitives inside their
+handlers).
+
+The following restriction applies: all interrupts of Category 1 must
+have a higher or equal hardware priority compared with interrupts of
+Category 2. This limitation has been introduced to avoid various
+rescheduling problems appearing when a ISR2 interrupts a lower
+priority ISR1.
+
 This is the only limitation common to all \ee\ porting, so you should check
-specific architecture manuals and/or wiki pages if more limitation
+specific architecture manuals and/or \ee\ wiki pages if more limitations
 regarding ISR priority levels has been introduced.

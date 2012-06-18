@@ -4,9 +4,25 @@
 
 \section{Introduction}
 % provide an introduction to the OSEK COM stack
-\ee\ provides a communication environment according to \oc\ specification, version 3.0.3. \oc\ endows \ee\ with a mechanism to transfer data between tasks and/or interrupt service routines (ISRs). The communication is based on message objects. A message containing application data is sent to sending message objects and received by receiving message objects.  Message objects are identified by message identifiers. For internal communication, sending messages can store messages in zero or more receiving message objects. Zero or more senders can send messages to the same sending message object. This allows a n:m communication. All message objects are statically defined using the OIL language.    
+\ee\ provides a communication environment according to
+\oc\ specification, version 3.0.3. \oc\ endows \ee\ with a mechanism
+to transfer data between tasks and/or interrupt service routines
+(ISRs). The communication is based on message objects. A message
+containing application data is sent to sending message objects and
+received by receiving message objects.  Message objects are identified
+by message identifiers. For internal communication, sending messages
+can store messages in zero or more receiving message objects. Zero or
+more senders can send messages to the same sending message
+object. This allows a n:m communication. All message objects are
+statically defined using the OIL language.
 
-The current implementation supports internal communication for queue and unqueued messages. If a receiving message object is defined as "queued", any message received by this object can only be read once and the read operation removes the oldest message from the queue. For a receiving message object defined as "unqueued", each message can be read more times. The message object returns the last received message every time it is read.
+The current implementation supports internal communication for queue
+and unqueued messages. If a receiving message object is defined as
+"queued", any message received by this object can only be read once
+and the read operation removes the oldest message from the queue. For
+a receiving message object defined as "unqueued", each message can be
+read more times. The message object returns the last received message
+every time it is read.
 
 %aggiungere due parole sui meccanismi di notifica.
 %aggiungere due parole gestione errori.
@@ -16,17 +32,29 @@ The current implementation supports internal communication for queue and unqueue
 
 \subsection{Communication Conformance Classes}
 % provide a description of the available conformance classes and their features
-Depending on the specific application and the hardware platform, different levels of communication service can be required. \oc\ defines these service levels through  Communication Conformance Classes (CCCs). The current version of the \ee\ \oc\ implementation provides two conformance classes:
+Depending on the specific application and the hardware platform,
+different levels of communication service can be
+required. \oc\ defines these service levels through Communication
+Conformance Classes (CCCs). The current version of the
+\ee\ \oc\ implementation provides two conformance classes:
 
-CCCA provides internal communication only. It supports only unqued messages. Message status is not supported. It provides the notification mechanism defined by Notification Class 1, except for the Flag notification mechanism.
+\begin{itemize}
+  \item \const{CCCA} provides internal communication only. It supports
+    only unqued messages. Message status is not supported. It provides
+    the notification mechanism defined by Notification Class 1, except
+    for the Flag notification mechanism.
 
-CCCB provides internal communication only. It supports queued and unqued message objects. It provides all the notification mechanisms provided by Notification Class 1. Moreover, it supports message status information services.
+  \item \const{CCCB} provides internal communication only. It supports
+    queued and unqued message objects. It provides all the
+    notification mechanisms provided by Notification Class
+    1. Moreover, it supports message status information services.
+\end{itemize}
 
 
 
 
 \subsection{Notfication Classes}
-Only notification class 1 is supported for internal communication. 
+Only Notification Class 1 is supported for internal communication. 
 
 The following notification mechanisms are provided:
 \begin{itemize}
@@ -91,7 +119,7 @@ for writing applications.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-
+%PJ: most of these sections are here as a placeholder and can be removed if not used!
 
 \section{Types}
 \label{sec:types}
@@ -185,6 +213,7 @@ Alarm Callbacks.
   %  \end{funreturn}
   \begin{funconformance}
     BCC1, BCC2, ECC1, ECC2
+%PJ: should this be CCCA and CCCB?
   \end{funconformance}
 \end{function_nopb}
 
@@ -227,14 +256,20 @@ Alarm Callbacks.
 \begin{function}{StartCOM}
   \synopsis{StatusType StartCOM (COMApplicationModeType Mode)}
   \begin{fundescription}
-    The user shall call this primitive to initialise and start the  communication system in a specific application mode, defined by \vr{Mode}. This routine shall be called from a task. When COMSTARTCOMEXTENSION  is set to TRUE within the OIL configuration file, before returning StartCOM calls StartCOMExtension. StartCOMExtension is provided by the application.  
+    The user shall call this primitive to initialise and start the
+    communication system in a specific application mode, defined by
+    \vr{Mode}. This routine shall be called from a task. When
+    \const{COMSTARTCOMEXTENSION} is set to \const{TRUE} within the OIL
+    configuration file, before returning \reffun{StartCOM} calls
+    \reffun{StartCOMExtension}. \reffun{StartCOMExtension} is provided
+    by the application.
   \end{fundescription}
   \begin{funparameters}
     \fpar{Mode}{COM application mode}
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors. }
-    \fret{A value returned from StartCOMExtension if different from E_OK.}.
+    \fret{A value returned from \reffun{StartCOMExtension} if different from E_OK.}.
     \fret{E_COM_ID}{(Extended) if \vr{Mode} is greater than  \const{EE_COM_N_MODE}.}
   \end{funreturn}
   \begin{funconformance}
@@ -245,7 +280,9 @@ Alarm Callbacks.
 \begin{function}{StopCOM}
   \synopsis{StatusType StopCOM (COMShutdownModeType Mode)}
   \begin{fundescription}
-    This primitive is called to terminate all communication activities immidiatly. The only possibile value for \vr{Mode} is \vr{COM_SHUTDOWN_IMMEDIATE}. 
+    This primitive is called to terminate all communication activities
+    immidiatly. The only possibile value for \vr{Mode} is
+    \vr{COM_SHUTDOWN_IMMEDIATE}.
   \end{fundescription}
   \begin{funparameters}
     \fpar{Mode}{Shutdown mode}
@@ -263,7 +300,8 @@ Alarm Callbacks.
 \begin{function}{GetCOMApplicationMode}
   \synopsis{COMApplicationModeType GetCOMApplicationMode()}
   \begin{fundescription}
-    This primitive returns the current COM application mode. It shall not be called before StartCOM.
+    This primitive returns the current COM application mode. It shall
+    not be called before \reffun{StartCOM}.
   \end{fundescription}
   \begin{funparameters}
     \fpar{None}{}
@@ -324,7 +362,7 @@ Alarm Callbacks.
   \end{funconformance}
 \end{function}
 
-\begin{function}{RecevieMessage}
+\begin{function}{ReceiveMessage}
   \synopsis{StatusType ReceiveMessage (MessageIdentifier Message, ApplicationDataRef DataRef)}
   \begin{fundescription}
     This primitive 
@@ -402,6 +440,7 @@ Alarm Callbacks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%PJ: to be removed if not used
 \begin{function}{ActivateTask}
   \synopsis{StatusType ActivateTask(TaskType TaskID);}
   
