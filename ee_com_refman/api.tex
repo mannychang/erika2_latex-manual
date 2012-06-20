@@ -1,28 +1,24 @@
-
 \chapter{API reference}
 \label{sec:api_reference}
 
 \section{Introduction}
 % provide an introduction to the OSEK COM stack
-\ee\ provides a communication environment according to
-\oc\ specification, version 3.0.3. \oc\ endows \ee\ with a mechanism
-to transfer data between tasks and/or interrupt service routines
-(ISRs). The communication is based on message objects. A message
-containing application data is sent to sending message objects and
-received by receiving message objects.  Message objects are identified
-by message identifiers. For internal communication, sending messages
-can store messages in zero or more receiving message objects. Zero or
-more senders can send messages to the same sending message
-object. This allows a n:m communication. All message objects are
-statically defined using the OIL language.
+\ee\ provides a communication environment according to \oc\ specification, 
+version 3.0.3. \oc\ endows \ee\ with a mechanism to transfer data between tasks 
+and/or interrupt service routines (ISRs). The communication is based on message 
+objects. A message containing application data is sent to sending message objects 
+and received by receiving message objects.  Message objects are identified by 
+message identifiers. For internal communication, sending messages can store 
+messages in zero or more receiving message objects. Zero or more senders can 
+send messages to the same sending message object. This allows a n:m communication. 
+All message objects are statically defined using the OIL language.    
 
-The current implementation supports internal communication for queue
-and unqueued messages. If a receiving message object is defined as
-"queued", any message received by this object can only be read once
-and the read operation removes the oldest message from the queue. For
-a receiving message object defined as "unqueued", each message can be
-read more times. The message object returns the last received message
-every time it is read.
+The current implementation supports internal communication for queue and 
+unqueued messages. If a receiving message object is defined as "queued", 
+any message received by this object can only be read once and the read 
+operation removes the oldest message from the queue. For a receiving message 
+object defined as "unqueued", each message can be read more times. The message 
+object returns the last received message every time it is read.
 
 %aggiungere due parole sui meccanismi di notifica.
 %aggiungere due parole gestione errori.
@@ -32,36 +28,38 @@ every time it is read.
 
 \subsection{Communication Conformance Classes}
 % provide a description of the available conformance classes and their features
-Depending on the specific application and the hardware platform,
-different levels of communication service can be
-required. \oc\ defines these service levels through Communication
-Conformance Classes (CCCs). The current version of the
-\ee\ \oc\ implementation provides two conformance classes:
+Depending on the specific application and the hardware platform, different 
+levels of communication service can be required. \oc\ defines these service 
+levels through  Communication Conformance Classes (CCCs). The current version of 
+the \ee\ \oc\ implementation provides two conformance classes:
 
-\begin{itemize}
-  \item \const{CCCA} provides internal communication only. It supports
-    only unqued messages. Message status is not supported. It provides
-    the notification mechanism defined by Notification Class 1, except
-    for the Flag notification mechanism.
+CCCA provides internal communication only. It supports only unqued messages. 
+Message status is not supported. It provides the notification mechanism defined 
+by Notification Class 1, except for the Flag notification mechanism.
 
-  \item \const{CCCB} provides internal communication only. It supports
-    queued and unqued message objects. It provides all the
-    notification mechanisms provided by Notification Class
-    1. Moreover, it supports message status information services.
-\end{itemize}
+CCCB provides internal communication only. It supports queued and unqued message 
+objects. It provides all the notification mechanisms provided by Notification 
+Class 1. Moreover, it supports message status information services.
 
+\subsection{Available primitives}
+\ee\ provides a set of primitives to exchange messages between tasks according to 
+\oc\ specification. The primiteves can be called in different situations. 
+The complete list of primitives is listed in Table xx, together with the 
+locations where it is legal to call these functions.
 
 
 
 \subsection{Notfication Classes}
-Only Notification Class 1 is supported for internal communication. 
+Only notification class 1 is supported for internal communication. This means 
+that the notification mechanism is only used to notify the receiver of a message.
 
 The following notification mechanisms are provided:
 \begin{itemize}
 \item Callback routines provided by the application;
-\item Flags set by the \oc\ layer, read and reset by the application through the specific API service;
-\item Tasks activated by the \oc\ layer;
-\item Events set for application tasks by the \oc\ layer.
+\item Flags set by the COM layer, read and reset by the application through 
+the specific API service;
+\item Tasks activated by the COM layer;
+\item Events set for application tasks by the COM layer.
 \end{itemize}
 
 
@@ -71,149 +69,141 @@ The following notification mechanisms are provided:
 \label{sec:constants}
 
 This is a list of the \ee\ constants that can be used by the developer
-for writing applications.
+for writing applications that uses the COM support.
 
 \begin{constant}{Error List}
   \begin{constantdescription}
-    This is the list of the error values returned by the kernel primitives:
+    This is the list of the error values returned by the COM primitives:
     \begin {lstlisting}
-#define E_OK          0
+#define E_OK                                0
+#define E_COM_ID                            1
+#define E_COM_LENGTH                        2
+#define E_COM_LIMIT                         3
+#define E_COM_NOMSG                         4
+#define E_COM_SYS_DISCONNECTED              5
     \end{lstlisting}
   \end{constantdescription}
 \end{constant}
 
-\begin{constant2}{INVALID\_TASK}{INVALID_TASK}
+\begin{constant}{Boolean constants}
   \begin{constantdescription}
-    This constant represent an invalid task ID, and is returned by
-    \reffun{GetTaskID} when the function is called and no task is
-    running.
+    These constants are used to represent boolean values FALSE and TRUE.
+    \begin {lstlisting}
+#define COM_FALSE                           0
+#define COM_TRUE                            1
+    \end{lstlisting}
   \end{constantdescription}
-\end{constant2}
+\end{constant}
 
-\begin{constant}{OSService IDs}
+\begin{constant}{COMService IDs}
   \begin{constantdescription}
     This is the list of Service IDs values that can be returned by
-    \reffun{OSErrorGetServiceId}:
+    \reffun{COMErrorGetServiceId}:
     \begin {lstlisting}
-#define OSServiceId_ActivateTask      1U
+#define COMServiceId_NoError                    0
+#define COMServiceId_StartCOM                   1
+#define COMServiceId_StartCOM                   1
+#define COMServiceId_StopCOM                    2
+#define COMServiceId_GetCOMApplicationMode      3
+#define COMServiceId_InitMessage                4
+#define COMServiceId_ReadFlag                   7
+#define COMServiceId_ResetFlag                  8
+#define COMServiceId_SendMessage                9
+#define COMServiceId_ReceiveMessage             10
+#define COMServiceId_SendZeroMessage            13
+#define COMServiceId_GetMessageStatus           14
+#define COMServiceId_COMErrorGetServiceId       15
+
     \end{lstlisting}
-    Please note that the primitives:
-    \begin{itemize}                              \vspace{-2mm}
-      \item \reffun{DisableAllInterrupts}        \vspace{-2mm}
-    \end{itemize}
-    never return an error, and for that reason they are not listed
-    here.
   \end{constantdescription}
 \end{constant}
 
-\begin{constant}{OSDEFAULTAPPMODE}
+\begin{constant}{COM\_SHUTDOWN\_IMMEDIATE}
   \begin{constantdescription}
-    This is the default Application Mode. This value is always a valid
-    Application Mode that can be passed to \reffun{StartOS}.
+    This is the default and only possible value for COM Suthdown Mode that can 
+    be passed to \reffun{StopCOM}.
   \end{constantdescription}
 \end{constant}
-
 
 \pagebreak
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%PJ: most of these sections are here as a placeholder and can be removed if not used!
-
 \section{Types}
 \label{sec:types}
 
-This Section contains a description of the data types used by the OS
+This Section contains a description of the data types used by the COM
 interface of \ee. When the size of a type is specified to be of the
 size of a machine register, it is intended that the type has the same
 size of the CPU general purpose register.
 
-\begin{type}{AlarmBaseType}
+\begin{type}{ApplicationDataRef}
   \begin{typedescription}
-    This structure is used to store the basic information about
-    Counters. It has the following fields:
-    \begin{description}
-    \item[TickType maxallowedvalue] Is the maximum allowed count value
-      in ticks for a counter.
-    \item[TickType ticksperbase] It is the number of ticks required to
-      reach a counter-specific significant unit.
-    \item[TickType mincycle] It is the smallest allowed value for the
-      \vr{cycle} parameter of the primitives 
-      \reffun{SetRelAlarm}/\reffun{SetAbsAlarm}. This field is only
-      present when Extended status is selected.
-    \end{description}
+    This is a pointer to appliation data. This pointer can be passed to 
+    \reffun{InitMessage}, \reffun{ReceiveMessage} and \reffun{SendMessage}.  
   \end{typedescription}
 \end{type}
 
-\begin{type}{AlarmBaseRefType}
+\begin{type}{COMApplicationModeType}
   \begin{typedescription}
-    This is a pointer to \reftype{AlarmBaseType}.
+   This type is an unsigned 8-bit integer type used to store COM Application Mode 
+   IDs.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{COMServiceIdType}
+  \begin{typedescription}
+    This is an enumeration type used to store COM Service IDs, and it is used 
+    within the COMErrorGetServiceId.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{COMShutdownModeType}
+  \begin{typedescription}
+    This type is an unsigned 8-bit integer type used to store COM Shutdown Mode 
+    IDs. The default and only possibile value is \vr{COM_SHUTDOWN_IMMEDIATE}. 
+  \end{typedescription}
+\end{type}
+
+\begin{type}{FlagValue}
+  \begin{typedescription}
+    This is an enumeration type used to store the current state of a message flag.
+    Possible values are COM_FALSE and COM_TRUE, see \ref{sec:constants}. 
+  \end{typedescription}
+\end{type}
+
+\begin{type}{MessageIdentifier}
+  \begin{typedescription}
+    This is an unsigned char used as ID for a message object.
+  \end{typedescription}
+\end{type}
+
+\begin{type}{StatusType}
+  \begin{typedescription}
+    This type is an unsigned char used to store function error return values.
   \end{typedescription}
 \end{type}
 
 
 \pagebreak
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-\section{Object Declarations}
-The following declarations have to be used to declare Tasks, Resources,
-Alarms, and Events within the application code.
-
-\begin{function_nopb}{DeclareAlarm}
-  \synopsis{DeclareAlarm (AlarmIdentifier)}
-  \begin{fundescription}
-    Declares an alarm.
-
-    This declaration is currently not mandatory because alarm
-    identifiers are all declared within the code generated by \rtd.
-  \end{fundescription}
-  \begin{funconformance}
-    BCC1, BCC2, ECC1, ECC2
-  \end{funconformance}
-\end{function_nopb}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\pagebreak
-
-
-
-
-
-
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Object Definitions}
-The following macro have to be used when defining Tasks, ISRs and
-Alarm Callbacks.
+The following macro has to be used when defining Message Callbacks.
 
-\begin{function_nopb}{ALARMCALLBACK}
-  \synopsis{ALARMCALLBACK(t)}
+\begin{function_nopb}{COMCallback}
+  \synopsis{COMCallback(c)}
   \begin{fundescription}
-    This macro is used to declare and to define an alarm callback.
+    This macro is used to declare and to define a message callback.
   \end{fundescription}
   \begin{funparameters}
-    \fpar{t}{Name of the alarm callback.}
+    \fpar{c}{Name of the message callback.}
   \end{funparameters}
-  %  \begin{funreturn}
-  %    \fret{E_OK}{No error.}
-  %  \end{funreturn}
   \begin{funconformance}
-    BCC1, BCC2, ECC1, ECC2
-%PJ: should this be CCCA and CCCB?
+    CCCA, CCCB
   \end{funconformance}
 \end{function_nopb}
 
@@ -227,10 +217,10 @@ Alarm Callbacks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{XXX Primitives}
+\section{COM Primitives}
 
 % short general description
-
+Put here some introduction words!!!!
 \pagebreak
 
 %% 
@@ -256,20 +246,18 @@ Alarm Callbacks.
 \begin{function}{StartCOM}
   \synopsis{StatusType StartCOM (COMApplicationModeType Mode)}
   \begin{fundescription}
-    The user shall call this primitive to initialise and start the
-    communication system in a specific application mode, defined by
-    \vr{Mode}. This routine shall be called from a task. When
-    \const{COMSTARTCOMEXTENSION} is set to \const{TRUE} within the OIL
-    configuration file, before returning \reffun{StartCOM} calls
-    \reffun{StartCOMExtension}. \reffun{StartCOMExtension} is provided
-    by the application.
+    The user shall call this primitive to initialise and start the  communication 
+    system in a specific application mode, defined by \vr{Mode}. This routine 
+    shall be called from a task. When COMSTARTCOMEXTENSION  is set to TRUE 
+    within the OIL configuration file, before returning StartCOM calls 
+    StartCOMExtension. StartCOMExtension is provided by the application.  
   \end{fundescription}
   \begin{funparameters}
     \fpar{Mode}{COM application mode}
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors. }
-    \fret{A value returned from \reffun{StartCOMExtension} if different from E_OK.}.
+    \fret{A value returned from StartCOMExtension if different from E_OK.}.
     \fret{E_COM_ID}{(Extended) if \vr{Mode} is greater than  \const{EE_COM_N_MODE}.}
   \end{funreturn}
   \begin{funconformance}
@@ -280,16 +268,16 @@ Alarm Callbacks.
 \begin{function}{StopCOM}
   \synopsis{StatusType StopCOM (COMShutdownModeType Mode)}
   \begin{fundescription}
-    This primitive is called to terminate all communication activities
-    immidiatly. The only possibile value for \vr{Mode} is
-    \vr{COM_SHUTDOWN_IMMEDIATE}.
+    This primitive is called to terminate all communication activities immidiatly. 
+    The only possibile value for \vr{Mode} is \vr{COM_SHUTDOWN_IMMEDIATE}. 
   \end{fundescription}
   \begin{funparameters}
     \fpar{Mode}{Shutdown mode}
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors. }
-    \fret{E_COM_ID}{(Extended) if \vr{Mode} is different from \vr{COM_SHUTDOWN_IMMEDIATE}.}
+    \fret{E_COM_ID}{(Extended) if \vr{Mode} is different from 
+      \vr{COM_SHUTDOWN_IMMEDIATE}.}
   \end{funreturn}
   \begin{funconformance}
     CCCA, CCCB
@@ -300,8 +288,8 @@ Alarm Callbacks.
 \begin{function}{GetCOMApplicationMode}
   \synopsis{COMApplicationModeType GetCOMApplicationMode()}
   \begin{fundescription}
-    This primitive returns the current COM application mode. It shall
-    not be called before \reffun{StartCOM}.
+    This primitive returns the current COM application mode. 
+    mIt shall not be called before StartCOM.
   \end{fundescription}
   \begin{funparameters}
     \fpar{None}{}
@@ -362,7 +350,7 @@ Alarm Callbacks.
   \end{funconformance}
 \end{function}
 
-\begin{function}{ReceiveMessage}
+\begin{function}{RecevieMessage}
   \synopsis{StatusType ReceiveMessage (MessageIdentifier Message, ApplicationDataRef DataRef)}
   \begin{fundescription}
     This primitive 
@@ -383,9 +371,7 @@ Alarm Callbacks.
   \begin{fundescription}
     This primitive 
   \end{fundescription}
-  \begin{funparameters}
-    \fpar{None}{}
-  \end{funparameters}
+
   \begin{funreturn}
     \fret{}
   \end{funreturn}
@@ -394,21 +380,6 @@ Alarm Callbacks.
   \end{funconformance}
 \end{function}
 
-\begin{function}{COMErrorGetServiceId}
-  \synopsis{COMServiceIdType COMErrorGetServiceId (void)}
-  \begin{fundescription}
-    This primitive 
-  \end{fundescription}
-  \begin{funparameters}
-    \fpar{None}{}
-  \end{funparameters}
-  \begin{funreturn}
-    \fret{}
-  \end{funreturn}
-  \begin{funconformance}
-    CCCA, CCCB
-  \end{funconformance}
-\end{function}
 
 \begin{function}{ReadFlag}
 	\synopsis{FlagValue ReadFlag_<Flag>()}
@@ -419,7 +390,7 @@ Alarm Callbacks.
  %    	\fpar{None}{None}
  %  	\end{funparameters}
   	\begin{funreturn}
-  	\fret{COM_TRUE }{$<$Flag$>$ is set}
+  	\fret{COM_TRUE}{$<$Flag$>$ is set}
    	\fret{COM_TRUE}{$<$Flag$>$ is not set}.
    	\end{funreturn}
 	\begin{funconformance}
@@ -438,43 +409,6 @@ Alarm Callbacks.
      	\end{funconformance}
 \end{function}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%PJ: to be removed if not used
-\begin{function}{ActivateTask}
-  \synopsis{StatusType ActivateTask(TaskType TaskID);}
-  
-  \begin{fundescription}
-    This primitive activates a task \vr{TaskID}, putting it in the
-    \const{READY} state, or in the \const{RUNNING} state if the
-    scheduler finds that the activated task should become the running
-    task.
-
-    Once activated, the task will run for an instance, starting from
-    its first instruction. For the BCC2 and ECC2 Conformance classes,
-    pending activations can be stored if the task has been configured
-    with a number of activations greater than 1 within the OIL
-    configuration file.
-
-    The function can be called from the Background task (typically,
-    the \fn{main()} function).
-
-  \end{fundescription}
-  
-  \begin{funparameters}
-    \fpar{TaskID}{Task reference.}
-  \end{funparameters}
-  
-  \begin{funreturn}
-    \fret{E_OK}{No error.}
-    \fret{E_OS_LIMIT}{Too many pending activations of \vr{TaskID}.}
-    \fret{E_OS_ID}{(Extended) \vr{TaskID} is invalid.}
-  \end{funreturn}
-  
-  \begin{funconformance}
-    BCC1, BCC2, ECC1, ECC2
-  \end{funconformance}
-\end{function}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -490,6 +424,32 @@ Alarm Callbacks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{function_nopb}{StartCOMExtension}
+  \synopsis{StatusType StartCOMExtension ()}
+  \begin{fundescription}
+    This primitive is ...
+  \end{fundescription}
+  \begin{funreturn}
+   \fret{E_OK }{aaa}
+   \fret{An implementation specific status code if an error occurred.}
+   \end{funreturn}
+  \begin{funconformance}
+    CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb}
+
+\begin{function_nopb}{COMErrorHook}
+  \synopsis{void COMErrorHook (StatusType err)}
+  \begin{fundescription}
+        This primitive is ...
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{err}{ID of the error.}
+  \end{funparameters}
+  \begin{funconformance}
+    CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb}
 \pagebreak
 
 
@@ -498,33 +458,33 @@ Alarm Callbacks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{ErrorHook Macros}
+\section{COMErrorHook and error handling primitives}
 \label{sec:errorhook-macros}
-These macros are meaningful inside the \reffun{ErrorHook} Hook
+These macros are meaningful inside the \reffun{COMErrorHook} Hook
 function, and are used to better understand the source of the
-error. In particular, \reffun{ErrorHook} receives as parameter the
+error. In particular, \reffun{COMErrorHook} receives as parameter the
 error that is raised by the primitive. Then, a call to
-\reffun{OSErrorGetServiceId} returns informations about which
+\reffun{COMErrorGetServiceId} returns informations about which
 primitive caused the error. Finally, calls to the macros
-\fn{OSError_XXX_YYY} returns the values of the \const{YYY} parameter
+\fn{COMError_XXX_YYY} returns the values of the \const{YYY} parameter
 of the primitive \const{XXX}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{function_nopb2}{OSErrorGetServiceId}{OSErrorGetServiceId}
-  \synopsis{OSServiceIdType OSErrorGetServiceId(void)}
+\begin{function_nopb2}{COMErrorGetServiceId}
+  \synopsis{COMServiceIdType COMErrorGetServiceId (void)}
   \begin{fundescription}
-    The function may be used inside \reffun{ErrorHook} to return the
+    This function may be used inside \reffun{COMErrorHook} to return the
     Service ID that generated the error that caused the call to
-    \reffun{ErrorHook}.
+    \reffun{COMErrorHook}. 
   \end{fundescription}
   \begin{funreturn}
     \fret{Service ID}{The service ID causing the error.}
   \end{funreturn}
   \begin{funconformance}
-    BCC1, BCC2, ECC1, ECC2
+    CCCA, CCCB
   \end{funconformance}
 \end{function_nopb2}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
