@@ -20,7 +20,7 @@ operation removes the oldest message from the queue. For a receiving message
 object defined as "unqueued", each message can be read more times. The message 
 object returns the last received message every time it is read.
 
-%aggiungere due parole sui meccanismi di notifica.
+
 %aggiungere due parole gestione errori.
 %aggiungere gli header da includere
 
@@ -75,22 +75,23 @@ for writing applications that uses the COM support.
   \begin{constantdescription}
     This is the list of the error values returned by the COM primitives:
     \begin {lstlisting}
-#define E_OK                                0
-#define E_COM_ID                            1
-#define E_COM_LENGTH                        2
-#define E_COM_LIMIT                         3
-#define E_COM_NOMSG                         4
-#define E_COM_SYS_DISCONNECTED              5
+#define E_OK                                    0
+#define E_COM_ID                                1
+#define E_COM_LENGTH                            2
+#define E_COM_LIMIT                             3
+#define E_COM_NOMSG                             4
+#define E_COM_SYS_DISCONNECTED                  5
     \end{lstlisting}
   \end{constantdescription}
 \end{constant}
 
 \begin{constant}{Boolean constants}
+\label{subsec:const_bool}
   \begin{constantdescription}
     These constants are used to represent boolean values FALSE and TRUE.
     \begin {lstlisting}
-#define COM_FALSE                           0
-#define COM_TRUE                            1
+#define COM_FALSE                               0
+#define COM_TRUE                                1
     \end{lstlisting}
   \end{constantdescription}
 \end{constant}
@@ -102,17 +103,16 @@ for writing applications that uses the COM support.
     \begin {lstlisting}
 #define COMServiceId_NoError                    0
 #define COMServiceId_StartCOM                   1
-#define COMServiceId_StartCOM                   1
 #define COMServiceId_StopCOM                    2
 #define COMServiceId_GetCOMApplicationMode      3
 #define COMServiceId_InitMessage                4
 #define COMServiceId_ReadFlag                   7
 #define COMServiceId_ResetFlag                  8
 #define COMServiceId_SendMessage                9
-#define COMServiceId_ReceiveMessage             10
-#define COMServiceId_SendZeroMessage            13
-#define COMServiceId_GetMessageStatus           14
-#define COMServiceId_COMErrorGetServiceId       15
+#define COMServiceId_ReceiveMessage            10
+#define COMServiceId_SendZeroMessage           13
+#define COMServiceId_GetMessageStatus          14
+#define COMServiceId_COMErrorGetServiceId      15
 
     \end{lstlisting}
   \end{constantdescription}
@@ -170,13 +170,14 @@ size of the CPU general purpose register.
 \begin{type}{FlagValue}
   \begin{typedescription}
     This is an enumeration type used to store the current state of a message flag.
-    Possible values are COM_FALSE and COM_TRUE, see \ref{sec:constants}. 
+    Possible values are \vr{COM_FALSE} and \vr{COM_TRUE}, see 
+    Section \ref{subsec:const_bool}
   \end{typedescription}
 \end{type}
 
 \begin{type}{MessageIdentifier}
   \begin{typedescription}
-    This is an unsigned char used as ID for a message object.
+    This is an unsigned char used as ID for message objects.
   \end{typedescription}
 \end{type}
 
@@ -217,11 +218,10 @@ The following macro has to be used when defining Message Callbacks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{COM Primitives}
+\section{COM Initialization Primitives}
 
 % short general description
 Put here some introduction words!!!!
-\pagebreak
 
 %% 
 %% Basic template 
@@ -258,7 +258,7 @@ Put here some introduction words!!!!
   \begin{funreturn}
     \fret{E_OK }{ No errors. }
     \fret{A value returned from StartCOMExtension if different from E_OK.}.
-    \fret{E_COM_ID}{(Extended) if \vr{Mode} is greater than  \const{EE_COM_N_MODE}.}
+    \fret{E_COM_ID}{(Extended) If \vr{Mode} is not valid.}
   \end{funreturn}
   \begin{funconformance}
     CCCA, CCCB
@@ -276,7 +276,7 @@ Put here some introduction words!!!!
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors. }
-    \fret{E_COM_ID}{(Extended) if \vr{Mode} is different from 
+    \fret{E_COM_ID}{(Extended) If \vr{Mode} is different from 
       \vr{COM_SHUTDOWN_IMMEDIATE}.}
   \end{funreturn}
   \begin{funconformance}
@@ -286,14 +286,11 @@ Put here some introduction words!!!!
 
 
 \begin{function}{GetCOMApplicationMode}
-  \synopsis{COMApplicationModeType GetCOMApplicationMode()}
+  \synopsis{COMApplicationModeType GetCOMApplicationMode(void)}
   \begin{fundescription}
-    This primitive returns the current COM application mode. 
-    mIt shall not be called before StartCOM.
+    This primitive returns the current COM application mode. It shall not be 
+    called before StartCOM.
   \end{fundescription}
-  \begin{funparameters}
-    \fpar{None}{}
-  \end{funparameters}
   \begin{funreturn}
     \fret{Current COM application mode}
   \end{funreturn}
@@ -305,75 +302,94 @@ Put here some introduction words!!!!
 \begin{function}{InitMessage}
   \synopsis{StatusType InitMessage (MessageIdentifier Message, ApplicationDataRef DataRef)}
   \begin{fundescription}
-    This primitive 
+    This primitive can be used to initializes a message object with the application data
+    passed by reference. To change the default initialization, it is possible 
+    to call this primitive from StartCOMExtension.
   \end{fundescription}
   \begin{funparameters}
-    \fpar{None}{}
+    \fpar{Message}{Message object ID}
+    \fpar{DataRef}{Pointer to application data for the message object being initialized}
   \end{funparameters}
   \begin{funreturn}
-    \fret{StatusType}{StatusType}
+    \fret{E_OK }{ No errors.}
+    \fret{E_COM_ID}{(Extended) if message identifier \vr{Message} is not valid.}
   \end{funreturn}
   \begin{funconformance}
     CCCA, CCCB
   \end{funconformance}
 \end{function}
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Message Communication Primitives}
 
 \begin{function}{SendMessage}
   \synopsis{StatusType SendMessage (MessageIdentifier Message, ApplicationDataRef DataRef)}
   \begin{fundescription}
-    This primitive 
+    This primitive stores in the message object \vr{Message} the application data
+    pointed by \vr{DataRef}.
   \end{fundescription}
   \begin{funparameters}
-    \fpar{None}{}
+    \fpar{Message}{Message object ID}
+    \fpar{DataRef}{Pointer to application data to store in the message}
   \end{funparameters}
   \begin{funreturn}
-    \fret{StatusType}{StatusType}
+    \fret{E_OK }{ No errors.}
+    \fret{E_COM_ID}{(Extended) If message identifier \vr{Message} is not valid.}
   \end{funreturn}
   \begin{funconformance}
     CCCA, CCCB
   \end{funconformance}
 \end{function}
 
-\begin{function}{SendZeroMessage}
-  \synopsis{StatusType SendZeroMessage (MessageIdentifier Message)}
-  \begin{fundescription}
-    This primitive 
-  \end{fundescription}
-  \begin{funparameters}
-    \fpar{None}{}
-  \end{funparameters}
-  \begin{funreturn}
-    \fret{StatusType}{StatusType}
-  \end{funreturn}
-  \begin{funconformance}
-    CCCA, CCCB
-  \end{funconformance}
-\end{function}
 
 \begin{function}{RecevieMessage}
   \synopsis{StatusType ReceiveMessage (MessageIdentifier Message, ApplicationDataRef DataRef)}
   \begin{fundescription}
-    This primitive 
+    This primitive stores the data from the message object \vr{Message} in the 
+    application message memory pointed by \vr{DataRef}. All flags associated with 
+    \vr{Message} are reset. If a message queue overflow happended since the last 
+    call of the primiteve, a \vr{E_COM_LIMIT} is returned, nevertheless a message is 
+    store in \vr{DataRef} and the overflow is cleared.
   \end{fundescription}
   \begin{funparameters}
-    \fpar{None}{}
+    \fpar{Message}{Message object ID}
+    \fpar{DataRef}{Pointer to the application message data buffer.}
   \end{funparameters}
   \begin{funreturn}
-    \fret{StatusType}{StatusType}
+    \fret{E_OK }{ No errors.}
+    \fret{E_COM_NOMSG }{If \vr{Message} is a queued message object and it is empty.}
+    \fret{E_COM_LIMIT}{If \vr{Message} is a queued message object and a queue overflow 
+          occurred since the last call of the primitive for \vr{Message}. 
+         \vr{E_COM_LIMIT} indicates that at least a message was discarded.}
+    \fret{E_COM_ID}{(Extended) If message identifier \vr{Message} is not valid.}
   \end{funreturn}
   \begin{funconformance}
     CCCA, CCCB
   \end{funconformance}
 \end{function}
 
-\begin{function}{GetMessageStatus}
-  \synopsis{StatusType GetMessageStatus()}
-  \begin{fundescription}
-    This primitive 
-  \end{fundescription}
 
+\begin{function}{GetMessageStatus}
+  \synopsis{StatusType GetMessageStatus(MessageIdentifier Message)}
+  \begin{fundescription}
+    This primitive returns the current status of the message object identified by 
+    \vr{Message}.  
+  \end{fundescription}
+  \begin{funparameters}
+    \fpar{Message}{Message object ID}
+  \end{funparameters}
   \begin{funreturn}
-    \fret{}
+    \fret{E_COM_NOMSG }{If \vr{Message} is a queued message object and it is empty.}
+    \fret{E_COM_LIMIT}{If \vr{Message} is a queued message object and a queue overflow 
+          occurred since the last call of the primitive for \vr{Message}}. 
+    \fret{E_OK }{ If there are no error indications, if \vr{Message} is not empty 
+                 and an overflow condiction has not occured since the last call 
+                 to \reffun{ReceiveMessage} }
+    \fret{E_COM_ID}{(Extended) if message identifier \vr{Message} is not valid 
+     (e.g. \vr{Message} is invalid if it is not a queued message object).}
   \end{funreturn}
   \begin{funconformance}
     CCCB
@@ -381,32 +397,34 @@ Put here some introduction words!!!!
 \end{function}
 
 
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Notification Primitives}
+
 \begin{function}{ReadFlag}
-	\synopsis{FlagValue ReadFlag_<Flag>()}
-	\begin{fundescription}
-	This routine reads the status of the flag identified by the name $<$Flag$>$.
-   	\end{fundescription}
-%   	\begin{funparameters}
- %    	\fpar{None}{None}
- %  	\end{funparameters}
-  	\begin{funreturn}
-  	\fret{COM_TRUE}{$<$Flag$>$ is set}
-   	\fret{COM_TRUE}{$<$Flag$>$ is not set}.
-   	\end{funreturn}
-	\begin{funconformance}
-     	 CCCB
-     	\end{funconformance}
+ \synopsis{FlagValue ReadFlag_<Flag>(void)}
+ \begin{fundescription}
+   This primitive reads the status of the flag identified by the name \vr{<Flag>}.
+ \end{fundescription}
+ \begin{funreturn}
+   \fret{COM_TRUE}{\vr{<Flag>} is set}
+   \fret{COM_TRUE}{\vr{<Flag>} is not set}.
+ \end{funreturn}
+ \begin{funconformance}
+  CCCB
+  \end{funconformance}
 \end{function}
 
 \begin{function}{ResetFlag}
-	\synopsis{void ResetFlag_<Flag>()}
-	\begin{fundescription}
-	This routine reset the status of the flag identified by the name $<$Flag$>$.
-   	\end{fundescription}
-
-	\begin{funconformance}
-     	CCCB
-     	\end{funconformance}
+  \synopsis{void ResetFlag_<Flag>()}
+  \begin{fundescription}
+    This routine reset the status of the flag identified by \vr{<Flag>}.
+   \end{fundescription}
+   \begin{funconformance}
+    CCCB
+   \end{funconformance}
 \end{function}
 
 
@@ -420,17 +438,24 @@ Put here some introduction words!!!!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Primitives provided by the application}
+\section{Primitives Provided by the Application}
+
+The following routines are optional and must be provided by the application. 
+These routines are enabled through the OIL configuration file 
+of the specific application.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{function_nopb}{StartCOMExtension}
-  \synopsis{StatusType StartCOMExtension ()}
+  \synopsis{StatusType StartCOMExtension (void)}
   \begin{fundescription}
-    This primitive is ...
+    This primitive is exucuted at the end of the \reffun{StartCOM} routine. Its 
+    purpose is to addittional start-up configurations provided by the user. This 
+    primitive is called by \reffun{StartCOM} if COMSTARTCOMEXTENSION  is set to 
+    TRUE in the OIL configuration file. 
   \end{fundescription}
   \begin{funreturn}
-   \fret{E_OK }{aaa}
+   \fret{E_OK }{No errors}
    \fret{An implementation specific status code if an error occurred.}
    \end{funreturn}
   \begin{funconformance}
@@ -441,7 +466,10 @@ Put here some introduction words!!!!
 \begin{function_nopb}{COMErrorHook}
   \synopsis{void COMErrorHook (StatusType err)}
   \begin{fundescription}
-        This primitive is ...
+    This primitive is called by COM services, such as \reffun{StartCOM}, 
+    \reffun{ReceviceMessage} etc., when a status code different from \vr{E_OK} is 
+     returned. This primitive is enabled by setting COMERRORHOOK to TRUE in 
+     the OIL configuration file. 
   \end{fundescription}
   \begin{funparameters}
     \fpar{err}{ID of the error.}
@@ -450,15 +478,13 @@ Put here some introduction words!!!!
     CCCA, CCCB
   \end{funconformance}
 \end{function_nopb}
+
+
 \pagebreak
-
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{COMErrorHook and error handling primitives}
+\section{Error Handling Primitives and ErrorHook Macros}
 \label{sec:errorhook-macros}
 These macros are meaningful inside the \reffun{COMErrorHook} Hook
 function, and are used to better understand the source of the
@@ -467,8 +493,9 @@ error that is raised by the primitive. Then, a call to
 \reffun{COMErrorGetServiceId} returns informations about which
 primitive caused the error. Finally, calls to the macros
 \fn{COMError_XXX_YYY} returns the values of the \const{YYY} parameter
-of the primitive \const{XXX}.
+of the primitive \const{XXX}. 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{function_nopb2}{COMErrorGetServiceId}
   \synopsis{COMServiceIdType COMErrorGetServiceId (void)}
@@ -484,6 +511,156 @@ of the primitive \const{XXX}.
     CCCA, CCCB
   \end{funconformance}
 \end{function_nopb2}
+
+
+%#define COMError_GetMessageStatus_Message()    EE_com_ErrorHook.proc_param.OtherCOM.Message
+
+\begin{function_nopb2}{COMError\_GetMessageStatus\_Message}{COMError_GetMessageStatus_Message()}
+  \synopsis{MessageIdentifier COMError_GetMessageStatus_Message(void)}
+  \begin{fundescription}
+    The function returns the \const{Message} parameter passed to
+    \reffun{GetMessageStatus}. The function must be used inside \reffun{ErrorHook} 
+     after having discovered using \reffun{COMErrorGetServiceId} that the error 
+     was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+     \fret{Message}{The value of the \const{Message} ID passed to \reffun{GetMessageStatus}.}
+  \end{funreturn}
+  \begin{funconformance}
+   CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{COMError\_InitMessage\_Message()}{COMError_InitMessage_Message()}
+  \synopsis{MessageIdentifier COMError_InitMessage_Message(void)}
+  \begin{fundescription}
+    The function returns the \const{Message} parameter passed to
+    \reffun{InitMessage}. The function must be used inside \reffun{ErrorHook} 
+     after having discovered using \reffun{COMErrorGetServiceId} that the error 
+     was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+     \fret{Message}{The value of the \const{Message} ID passed to \reffun{InitMessage}.}
+  \end{funreturn}
+  \begin{funconformance}
+   CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{COMError\_InitMessage\_DataRef()}{COMError_InitMessage_DataRef()}
+  \synopsis{ApplicationDataRef COMError_InitMessage_DataRef(void)}
+  \begin{fundescription}
+    The function returns the \const{DataRef} parameter passed to
+    \reffun{InitMessage}. The function must be used inside \reffun{ErrorHook} 
+     after having discovered using \reffun{COMErrorGetServiceId} that the error 
+     was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+     \fret{DataRef}{The value of the pointer \const{DataRef} passed to \reffun{InitMessage}.}
+  \end{funreturn}
+  \begin{funconformance}
+   CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{COMError\_ReceiveMessage\_Message()}{COMError_ReceiveMessage_Message()}
+  \synopsis{MessageIdentifier COMError_ReceiveMessage_Message(void)}
+  \begin{fundescription}
+    The function returns the \const{Message} parameter passed to
+    \reffun{ReceiveMessage}. The function must be used inside \reffun{ErrorHook} 
+     after having discovered using \reffun{COMErrorGetServiceId} that the error 
+     was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+     \fret{Message}{The value of the \const{Message} ID passed to \reffun{ReceiveMessage}.}
+  \end{funreturn}
+  \begin{funconformance}
+   CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{COMError\_ReceiveMessage\_DataRef()}{COMError_ReceiveMessage_DataRef()}
+  \synopsis{ApplicationDataRef COMError_SendMessage_DataRef(void)}
+  \begin{fundescription}
+    The function returns the \const{DataRef} parameter passed to
+    \reffun{ReceiveMessage}. The function must be used inside \reffun{ErrorHook} 
+     after having discovered using \reffun{COMErrorGetServiceId} that the error 
+     was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+     \fret{DataRef}{The value of the pointer \const{DataRef} passed to \reffun{ReceiveMessage}.}
+  \end{funreturn}
+  \begin{funconformance}
+   CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{COMError\_SendMessage\_Message()}{COMError_SendMessage_Message()}
+  \synopsis{MessageIdentifier COMError_SendMessage_Message(void)}
+  \begin{fundescription}
+    The function returns the \const{Message} parameter passed to
+    \reffun{SendMessage}. The function must be used inside \reffun{ErrorHook} 
+     after having discovered using \reffun{COMErrorGetServiceId} that the error 
+     was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+     \fret{Message}{The value of the \const{Message} ID passed to \reffun{SendMessage}.}
+  \end{funreturn}
+  \begin{funconformance}
+   CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{COMError\_SendMessage\_DataRef()}{COMError_SendMessage_DataRef()}
+  \synopsis{ApplicationDataRef COMError_SendMessage_DataRef(void)}
+  \begin{fundescription}
+    The function returns the \const{DataRef} parameter passed to
+    \reffun{SendMessage}. The function must be used inside \reffun{ErrorHook} 
+     after having discovered using \reffun{COMErrorGetServiceId} that the error 
+     was caused by that function.
+  \end{fundescription}
+  \begin{funreturn}
+     \fret{DataRef}{The value of the pointer \const{DataRef} passed to \reffun{SendMessage}.}
+  \end{funreturn}
+  \begin{funconformance}
+   CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{COMError\_StartCOM\_Mode()}{COMError_StartCOM_Mode()}
+  \synopsis{COMApplicationModeType COMError_StartCOM_Mode(void)}
+  \begin{fundescription}
+    The function returns the \const{Mode} parameter passed to
+    \reffun{StartCOM}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{COMErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+    \fret{Mode}{The value of the \const{Mode} parameter passed to \reffun{StartCOM}.}
+  \end{funreturn}
+  \begin{funconformance}
+   CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb2}
+
+\begin{function_nopb2}{COMError\_StopCOM\_Mode()}{COMError_StopCOM_Mode()}
+  \synopsis{COMShutdownModeType COMError_StopCOM_Mode(void)}
+  \begin{fundescription}
+    The function returns the \const{Mode} parameter passed to
+    \reffun{StopCOM}. The function must be used inside
+    \reffun{ErrorHook} after having discovered using
+    \reffun{COMErrorGetServiceId} that the error was caused by that
+    function.
+  \end{fundescription}
+  \begin{funreturn}
+     \fret{Mode}{The value of the \const{Mode} parameter passed to \reffun{StopCOM}.}
+  \end{funreturn}
+  \begin{funconformance}
+   CCCA, CCCB
+  \end{funconformance}
+\end{function_nopb2}
+
 
 
 
