@@ -1,0 +1,41 @@
+\begin{table}
+\begin{centering}
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+Service & \begin{sideways}
+Background Task
+\end{sideways} & \begin{sideways}
+Task
+\end{sideways} & \begin{sideways}
+ISR2
+\end{sideways} & \begin{sideways}
+COMErrorHook
+\end{sideways}\tabularnewline
+\hline 
+\hline 
+\reffun{StartCOM} & $\surd$ & $\surd$ & \surd$ &  & %\tabularnewline
+\hline 
+\reffun{StopCOM} & $\surd$ & $\surd$ & \surd$ &  &  %\tabularnewline
+\hline 
+\reffun{GetCOMApplicationMode} & $\surd$  & $\surd$ & \surd$ &  & %\tabularnewline
+\hline 
+\reffun{InitMessage} & $\surd$ & $\surd$ & $\surd$ &  & %\tabularnewline
+\hline 
+\reffun{SendMessage} & $\surd$ & $\surd$ & $\surd$ &  &  %\tabularnewline
+\hline 
+\reffun{ReceiveMessage} & $\surd$ & $\surd$ & $\surd$ &  &  %\tabularnewline
+\hline 
+\reffun{GetMessageStatus} & $\surd$ &  & $\surd$ & $\surd$ & %\tabularnewline
+\hline
+\reffun{COMErrorGetServiceId} &  &  & & $\surd$ & %\tabularnewline
+\hline  
+\reffun{ReadFlag} & $\surd$ & $\surd$ & $\surd$ &  &  %\tabularnewline
+\hline 
+\reffun{ResetFlag} & $\surd$ & $\surd$ & $\surd$ &  &  %\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\caption{\label{tab:api-restrictions}This table lists the environments where
+primitives can be called. }
+\end{table}

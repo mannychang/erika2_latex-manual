@@ -6,11 +6,11 @@
 \ee\ provides a communication environment according to \oc\ specification, 
 version 3.0.3. \oc\ endows \ee\ with a mechanism to transfer data between tasks 
 and/or interrupt service routines (ISRs). The communication is based on message 
-objects. A message containing application data is sent to sending message objects 
+objects. A message containing application data is sent by sending message objects 
 and received by receiving message objects.  Message objects are identified by 
-message identifiers. For internal communication, sending messages can store 
-messages in zero or more receiving message objects. Zero or more senders can 
-send messages to the same sending message object. This allows a n:m communication. 
+message identifiers (IDs). For internal communication, sending message objects 
+can store messages in zero or more receiving message objects. Zero or more senders 
+can send messages to the same sending message object. This allows a n:m communication. 
 All message objects are statically defined using the OIL language.    
 
 The current implementation supports internal communication for queue and 
@@ -20,10 +20,16 @@ operation removes the oldest message from the queue. For a receiving message
 object defined as "unqueued", each message can be read more times. The message 
 object returns the last received message every time it is read.
 
+In order to used the COM support, the application should add the following includes
+in its source files:
+\begin {lstlisting}
+  #include "com/ee_com.h"
+  #include "com/com/inc/ee_cominit.h"
+  #include "com/com/inc/ee_api.h"
+\end{lstlisting}
 
-%aggiungere due parole gestione errori.
-%aggiungere gli header da includere
-
+The COM layer and the message objects are configurated in the OIL configuration 
+file.
 
 
 \subsection{Communication Conformance Classes}
@@ -44,14 +50,24 @@ Class 1. Moreover, it supports message status information services.
 \subsection{Available primitives}
 \ee\ provides a set of primitives to exchange messages between tasks according to 
 \oc\ specification. The primiteves can be called in different situations. 
-The complete list of primitives is listed in Table xx, together with the 
-locations where it is legal to call these functions.
+The complete list of primitives is listed in Table \ref{tab:api-restrictions}, 
+together with the locations where it is legal to call these functions.
 
-
+\input{osekcomtable.tex}
 
 \subsection{Notfication Classes}
-Only notification class 1 is supported for internal communication. This means 
-that the notification mechanism is only used to notify the receiver of a message.
+To determine the final status of a send or receive operation, the application can
+exploit the notification services provided by the COM layer. The application does 
+not need to check directly the occurance of an event by calling a COM API primitive, 
+but it is notified as soon as the specific event has occurred. A notification is
+configured for each message object in the OIL configuration file.
+
+
+Only notification class 1 is supported for conformance classes CCCA and CCCB. 
+This means that the notification mechanism is only used to notify the receiver 
+of a message. The configured notification mechanism is called whenever a message 
+has been stored in the receiving message object.
+
 
 The following notification mechanisms are provided:
 \begin{itemize}
@@ -68,8 +84,8 @@ the specific API service;
 \section{Constants}
 \label{sec:constants}
 
-This is a list of the \ee\ constants that can be used by the developer
-for writing applications that uses the COM support.
+This section provides a list of the constants that can be used by the developer
+for writing applications that use the COM support.
 
 \begin{constant}{Error List}
   \begin{constantdescription}
@@ -134,7 +150,7 @@ for writing applications that uses the COM support.
 \section{Types}
 \label{sec:types}
 
-This Section contains a description of the data types used by the COM
+This section contains a description of the data types used by the COM
 interface of \ee. When the size of a type is specified to be of the
 size of a machine register, it is intended that the type has the same
 size of the CPU general purpose register.
@@ -193,7 +209,9 @@ size of the CPU general purpose register.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Object Definitions}
-The following macro has to be used when defining Message Callbacks.
+The following macro has to be used when defining Message Callbacks. A message
+callback is a notification mechanism that can be configured for each message 
+object in the OIL configuration file.
 
 \begin{function_nopb}{COMCallback}
   \synopsis{COMCallback(c)}
@@ -219,45 +237,51 @@ The following macro has to be used when defining Message Callbacks.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{COM Initialization Primitives}
+The \oc\ implementation of \ee\ supports the specification of a set of {\itCOM 
+Application Modes}. Application modes are startup configurations that are used to
+configure the coomunication system support for a certain mode of operation. 
+COM Application modes are passed to \reffun{StartCOM} in order to start
+the system in a specific mode. Application modes are defined by the application in 
+the OIL configuration file. Examples of COM Application Modes are "Debug Mode", 
+"Releas Mode", "Test Mode" and so forth. 
 
-% short general description
-Put here some introduction words!!!!
+The COM support is initialized by \reffun{StartCOM} which initializes the system 
+resources utilized by the COM module. \reffun{StartCOM} sets the initial value of 
+an unqueued message to 0 if an initial value is not specified in the OIL
+configuration file. If a message object has an initial value specified in the OIL
+file, \reffun{StartCOM} initializes the message object with that specific value.
+\reffun{StartCOM} initiliazes queued message objects with the number of receieved 
+messages equal to 0. For internal transmit messages there is not any initialization 
+procedure. An applicaton can directly initialize a message by \reffun{InitMessage}. If 
+configured in the OIL file, the application can provides a \reffun{StartCOMExtension} 
+primitive used to add specific initialization functions, e.g. it can use 
+\reffun{InitMessage} to initialize the application messages.
 
-%% 
-%% Basic template 
-%%
-%% \begin{function}{FunctionName}
-%% \synopsis{}
-%%   \begin{fundescription}
-%%   \end{fundescription}
-%%   \begin{funparameters}
-%%     \fpar{}{}
-%%   \end{funparameters}
-%%   \begin{funreturn}
-%%   \fret{}{}
-%%   \fret{}{(Extended)}.
-%%   \end{funreturn}
-%%   \begin{funconformance}
-%%     BCC1, BCC2, ECC1, ECC2
-%%   \end{funconformance}
-%% \end{function}
+Finally, \reffun{StopCOM} shall be used to stop the communication system releasing 
+its resources. Note that, after calling \reffun{StopCOM} the system can be re-initialized 
+be calling \reffun{StartCOM} which resets all communication resources to their 
+initial status. 
 
-% provide a list of the functions and of the contexts where they can be called
+The start-up primitives are listed in the following.
+
+\pagebreak
+
 \begin{function}{StartCOM}
   \synopsis{StatusType StartCOM (COMApplicationModeType Mode)}
   \begin{fundescription}
-    The user shall call this primitive to initialise and start the  communication 
+    The user shall call this primitive to initialize and start the  communication 
     system in a specific application mode, defined by \vr{Mode}. This routine 
     shall be called from a task. When COMSTARTCOMEXTENSION  is set to TRUE 
-    within the OIL configuration file, before returning StartCOM calls 
-    StartCOMExtension. StartCOMExtension is provided by the application.  
+    within the OIL configuration file, before returning, this primitive calls 
+    \reffun{StartCOMExtension}. \reffun{StartCOMExtension} is provided by the 
+    application.  
   \end{fundescription}
   \begin{funparameters}
-    \fpar{Mode}{COM application mode}
+    \fpar{Mode}{COM Application Mode}
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors. }
-    \fret{A value returned from StartCOMExtension if different from E_OK.}.
+    \fret{A value returned from StartCOMExtension if different from E_OK.}
     \fret{E_COM_ID}{(Extended) If \vr{Mode} is not valid.}
   \end{funreturn}
   \begin{funconformance}
@@ -268,11 +292,12 @@ Put here some introduction words!!!!
 \begin{function}{StopCOM}
   \synopsis{StatusType StopCOM (COMShutdownModeType Mode)}
   \begin{fundescription}
-    This primitive is called to terminate all communication activities immidiatly. 
+    This primitive is called to terminate all communication activities and release
+    their resources. 
     The only possibile value for \vr{Mode} is \vr{COM_SHUTDOWN_IMMEDIATE}. 
   \end{fundescription}
   \begin{funparameters}
-    \fpar{Mode}{Shutdown mode}
+    \fpar{Mode}{Shutdown Mode}
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors. }
@@ -288,11 +313,11 @@ Put here some introduction words!!!!
 \begin{function}{GetCOMApplicationMode}
   \synopsis{COMApplicationModeType GetCOMApplicationMode(void)}
   \begin{fundescription}
-    This primitive returns the current COM application mode. It shall not be 
+    This primitive returns the current COM Application Mode. It shall not be 
     called before StartCOM.
   \end{fundescription}
   \begin{funreturn}
-    \fret{Current COM application mode}
+    \fret{Current COM Application Mode}
   \end{funreturn}
   \begin{funconformance}
     CCCA, CCCB
@@ -302,17 +327,17 @@ Put here some introduction words!!!!
 \begin{function}{InitMessage}
   \synopsis{StatusType InitMessage (MessageIdentifier Message, ApplicationDataRef DataRef)}
   \begin{fundescription}
-    This primitive can be used to initializes a message object with the application data
-    passed by reference. To change the default initialization, it is possible 
-    to call this primitive from StartCOMExtension.
+    This primitive can be used to initializes a message object with application data
+    passed by the pointer \vr{DataRef}. To change the default initialization, it is possible 
+    to call this primitive from \reffun{StartCOMExtension}.
   \end{fundescription}
   \begin{funparameters}
     \fpar{Message}{Message object ID}
-    \fpar{DataRef}{Pointer to application data for the message object being initialized}
+    \fpar{DataRef}{Pointer to application data for the message object being initialized.}
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors.}
-    \fret{E_COM_ID}{(Extended) if message identifier \vr{Message} is not valid.}
+    \fret{E_COM_ID}{(Extended) If the message identifier \vr{Message} is not valid.}
   \end{funreturn}
   \begin{funconformance}
     CCCA, CCCB
@@ -324,16 +349,17 @@ Put here some introduction words!!!!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Message Communication Primitives}
+This section provides the COM primiteves used to transmit and receive messages.
 
 \begin{function}{SendMessage}
   \synopsis{StatusType SendMessage (MessageIdentifier Message, ApplicationDataRef DataRef)}
   \begin{fundescription}
-    This primitive stores in the message object \vr{Message} the application data
-    pointed by \vr{DataRef}.
+    This primitive stores in the message object identified by \vr{Message} the 
+    application datapointed by \vr{DataRef}.
   \end{fundescription}
   \begin{funparameters}
     \fpar{Message}{Message object ID}
-    \fpar{DataRef}{Pointer to application data to store in the message}
+    \fpar{DataRef}{Pointer to the application data.}
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors.}
@@ -351,18 +377,18 @@ Put here some introduction words!!!!
     This primitive stores the data from the message object \vr{Message} in the 
     application message memory pointed by \vr{DataRef}. All flags associated with 
     \vr{Message} are reset. If a message queue overflow happended since the last 
-    call of the primiteve, a \vr{E_COM_LIMIT} is returned, nevertheless a message is 
+    call of this primitive, an \vr{E_COM_LIMIT} is returned, nevertheless a message is 
     store in \vr{DataRef} and the overflow is cleared.
   \end{fundescription}
   \begin{funparameters}
     \fpar{Message}{Message object ID}
-    \fpar{DataRef}{Pointer to the application message data buffer.}
+    \fpar{DataRef}{Pointer to the application message data.}
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors.}
     \fret{E_COM_NOMSG }{If \vr{Message} is a queued message object and it is empty.}
     \fret{E_COM_LIMIT}{If \vr{Message} is a queued message object and a queue overflow 
-          occurred since the last call of the primitive for \vr{Message}. 
+          occurred since the last call of this primitive for \vr{Message}. 
          \vr{E_COM_LIMIT} indicates that at least a message was discarded.}
     \fret{E_COM_ID}{(Extended) If message identifier \vr{Message} is not valid.}
   \end{funreturn}
@@ -388,7 +414,7 @@ Put here some introduction words!!!!
     \fret{E_OK }{ If there are no error indications, if \vr{Message} is not empty 
                  and an overflow condiction has not occured since the last call 
                  to \reffun{ReceiveMessage} }
-    \fret{E_COM_ID}{(Extended) if message identifier \vr{Message} is not valid 
+    \fret{E_COM_ID}{(Extended) If the message identifier \vr{Message} is not valid 
      (e.g. \vr{Message} is invalid if it is not a queued message object).}
   \end{funreturn}
   \begin{funconformance}
@@ -402,6 +428,8 @@ Put here some introduction words!!!!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Notification Primitives}
+The following primitives can be used to read and reset the status of 
+the flags used as notification mechanism.
 
 \begin{function}{ReadFlag}
  \synopsis{FlagValue ReadFlag_<Flag>(void)}
@@ -410,7 +438,7 @@ Put here some introduction words!!!!
  \end{fundescription}
  \begin{funreturn}
    \fret{COM_TRUE}{\vr{<Flag>} is set}
-   \fret{COM_TRUE}{\vr{<Flag>} is not set}.
+   \fret{COM_FALSE}{\vr{<Flag>} is not set}.
  \end{funreturn}
  \begin{funconformance}
   CCCB
@@ -418,7 +446,7 @@ Put here some introduction words!!!!
 \end{function}
 
 \begin{function}{ResetFlag}
-  \synopsis{void ResetFlag_<Flag>()}
+  \synopsis{void ResetFlag_<Flag>(void)}
   \begin{fundescription}
     This routine reset the status of the flag identified by \vr{<Flag>}.
    \end{fundescription}
@@ -447,16 +475,16 @@ of the specific application.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{function_nopb}{StartCOMExtension}
-  \synopsis{StatusType StartCOMExtension (void)}
+  \synopsis{StatusType StartCOMExtension(void)}
   \begin{fundescription}
-    This primitive is exucuted at the end of the \reffun{StartCOM} routine. Its 
-    purpose is to addittional start-up configurations provided by the user. This 
+    This primitive is exucuted at the end of the \reffun{StartCOM} routine. It can
+    be used to add start-up configurations provided by the user. This 
     primitive is called by \reffun{StartCOM} if COMSTARTCOMEXTENSION  is set to 
     TRUE in the OIL configuration file. 
   \end{fundescription}
   \begin{funreturn}
    \fret{E_OK }{No errors}
-   \fret{An implementation specific status code if an error occurred.}
+   \fret{} {An implementation specific status code if an error occurred.}
    \end{funreturn}
   \begin{funconformance}
     CCCA, CCCB
@@ -466,7 +494,7 @@ of the specific application.
 \begin{function_nopb}{COMErrorHook}
   \synopsis{void COMErrorHook (StatusType err)}
   \begin{fundescription}
-    This primitive is called by COM services, such as \reffun{StartCOM}, 
+    This primitive is called by the COM services, such as \reffun{StartCOM}, 
     \reffun{ReceviceMessage} etc., when a status code different from \vr{E_OK} is 
      returned. This primitive is enabled by setting COMERRORHOOK to TRUE in 
      the OIL configuration file. 
