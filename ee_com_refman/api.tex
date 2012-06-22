@@ -49,7 +49,7 @@ Class 1. Moreover, it supports message status information services.
 
 \subsection{Available primitives}
 \ee\ provides a set of primitives to exchange messages between tasks according to 
-\oc\ specification. The primiteves can be called in different situations. 
+\oc\ specification. The primitives can be called in different situations. 
 The complete list of primitives is listed in Table \ref{tab:api-restrictions}, 
 together with the locations where it is legal to call these functions.
 
@@ -58,7 +58,7 @@ together with the locations where it is legal to call these functions.
 \subsection{Notfication Classes}
 To determine the final status of a send or receive operation, the application can
 exploit the notification services provided by the COM layer. The application does 
-not need to check directly the occurance of an event by calling a COM API primitive, 
+not need to check directly the occurrence of an event by calling a COM API primitive, 
 but it is notified as soon as the specific event has occurred. A notification is
 configured for each message object in the OIL configuration file.
 
@@ -157,7 +157,7 @@ size of the CPU general purpose register.
 
 \begin{type}{ApplicationDataRef}
   \begin{typedescription}
-    This is a pointer to appliation data. This pointer can be passed to 
+    This is a pointer to application data. This pointer can be passed to 
     \reffun{InitMessage}, \reffun{ReceiveMessage} and \reffun{SendMessage}.  
   \end{typedescription}
 \end{type}
@@ -239,7 +239,7 @@ object in the OIL configuration file.
 \section{COM Initialization Primitives}
 The \oc\ implementation of \ee\ supports the specification of a set of {\itCOM 
 Application Modes}. Application modes are startup configurations that are used to
-configure the coomunication system support for a certain mode of operation. 
+configure the communication system support for a certain mode of operation. 
 COM Application modes are passed to \reffun{StartCOM} in order to start
 the system in a specific mode. Application modes are defined by the application in 
 the OIL configuration file. Examples of COM Application Modes are "Debug Mode", 
@@ -250,9 +250,9 @@ resources utilized by the COM module. \reffun{StartCOM} sets the initial value o
 an unqueued message to 0 if an initial value is not specified in the OIL
 configuration file. If a message object has an initial value specified in the OIL
 file, \reffun{StartCOM} initializes the message object with that specific value.
-\reffun{StartCOM} initiliazes queued message objects with the number of receieved 
+\reffun{StartCOM} initilaizes queued message objects with the number of receieved 
 messages equal to 0. For internal transmit messages there is not any initialization 
-procedure. An applicaton can directly initialize a message by \reffun{InitMessage}. If 
+procedure. An application can directly initialize a message by \reffun{InitMessage}. If 
 configured in the OIL file, the application can provides a \reffun{StartCOMExtension} 
 primitive used to add specific initialization functions, e.g. it can use 
 \reffun{InitMessage} to initialize the application messages.
@@ -294,7 +294,7 @@ The start-up primitives are listed in the following.
   \begin{fundescription}
     This primitive is called to terminate all communication activities and release
     their resources. 
-    The only possibile value for \vr{Mode} is \vr{COM_SHUTDOWN_IMMEDIATE}. 
+    The only possible value for \vr{Mode} is \vr{COM_SHUTDOWN_IMMEDIATE}. 
   \end{fundescription}
   \begin{funparameters}
     \fpar{Mode}{Shutdown Mode}
@@ -376,7 +376,7 @@ This section provides the COM primiteves used to transmit and receive messages.
   \begin{fundescription}
     This primitive stores the data from the message object \vr{Message} in the 
     application message memory pointed by \vr{DataRef}. All flags associated with 
-    \vr{Message} are reset. If a message queue overflow happended since the last 
+    \vr{Message} are reset. If a message queue overflow happened since the last 
     call of this primitive, an \vr{E_COM_LIMIT} is returned, nevertheless a message is 
     store in \vr{DataRef} and the overflow is cleared.
   \end{fundescription}
@@ -412,7 +412,7 @@ This section provides the COM primiteves used to transmit and receive messages.
     \fret{E_COM_LIMIT}{If \vr{Message} is a queued message object and a queue overflow 
           occurred since the last call of the primitive for \vr{Message}}. 
     \fret{E_OK }{ If there are no error indications, if \vr{Message} is not empty 
-                 and an overflow condiction has not occured since the last call 
+                 and an overflow condition has not occurred since the last call 
                  to \reffun{ReceiveMessage} }
     \fret{E_COM_ID}{(Extended) If the message identifier \vr{Message} is not valid 
      (e.g. \vr{Message} is invalid if it is not a queued message object).}
@@ -477,7 +477,7 @@ of the specific application.
 \begin{function_nopb}{StartCOMExtension}
   \synopsis{StatusType StartCOMExtension(void)}
   \begin{fundescription}
-    This primitive is exucuted at the end of the \reffun{StartCOM} routine. It can
+    This primitive is executed at the end of the \reffun{StartCOM} routine. It can
     be used to add start-up configurations provided by the user. This 
     primitive is called by \reffun{StartCOM} if COMSTARTCOMEXTENSION  is set to 
     TRUE in the OIL configuration file. 
@@ -540,8 +540,6 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-
-%#define COMError_GetMessageStatus_Message()    EE_com_ErrorHook.proc_param.OtherCOM.Message
 
 \begin{function_nopb2}{COMError\_GetMessageStatus\_Message}{COMError_GetMessageStatus_Message()}
   \synopsis{MessageIdentifier COMError_GetMessageStatus_Message(void)}
