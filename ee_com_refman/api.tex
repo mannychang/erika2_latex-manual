@@ -545,7 +545,7 @@ of the primitive \const{XXX}.
   \synopsis{MessageIdentifier COMError_GetMessageStatus_Message(void)}
   \begin{fundescription}
     The function returns the \const{Message} parameter passed to
-    \reffun{GetMessageStatus}. The function must be used inside \reffun{ErrorHook} 
+    \reffun{GetMessageStatus}. The function must be used inside \reffun{COMErrorHook} 
      after having discovered using \reffun{COMErrorGetServiceId} that the error 
      was caused by that function.
   \end{fundescription}
@@ -561,7 +561,7 @@ of the primitive \const{XXX}.
   \synopsis{MessageIdentifier COMError_InitMessage_Message(void)}
   \begin{fundescription}
     The function returns the \const{Message} parameter passed to
-    \reffun{InitMessage}. The function must be used inside \reffun{ErrorHook} 
+    \reffun{InitMessage}. The function must be used inside \reffun{COMErrorHook} 
      after having discovered using \reffun{COMErrorGetServiceId} that the error 
      was caused by that function.
   \end{fundescription}
@@ -577,7 +577,7 @@ of the primitive \const{XXX}.
   \synopsis{ApplicationDataRef COMError_InitMessage_DataRef(void)}
   \begin{fundescription}
     The function returns the \const{DataRef} parameter passed to
-    \reffun{InitMessage}. The function must be used inside \reffun{ErrorHook} 
+    \reffun{InitMessage}. The function must be used inside \reffun{COMErrorHook} 
      after having discovered using \reffun{COMErrorGetServiceId} that the error 
      was caused by that function.
   \end{fundescription}
@@ -593,7 +593,7 @@ of the primitive \const{XXX}.
   \synopsis{MessageIdentifier COMError_ReceiveMessage_Message(void)}
   \begin{fundescription}
     The function returns the \const{Message} parameter passed to
-    \reffun{ReceiveMessage}. The function must be used inside \reffun{ErrorHook} 
+    \reffun{ReceiveMessage}. The function must be used inside \reffun{COMErrorHook} 
      after having discovered using \reffun{COMErrorGetServiceId} that the error 
      was caused by that function.
   \end{fundescription}
@@ -609,7 +609,7 @@ of the primitive \const{XXX}.
   \synopsis{ApplicationDataRef COMError_SendMessage_DataRef(void)}
   \begin{fundescription}
     The function returns the \const{DataRef} parameter passed to
-    \reffun{ReceiveMessage}. The function must be used inside \reffun{ErrorHook} 
+    \reffun{ReceiveMessage}. The function must be used inside \reffun{COMErrorHook} 
      after having discovered using \reffun{COMErrorGetServiceId} that the error 
      was caused by that function.
   \end{fundescription}
@@ -625,7 +625,7 @@ of the primitive \const{XXX}.
   \synopsis{MessageIdentifier COMError_SendMessage_Message(void)}
   \begin{fundescription}
     The function returns the \const{Message} parameter passed to
-    \reffun{SendMessage}. The function must be used inside \reffun{ErrorHook} 
+    \reffun{SendMessage}. The function must be used inside \reffun{COMErrorHook} 
      after having discovered using \reffun{COMErrorGetServiceId} that the error 
      was caused by that function.
   \end{fundescription}
@@ -641,7 +641,7 @@ of the primitive \const{XXX}.
   \synopsis{ApplicationDataRef COMError_SendMessage_DataRef(void)}
   \begin{fundescription}
     The function returns the \const{DataRef} parameter passed to
-    \reffun{SendMessage}. The function must be used inside \reffun{ErrorHook} 
+    \reffun{SendMessage}. The function must be used inside \reffun{COMErrorHook} 
      after having discovered using \reffun{COMErrorGetServiceId} that the error 
      was caused by that function.
   \end{fundescription}
@@ -658,7 +658,7 @@ of the primitive \const{XXX}.
   \begin{fundescription}
     The function returns the \const{Mode} parameter passed to
     \reffun{StartCOM}. The function must be used inside
-    \reffun{ErrorHook} after having discovered using
+    \reffun{COMErrorHook} after having discovered using
     \reffun{COMErrorGetServiceId} that the error was caused by that
     function.
   \end{fundescription}
@@ -675,7 +675,7 @@ of the primitive \const{XXX}.
   \begin{fundescription}
     The function returns the \const{Mode} parameter passed to
     \reffun{StopCOM}. The function must be used inside
-    \reffun{ErrorHook} after having discovered using
+    \reffun{COMErrorHook} after having discovered using
     \reffun{COMErrorGetServiceId} that the error was caused by that
     function.
   \end{fundescription}
