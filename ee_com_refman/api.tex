@@ -39,13 +39,16 @@ levels of communication service can be required. \oc\ defines these service
 levels through  Communication Conformance Classes (CCCs). The current version of 
 the \ee\ \oc\ implementation provides two conformance classes:
 
-CCCA provides internal communication only. It supports only unqued messages. 
-Message status is not supported. It provides the notification mechanism defined 
-by Notification Class 1, except for the Flag notification mechanism.
-
-CCCB provides internal communication only. It supports queued and unqued message 
-objects. It provides all the notification mechanisms provided by Notification 
-Class 1. Moreover, it supports message status information services.
+\begin{itemize}
+\item CCCA (internal communication only). It supports only unqued
+  messages.  Message status is not supported. It provides the
+  notification mechanism defined by Notification Class 1, except for
+  the Flag notification mechanism.
+\item CCCB (internal communication only). It supports queued and
+  unqued message objects. It provides all the notification mechanisms
+  provided by Notification Class 1. Moreover, it supports message
+  status information services.
+\end{itemize}
 
 \subsection{Available primitives}
 \ee\ provides a set of primitives to exchange messages between tasks according to 
@@ -262,7 +265,7 @@ its resources. Note that, after calling \reffun{StopCOM} the system can be re-in
 be calling \reffun{StartCOM} which resets all communication resources to their 
 initial status. 
 
-The start-up primitives are listed in the following.
+The start-up primitives are listed in the following Sections.
 
 \pagebreak
 
@@ -271,7 +274,7 @@ The start-up primitives are listed in the following.
   \begin{fundescription}
     The user shall call this primitive to initialize and start the  communication 
     system in a specific application mode, defined by \vr{Mode}. This routine 
-    shall be called from a task. When COMSTARTCOMEXTENSION  is set to TRUE 
+    shall be called from a task. When \const{COMSTARTCOMEXTENSION}  is set to \const{TRUE}
     within the OIL configuration file, before returning, this primitive calls 
     \reffun{StartCOMExtension}. \reffun{StartCOMExtension} is provided by the 
     application.  
@@ -281,7 +284,7 @@ The start-up primitives are listed in the following.
   \end{funparameters}
   \begin{funreturn}
     \fret{E_OK }{ No errors. }
-    \fret{A value returned from StartCOMExtension if different from E_OK.}
+    \fret{value}{A value returned from StartCOMExtension if different from \const{E_OK}.}
     \fret{E_COM_ID}{(Extended) If \vr{Mode} is not valid.}
   \end{funreturn}
   \begin{funconformance}
@@ -317,7 +320,7 @@ The start-up primitives are listed in the following.
     called before StartCOM.
   \end{fundescription}
   \begin{funreturn}
-    \fret{Current COM Application Mode}
+    \fret{value}{Current COM Application Mode}
   \end{funreturn}
   \begin{funconformance}
     CCCA, CCCB
@@ -479,8 +482,8 @@ of the specific application.
   \begin{fundescription}
     This primitive is executed at the end of the \reffun{StartCOM} routine. It can
     be used to add start-up configurations provided by the user. This 
-    primitive is called by \reffun{StartCOM} if COMSTARTCOMEXTENSION  is set to 
-    TRUE in the OIL configuration file. 
+    primitive is called by \reffun{StartCOM} if \const{COMSTARTCOMEXTENSION}  is set to 
+    \const{TRUE} in the OIL configuration file. 
   \end{fundescription}
   \begin{funreturn}
    \fret{E_OK }{No errors}
@@ -496,7 +499,7 @@ of the specific application.
   \begin{fundescription}
     This primitive is called by the COM services, such as \reffun{StartCOM}, 
     \reffun{ReceiveMessage} etc., when a status code different from \vr{E_OK} is 
-     returned. This primitive is enabled by setting COMERRORHOOK to TRUE in 
+     returned. This primitive is enabled by setting \const{COMERRORHOOK} to \const{TRUE} in 
      the OIL configuration file. 
   \end{fundescription}
   \begin{funparameters}
