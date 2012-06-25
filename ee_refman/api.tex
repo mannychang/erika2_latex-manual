@@ -244,14 +244,14 @@ for writing applications.
 \begin{constant}{Counters Constants}
   \begin{constantdescription}
     For all configurated counters \rtd\ generate the return values of
-    \reffun{GetAlarmbase} as constants:
+    \reffun{GetAlarmBase} as constants:
     \begin{description}
       \item[OSMAXALLOWEDVALUE\_x] Maximum possible allowed value of counter x in ticks
       \item[OSTICKSPERBASE\_x]    Number of ticks required to reach a specific unit of counter x
       \item[OSMINCYCLE\_x]        Minimum allowed number of ticks for a cyclic alarm of counter x
     \end{description}
 
-    Thus, if the counter name is known, it is not necessary to call \reffun{GetAlarmbase}.
+    Thus, if the counter name is known, it is not necessary to call \reffun{GetAlarmBase}.
     When system counter is configured, the constants of this counter are
     additionally accessible via the following constants:
     \begin{description}
