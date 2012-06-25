@@ -134,12 +134,12 @@ for writing applications that use the COM support.
   \end{constantdescription}
 \end{constant}
 
-\begin{constant}{COM\_SHUTDOWN\_IMMEDIATE}
+\begin{constant2}{COM\_SHUTDOWN\_IMMEDIATE}{COM_SHUTDOWN_IMMEDIATE}
   \begin{constantdescription}
     This is the default and only possible value for COM Suthdown Mode that can 
     be passed to \reffun{StopCOM}.
   \end{constantdescription}
-\end{constant}
+\end{constant2}
 
 \pagebreak
 
@@ -172,7 +172,7 @@ size of the CPU general purpose register.
 \begin{type}{COMServiceIdType}
   \begin{typedescription}
     This is an enumeration type used to store COM Service IDs, and it is used 
-    within the COMErrorGetServiceId.
+    within the \reffun{COMErrorGetServiceId}.
   \end{typedescription}
 \end{type}
 
@@ -237,7 +237,7 @@ object in the OIL configuration file.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{COM Initialization Primitives}
-The \oc\ implementation of \ee\ supports the specification of a set of {\itCOM 
+The \oc\ implementation of \ee\ supports the specification of a set of {\it COM 
 Application Modes}. Application modes are startup configurations that are used to
 configure the communication system support for a certain mode of operation. 
 COM Application modes are passed to \reffun{StartCOM} in order to start
@@ -525,8 +525,8 @@ of the primitive \const{XXX}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{function_nopb2}{COMErrorGetServiceId}
-  \synopsis{COMServiceIdType COMErrorGetServiceId (void)}
+\begin{function_nopb2}{COMErrorGetServiceId}{COMErrorGetServiceId}
+  \synopsis{COMServiceIdType COMErrorGetServiceId(void)}
   \begin{fundescription}
     This function may be used inside \reffun{COMErrorHook} to return the
     Service ID that generated the error that caused the call to
