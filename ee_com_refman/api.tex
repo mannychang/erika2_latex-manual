@@ -371,7 +371,7 @@ This section provides the COM primiteves used to transmit and receive messages.
 \end{function}
 
 
-\begin{function}{RecevieMessage}
+\begin{function}{ReceiveMessage}
   \synopsis{StatusType ReceiveMessage (MessageIdentifier Message, ApplicationDataRef DataRef)}
   \begin{fundescription}
     This primitive stores the data from the message object \vr{Message} in the 
@@ -495,7 +495,7 @@ of the specific application.
   \synopsis{void COMErrorHook (StatusType err)}
   \begin{fundescription}
     This primitive is called by the COM services, such as \reffun{StartCOM}, 
-    \reffun{ReceviceMessage} etc., when a status code different from \vr{E_OK} is 
+    \reffun{ReceiveMessage} etc., when a status code different from \vr{E_OK} is 
      returned. This primitive is enabled by setting COMERRORHOOK to TRUE in 
      the OIL configuration file. 
   \end{fundescription}
@@ -512,7 +512,7 @@ of the specific application.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Error Handling Primitives and ErrorHook Macros}
+\section{Error Handling Primitives and COMErrorHook Macros}
 \label{sec:errorhook-macros}
 These macros are meaningful inside the \reffun{COMErrorHook} Hook
 function, and are used to better understand the source of the
@@ -541,7 +541,7 @@ of the primitive \const{XXX}.
 \end{function_nopb2}
 
 
-\begin{function_nopb2}{COMError\_GetMessageStatus\_Message}{COMError_GetMessageStatus_Message()}
+\begin{function_nopb2}{COMError\_GetMessageStatus\_Message}{COMError_GetMessageStatus_Message}
   \synopsis{MessageIdentifier COMError_GetMessageStatus_Message(void)}
   \begin{fundescription}
     The function returns the \const{Message} parameter passed to
@@ -557,7 +557,7 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{COMError\_InitMessage\_Message()}{COMError_InitMessage_Message()}
+\begin{function_nopb2}{COMError\_InitMessage\_Message}{COMError_InitMessage_Message}
   \synopsis{MessageIdentifier COMError_InitMessage_Message(void)}
   \begin{fundescription}
     The function returns the \const{Message} parameter passed to
@@ -573,7 +573,7 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{COMError\_InitMessage\_DataRef()}{COMError_InitMessage_DataRef()}
+\begin{function_nopb2}{COMError\_InitMessage\_DataRef}{COMError_InitMessage_DataRef}
   \synopsis{ApplicationDataRef COMError_InitMessage_DataRef(void)}
   \begin{fundescription}
     The function returns the \const{DataRef} parameter passed to
@@ -589,7 +589,7 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{COMError\_ReceiveMessage\_Message()}{COMError_ReceiveMessage_Message()}
+\begin{function_nopb2}{COMError\_ReceiveMessage\_Message}{COMError_ReceiveMessage_Message}
   \synopsis{MessageIdentifier COMError_ReceiveMessage_Message(void)}
   \begin{fundescription}
     The function returns the \const{Message} parameter passed to
@@ -605,7 +605,7 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{COMError\_ReceiveMessage\_DataRef()}{COMError_ReceiveMessage_DataRef()}
+\begin{function_nopb2}{COMError\_ReceiveMessage\_DataRef}{COMError_ReceiveMessage_DataRef}
   \synopsis{ApplicationDataRef COMError_SendMessage_DataRef(void)}
   \begin{fundescription}
     The function returns the \const{DataRef} parameter passed to
@@ -621,7 +621,7 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{COMError\_SendMessage\_Message()}{COMError_SendMessage_Message()}
+\begin{function_nopb2}{COMError\_SendMessage\_Message}{COMError_SendMessage_Message}
   \synopsis{MessageIdentifier COMError_SendMessage_Message(void)}
   \begin{fundescription}
     The function returns the \const{Message} parameter passed to
@@ -637,7 +637,7 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{COMError\_SendMessage\_DataRef()}{COMError_SendMessage_DataRef()}
+\begin{function_nopb2}{COMError\_SendMessage\_DataRef}{COMError_SendMessage_DataRef}
   \synopsis{ApplicationDataRef COMError_SendMessage_DataRef(void)}
   \begin{fundescription}
     The function returns the \const{DataRef} parameter passed to
@@ -653,7 +653,7 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{COMError\_StartCOM\_Mode()}{COMError_StartCOM_Mode()}
+\begin{function_nopb2}{COMError\_StartCOM\_Mode}{COMError_StartCOM_Mode}
   \synopsis{COMApplicationModeType COMError_StartCOM_Mode(void)}
   \begin{fundescription}
     The function returns the \const{Mode} parameter passed to
@@ -670,7 +670,7 @@ of the primitive \const{XXX}.
   \end{funconformance}
 \end{function_nopb2}
 
-\begin{function_nopb2}{COMError\_StopCOM\_Mode()}{COMError_StopCOM_Mode()}
+\begin{function_nopb2}{COMError\_StopCOM\_Mode}{COMError_StopCOM_Mode}
   \synopsis{COMShutdownModeType COMError_StopCOM_Mode(void)}
   \begin{fundescription}
     The function returns the \const{Mode} parameter passed to

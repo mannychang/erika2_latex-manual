@@ -274,7 +274,7 @@ status open
 
 
 \backslash
-reffun{GetCOMApplicationMore}
+reffun{GetCOMApplicationMode}
 \end_layout
 
 \end_inset
