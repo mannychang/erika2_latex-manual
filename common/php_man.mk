@@ -78,11 +78,6 @@ dynamic-man.php: version.mk
 	@echo -n $(FLEX_REFMAN__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
 	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
 
-	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(FLEX_SCICOS__MAIN_NAME)_$(FLEX_SCICOS__VER).pdf\" target=\"_blank\">Scicos for FLEX Reference Manual v. " >> dynamic-man.php
-	@echo -n $(FLEX_SCICOS__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
-	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-
 #-------------------------------------------------------------------
 
 	@echo >> dynamic-man.php
