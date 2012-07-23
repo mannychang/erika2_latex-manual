@@ -115,24 +115,6 @@ dynamic-man.php: version.mk
 #-------------------------------------------------------------------
 
 	@echo >> dynamic-man.php
-	@echo "<tr><td>&nbsp;</td></tr>" >> dynamic-man.php
-
-	@echo >> dynamic-man.php
-	@echo "<tr><td style=\"color: #000000; background-color: #dddddd; word-spacing: 2px; letter-spacing: 1px\">&nbsp;<strong>Erika Enterprise for the AVR5 Platform</strong></td></tr>" >> dynamic-man.php
-
-	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_AVR5__MAIN_NAME)_$(ARCH_AVR5__VER).pdf\" target=\"_blank\">Erika Enterprise Manual for AVR5 v. " >> dynamic-man.php
-	@echo -n $(ARCH_AVR5__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
-	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-
-	@echo >> dynamic-man.php
-	@echo -n "<tr><td><a href=\"download/manuals/pdf/$(ARCH_AVR5_TUTORIAL__MAIN_NAME)_$(ARCH_AVR5_TUTORIAL__VER).pdf\" target=\"_blank\">Erika Enterprise API Tutorial for AVR5 v. " >> dynamic-man.php
-	@echo -n $(ARCH_AVR5_TUTORIAL__VER) | sed "s/_/./" | sed "s/_/./" >> dynamic-man.php
-	@echo "&nbsp;</a></td></tr>" >> dynamic-man.php
-
-#-------------------------------------------------------------------
-
-	@echo >> dynamic-man.php
 	@echo "</tbody>" >> dynamic-man.php
 	@echo "</table>" >> dynamic-man.php
 

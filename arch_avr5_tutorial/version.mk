@@ -1,4 +1,0 @@
-ARCH_AVR5_TUTORIAL__DIR = arch_avr5_tutorial
-ARCH_AVR5_TUTORIAL__MAIN_NAME = tutorial_avr5
-ARCH_AVR5_TUTORIAL__MAIN = tutorial_avr5
-ARCH_AVR5_TUTORIAL__VER = 1_0_0
